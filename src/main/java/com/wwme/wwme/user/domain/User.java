@@ -1,4 +1,4 @@
-package com.wwme.wwme.user;
+package com.wwme.wwme.user.domain;
 
 import com.wwme.wwme.task.domain.Task;
 import jakarta.persistence.*;

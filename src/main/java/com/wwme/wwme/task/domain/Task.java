@@ -1,13 +1,11 @@
 package com.wwme.wwme.task.domain;
 
-import com.wwme.wwme.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Getter
