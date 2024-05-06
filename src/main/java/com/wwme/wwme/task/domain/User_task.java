@@ -1,23 +1,28 @@
 package com.wwme.wwme.task.domain;
 
 import com.wwme.wwme.user.domain.User;
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
+@Entity
+@Getter
+@Setter
+@ToString
+@RequiredArgsConstructor
 public class User_task {
 
-    @EmbeddedId
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @ManyToOne
-    @MapsId("user_id")
     @JoinColumn(name = "user_id")
     User user;
 
     @ManyToOne
-    @MapsId("task_id")
     @JoinColumn(name = "task_id")
     Task task;
 

@@ -3,7 +3,10 @@ package com.wwme.wwme.user.domain;
 import com.wwme.wwme.task.domain.Task;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -11,6 +14,8 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
+@RequiredArgsConstructor
+@NoArgsConstructor
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
