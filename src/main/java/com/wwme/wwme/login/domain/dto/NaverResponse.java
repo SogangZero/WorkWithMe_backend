@@ -17,11 +17,13 @@ public class NaverResponse implements OAuth2Response {
 
     @Override
     public String getProviderId() {
-        return attribute.get("id").toString();
+        Map<String, Object> response = (Map<String, Object>) attribute.get("response");
+        return response.get("id").toString();
     }
 
     @Override
     public String getName() {
-        return attribute.get("name").toString();
+        Map<String, Object> response = (Map<String, Object>) attribute.get("response");
+        return response.get("name").toString();
     }
 }
