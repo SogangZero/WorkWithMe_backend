@@ -2,7 +2,7 @@ package com.wwme.wwme.task;
 
 
 import com.wwme.wwme.task.domain.Task;
-import com.wwme.wwme.task.domain.User_task;
+import com.wwme.wwme.task.domain.UserTask;
 import com.wwme.wwme.task.repository.Tag_Repository;
 import com.wwme.wwme.task.repository.Task_Repository;
 import com.wwme.wwme.task.repository.UserTaskRepository;
@@ -49,7 +49,7 @@ public class UserTaskInsertTest {
         task.setEnd_time(LocalDateTime.now().plusDays(1));
         taskRepository.save(task);
 
-        User_task userTask = new User_task();
+        UserTask userTask = new UserTask();
         userTask.setId(12L);
         userTask.setUser(user);
         userTask.setTask(task);

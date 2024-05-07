@@ -12,7 +12,7 @@ import lombok.ToString;
 @Setter
 @ToString
 @RequiredArgsConstructor
-public class User_task {
+public class UserTask {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
