@@ -16,6 +16,9 @@ public class Group {
     private Long id;
     private String groupName;
 
+    @OneToMany(mappedBy = "group")
+    UserGroup userGroup;
+
     public Group(String groupName) {
         this.groupName = groupName;
     }

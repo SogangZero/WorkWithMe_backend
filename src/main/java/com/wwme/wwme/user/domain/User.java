@@ -1,5 +1,6 @@
 package com.wwme.wwme.user.domain;
 
+import com.wwme.wwme.group.domain.UserGroup;
 import com.wwme.wwme.task.domain.Task;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -22,4 +23,7 @@ public class User {
 
     @ManyToMany
     List<Task> task_list;
+
+    @OneToMany(mappedBy = "user")
+    UserGroup userGroup;
 }
