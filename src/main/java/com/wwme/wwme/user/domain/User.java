@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 @Getter
@@ -25,5 +26,10 @@ public class User {
     List<Task> task_list;
 
     @OneToMany(mappedBy = "user")
-    UserGroup userGroup;
+    Collection<UserGroup> userGroup;
+
+    public User() {}
+    public User(String nickname) {
+        this.nickname = nickname;
+    }
 }

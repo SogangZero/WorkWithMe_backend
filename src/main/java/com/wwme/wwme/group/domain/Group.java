@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Collection;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,7 +19,7 @@ public class Group {
     private String groupName;
 
     @OneToMany(mappedBy = "group")
-    UserGroup userGroup;
+    Collection<UserGroup> userGroup;
 
     public Group(String groupName) {
         this.groupName = groupName;
