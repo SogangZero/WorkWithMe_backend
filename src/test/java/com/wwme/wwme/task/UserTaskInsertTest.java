@@ -19,8 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 
 @SpringBootTest
-public class User_Task_Insert_Test {
-    private static final Logger logger = LoggerFactory.getLogger(User_Task_Insert_Test.class);
+public class UserTaskInsertTest {
+    private static final Logger logger = LoggerFactory.getLogger(UserTaskInsertTest.class);
 
     private Tag_Repository tagRepository;
     private Task_Repository taskRepository;
@@ -28,7 +28,7 @@ public class User_Task_Insert_Test {
     private UserTaskRepository userTaskRepository;
 
     @Autowired
-    public User_Task_Insert_Test(Tag_Repository tagRepository, Task_Repository taskRepository, UserRepository userRepository, UserTaskRepository userTaskRepository) {
+    public UserTaskInsertTest(Tag_Repository tagRepository, Task_Repository taskRepository, UserRepository userRepository, UserTaskRepository userTaskRepository) {
         this.tagRepository = tagRepository;
         this.taskRepository = taskRepository;
         this.userRepository = userRepository;
