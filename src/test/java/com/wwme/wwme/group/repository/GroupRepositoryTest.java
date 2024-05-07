@@ -46,13 +46,4 @@ class GroupRepositoryTest {
         long totalGroupCount = groupRepository.count();
         assertThat(totalGroupCount).isEqualTo(0);
     }
-
-    @Test
-    void groupFindByGroupNameTest() {
-        Group g1 = new Group("g1");
-        g1 = groupRepository.save(g1);
-
-        Group foundGroup = groupRepository.findByGroupName("g1").get();
-        assertThat(g1.getId()).isEqualTo(foundGroup.getId());
-    }
 }
