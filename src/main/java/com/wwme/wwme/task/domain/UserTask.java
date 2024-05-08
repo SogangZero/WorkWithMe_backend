@@ -1,25 +1,30 @@
 package com.wwme.wwme.task.domain;
 
+import com.wwme.wwme.user.domain.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.List;
-
 @Entity
 @Getter
 @Setter
 @ToString
 @RequiredArgsConstructor
-public class Tag {
+public class UserTask {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private Long group_id;
-    private String tag_name;
 
-    @OneToMany(mappedBy = "tag", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Task> task_list;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    User user;
+
+    @ManyToOne
+    @JoinColumn(name = "task_id")
+    Task task;
+
+    Boolean is_done = false;
 }
