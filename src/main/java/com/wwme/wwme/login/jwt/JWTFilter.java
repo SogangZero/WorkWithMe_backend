@@ -45,21 +45,26 @@ public class JWTFilter extends OncePerRequestFilter {
         //validate authorization header
         if (authorization == null) {
             log.info("token null");
-            filterChain.doFilter(request, response);
-
+            //filterChain.doFilter(request, response);
+            response.sendRedirect("http://localhost:8080/");
             return;
         }
 
         String token = authorization;
 
         //validate token's expired time
-        if (jwtUtil.isExpired(token)) {
-            log.info("token expired");
-
-            filterChain.doFilter(request, response);
-
+        try {
+            if (jwtUtil.isExpired(token)) {
+                log.info("token expired");
+                response.sendRedirect("http://localhost:8080/login");
+                return;
+            }
+        } catch (ExpiredJwtException e) {
+            response.sendRedirect("http://localhost:8080/login");
+            log.info("Expired Jwt");
             return;
         }
+
 
         String userKey = jwtUtil.getUserKey(token);
         String role = jwtUtil.getRole(token);
