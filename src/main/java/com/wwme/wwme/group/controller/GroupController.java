@@ -8,6 +8,7 @@ import com.wwme.wwme.group.service.GroupService;
 import com.wwme.wwme.login.jwt.JWTUtil;
 import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.repository.UserRepository;
+import com.wwme.wwme.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,17 +23,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class GroupController {
     private final GroupService groupService;
-    private final UserRepository userRepository;
-    private final JWTUtil jwtUtil;
-
-    private User getUserFromJWTString(String jwtString) {
-        String userKey = jwtUtil.getUserKey(jwtString);
-        Optional<User> optionalUserKey = userRepository.findByUserKey(userKey);
-        if(optionalUserKey.isEmpty()) {
-            return null;
-        }
-        return optionalUserKey.get();
-    }
+    private final UserService userService;
 
     // Create and Update group
     @PostMapping("/group")
@@ -41,7 +32,7 @@ public class GroupController {
             @CookieValue(value="Authorization") String jwtString
     ) {
         try {
-            User user = getUserFromJWTString(jwtString);
+            User user = userService.getUserFromJWTString(jwtString);
             Group createdGroup = groupService.createGroupWithUserAndColor(
                     requestDTO.getGroupName(),
                     user,
@@ -51,13 +42,13 @@ public class GroupController {
             GroupCreateSuccessResponseDTO responseDTO = new GroupCreateSuccessResponseDTO();
             responseDTO.setGroupId(createdGroup.getId());
             responseDTO.setSuccess(true);
-            responseDTO.setGroupInvitationLink("temptemp");
+            responseDTO.setGroupInvitationLink("temptemp"); // TODO : GROUP INVITATION LINK
             return new ResponseEntity<>(responseDTO, HttpStatus.OK);
         }
         catch(Exception e) {
             GroupCreateFailResponseDTO responseDTO = new GroupCreateFailResponseDTO();
+            responseDTO.setSuccess(false);
             return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
         }
     }
-
 }
