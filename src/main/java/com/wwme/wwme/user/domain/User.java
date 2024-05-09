@@ -22,7 +22,12 @@ public class User {
     private Long id;
     private String nickname;
     private LocalDateTime register_date;
+
+    private String userKey;
+    private String name;
     private String social_provider;
+
+    private String role;
 
     @ManyToMany
     List<Task> task_list;

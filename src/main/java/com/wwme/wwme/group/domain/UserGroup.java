@@ -15,8 +15,7 @@ public class UserGroup {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Embedded
-    Color color;
+    String color;
 
     @ManyToOne
     User user;
