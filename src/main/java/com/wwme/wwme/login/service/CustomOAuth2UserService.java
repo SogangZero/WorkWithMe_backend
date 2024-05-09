@@ -39,22 +39,22 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
 
         //create user-specific ID value by info from resource server
-        String username = oAuth2Response.getProvider() + " " + oAuth2Response.getProviderId();
-        UserEntity existData = userRepository.findByUsername(username);
+        String userKey = oAuth2Response.getProvider() + " " + oAuth2Response.getProviderId();
+        UserEntity existData = userRepository.findByUserKey(userKey);
 
         if (existData == null) {
             UserEntity userEntity = new UserEntity();
-            userEntity.setUsername(username);
+            userEntity.setUserKey(userKey);
             userEntity.setName(oAuth2Response.getName());
             userEntity.setRole("ROLE_USER");
 
             userRepository.save(userEntity);
-            UserDTO userDTO = new UserDTO(oAuth2Response.getName(),username, "ROLE_USER");
+            UserDTO userDTO = new UserDTO(oAuth2Response.getName(), userKey, "ROLE_USER");
             return new CustomOAuth2User(userDTO);
         } else {
             existData.setName(oAuth2Response.getName());
             userRepository.save(existData);
-            UserDTO userDTO = new UserDTO(oAuth2Response.getName(), existData.getUsername(), existData.getRole());
+            UserDTO userDTO = new UserDTO(oAuth2Response.getName(), existData.getUserKey(), existData.getRole());
 
             return new CustomOAuth2User(userDTO);
         }

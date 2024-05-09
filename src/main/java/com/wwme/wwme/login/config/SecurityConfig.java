@@ -79,7 +79,7 @@ public class SecurityConfig {
         //authorization for request URI
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/").permitAll()
+                        .requestMatchers("/", "/login").permitAll()
                         .anyRequest().authenticated());
 
         //session setting : STATELESS
