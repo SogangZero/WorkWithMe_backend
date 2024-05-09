@@ -15,6 +15,8 @@ public class UserEntity {
 
     private String userKey;//before username
     private String name;
+    private String socialProvider;
 
     private String role;
+
 }
