@@ -7,6 +7,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -17,6 +18,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private final JWTUtil jwtUtil;
@@ -36,9 +38,16 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String role = auth.getAuthority();
 
         String token = jwtUtil.createJwt(userKey, role, 1000 * 60 * 60L);
-
+        log.info("String role : {}", role);
         response.addCookie(createCookie("Authorization", token));
-        response.sendRedirect("http://localhost:8080/"); //로그인 성공시 이동할 주소
+        if (role.equals("ROLE_TEMP")) {
+            log.info("ROLE TEMP USER LOGGED IN");
+            response.sendRedirect("http://localhost:8080/login/nickname"); //닉네임 설정을 안 한 유저가 로그인 성공
+        } else {
+            log.info("ROLE USER USER LOGGED IN");
+            response.sendRedirect("http://localhost:8080/"); //닉네임 설정을 한 유저가 로그인 성공
+
+        }
     }
 
     private Cookie createCookie(String key, String value) {
