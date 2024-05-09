@@ -2,6 +2,7 @@ package com.wwme.wwme.login.jwt;
 
 import com.wwme.wwme.login.domain.dto.CustomOAuth2User;
 import com.wwme.wwme.login.domain.dto.UserDTO;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -25,6 +26,12 @@ public class JWTFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException {
+
+        log.info("HTTP REQUEST : {}",request.getRequestURI());
+        if (request.getRequestURI().equals("/") || request.getRequestURI().equals("/login")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         //get cookies -> find cookie in the authorization key
         String authorization = null;
         Cookie[] cookies = request.getCookies();
@@ -48,16 +55,17 @@ public class JWTFilter extends OncePerRequestFilter {
         //validate token's expired time
         if (jwtUtil.isExpired(token)) {
             log.info("token expired");
+
             filterChain.doFilter(request, response);
 
             return;
         }
 
-        String username = jwtUtil.getUsername(token);
+        String userKey = jwtUtil.getUserKey(token);
         String role = jwtUtil.getRole(token);
 
         UserDTO userDTO = new UserDTO();
-        userDTO.setUsername(username);
+        userDTO.setUserKey(userKey);
         userDTO.setRole(role);
 
         CustomOAuth2User customOAuth2User = new CustomOAuth2User(userDTO);

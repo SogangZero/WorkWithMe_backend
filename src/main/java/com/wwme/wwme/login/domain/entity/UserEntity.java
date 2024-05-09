@@ -13,8 +13,10 @@ public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String username;
+    private String userKey;//before username
     private String name;
+    private String socialProvider;
 
     private String role;
+
 }

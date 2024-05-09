@@ -28,14 +28,14 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             throws IOException, ServletException {
         //OAuth2User
         CustomOAuth2User customUserDetails = (CustomOAuth2User) authentication.getPrincipal();
-        String username = customUserDetails.getUsername();
+        String userKey = customUserDetails.getUserKey();
 
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
         GrantedAuthority auth = iterator.next();
         String role = auth.getAuthority();
 
-        String token = jwtUtil.createJwt(username, role, 60*60*60L);
+        String token = jwtUtil.createJwt(userKey, role, 60*60L);//60*60*60L
 
         response.addCookie(createCookie("Authorization", token));
         response.sendRedirect("http://localhost:8080/"); //로그인 성공시 이동할 주소

@@ -57,6 +57,16 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable);
 
+        //authorization for request URI
+        http
+                .authorizeHttpRequests((auth) -> auth
+                        .requestMatchers("/", "/login", "/favicon.ico").permitAll()
+                        .requestMatchers("/oauth2/authorization/**").permitAll()
+                        .requestMatchers("https://nid.naver.com/oauth2.0/authorize", "https://accounts.kakao.com/login/", "https://accounts.google.com/o/oauth2/v2/auth/oauthchooseaccount").permitAll()
+                        .anyRequest().authenticated()
+                );
+
+
         //From login disable
         http
                 .formLogin(AbstractHttpConfigurer::disable);
@@ -76,16 +86,13 @@ public class SecurityConfig {
                         .successHandler(customSuccessHandler)
                 );
 
-        //authorization for request URI
-        http
-                .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/").permitAll()
-                        .anyRequest().authenticated());
-
         //session setting : STATELESS
         http
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
+
+
 
         return http.build();
     }
