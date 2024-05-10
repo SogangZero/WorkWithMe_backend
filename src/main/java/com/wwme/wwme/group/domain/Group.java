@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 @Getter
@@ -19,7 +20,7 @@ public class Group {
     private String groupName;
 
     @OneToMany(mappedBy = "group")
-    Collection<UserGroup> userGroup;
+    Collection<UserGroup> userGroup = new ArrayList<>();
 
     public Group(String groupName) {
         this.groupName = groupName;

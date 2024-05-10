@@ -17,22 +17,18 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public Group createGroupWithUserAndColor(String groupName, User user, String color) {
-        Group newGroup = createAndSaveGroup(groupName);
-        createAndSaveUserGroup(newGroup, user, color);
-        return newGroup;
-    }
-
-    private Group createAndSaveGroup(String groupName) {
         Group newGroup = new Group();
         newGroup.setGroupName(groupName);
-        return groupRepository.save(newGroup);
-    }
+        newGroup = groupRepository.save(newGroup);
 
-    private UserGroup createAndSaveUserGroup(Group group, User user, String color) {
         UserGroup userGroup = new UserGroup();
         userGroup.setUser(user);
-        userGroup.setGroup(group);
+        userGroup.setGroup(newGroup);
         userGroup.setColor(color);
-        return userGroupRepository.save(userGroup);
+        userGroupRepository.save(userGroup);
+
+        newGroup.getUserGroup().add(userGroup);
+
+        return newGroup;
     }
 }
