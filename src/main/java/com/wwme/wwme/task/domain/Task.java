@@ -1,5 +1,7 @@
 package com.wwme.wwme.task.domain;
 
+import com.wwme.wwme.group.domain.Group;
+import com.wwme.wwme.user.domain.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -7,6 +9,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -28,5 +31,10 @@ public class Task {
     @JoinColumn(name = "tag_id")
     private Tag tag;
 
-    private Long group_id;
+    @ManyToOne
+    @JoinColumn(name = "group_id")
+    private Group group;
+
+    @OneToMany(mappedBy = "task") //the userTask entity controlls the relationship, and there is a "task" field in usertask
+    private List<UserTask> userTaskList;
 }

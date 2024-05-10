@@ -2,6 +2,7 @@ package com.wwme.wwme.user.domain;
 
 import com.wwme.wwme.group.domain.UserGroup;
 import com.wwme.wwme.task.domain.Task;
+import com.wwme.wwme.task.domain.UserTask;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,8 +25,8 @@ public class User {
     private LocalDateTime register_date;
     private String social_provider;
 
-    @ManyToMany
-    List<Task> task_list;
+    @OneToMany(mappedBy = "user")
+    List<UserTask> userTaskList;
 
     @OneToMany(mappedBy = "user")
     Collection<UserGroup> userGroup;
