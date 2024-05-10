@@ -1,4 +1,4 @@
-package com.wwme.wwme.user;
+package com.wwme.wwme.user.repository;
 
 import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.repository.UserRepository;
@@ -26,16 +26,12 @@ public class UserTest {
         user.setRegister_date(LocalDateTime.now());
         user.setNickname("dohkun");
         user.setSocial_provider("whatissocialprovider?");
-        user.setId(1L);
 
-        userRepository.save(user);
+        User findUser = userRepository.save(user);
 
-        Optional<User> findUserOp = userRepository.findById(1L);
 
-        if(findUserOp.isPresent()){
-            Assertions.assertThat(findUserOp.get().getId()).isEqualTo(user.getId());
-        }else{
-            Assertions.fail("could not find User from DB`");
-        }
+
+        Assertions.assertThat(findUser.getId()).isEqualTo(user.getId());
+
     }
 }
