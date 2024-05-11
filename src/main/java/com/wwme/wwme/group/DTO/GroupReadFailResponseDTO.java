@@ -3,6 +3,6 @@ package com.wwme.wwme.group.DTO;
 import lombok.Data;
 
 @Data
-public class GroupCreateFailResponseDTO {
+public class GroupReadFailResponseDTO {
     boolean success;
 }

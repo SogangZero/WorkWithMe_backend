@@ -3,7 +3,6 @@ package com.wwme.wwme.user.service;
 import com.wwme.wwme.login.jwt.JWTUtil;
 import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.repository.UserRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

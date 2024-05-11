@@ -2,10 +2,13 @@ package com.wwme.wwme.group.controller;
 
 import com.wwme.wwme.group.DTO.*;
 import com.wwme.wwme.group.domain.Group;
+import com.wwme.wwme.group.domain.UserGroup;
 import com.wwme.wwme.group.service.GroupService;
+import com.wwme.wwme.group.service.UserGroupService;
 import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,12 +19,13 @@ import org.springframework.web.bind.annotation.*;
 public class GroupController {
     private final GroupService groupService;
     private final UserService userService;
+    private final UserGroupService userGroupService;
 
     // Create group
     @PostMapping
     public ResponseEntity<?> groupCreate(
             @RequestBody GroupCreateRequestDTO requestDTO,
-            @CookieValue(value="Authorization") String jwtString
+            @CookieValue(value = "Authorization") String jwtString
     ) {
         try {
             // Get current user from jwt
@@ -40,8 +44,7 @@ public class GroupController {
             responseDTO.setSuccess(true);
             responseDTO.setGroupInvitationLink("temptemp"); // TODO : GROUP INVITATION LINK
             return new ResponseEntity<>(responseDTO, HttpStatus.OK);
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             GroupCreateFailResponseDTO responseDTO = new GroupCreateFailResponseDTO();
             responseDTO.setSuccess(false);
             return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
@@ -53,7 +56,7 @@ public class GroupController {
     public ResponseEntity<?> groupUpdate(
             @RequestBody GroupUpdateRequestDTO requestDTO,
             @CookieValue("Authorization") String jwtString
-    ){
+    ) {
         try {
             // Get user from JWT
             User user = userService.getUserFromJWTString(jwtString);
@@ -67,13 +70,13 @@ public class GroupController {
             );
 
             // Return response
-            GroupUpdateSuccessDTO responseDTO = new GroupUpdateSuccessDTO();
+            GroupUpdateSuccessResponseDTO responseDTO = new GroupUpdateSuccessResponseDTO();
             responseDTO.setSuccess(true);
             responseDTO.setGroupId(updatedGroup.getId());
 
             return new ResponseEntity<>(responseDTO, HttpStatus.OK);
         } catch (Exception e) {
-            GroupUpdateFailDTO responseDTO = new GroupUpdateFailDTO();
+            GroupUpdateFailResponseDTO responseDTO = new GroupUpdateFailResponseDTO();
             responseDTO.setSuccess(false);
 
             return new ResponseEntity<>(responseDTO, HttpStatus.OK);
@@ -83,10 +86,34 @@ public class GroupController {
     // Get group information based on group id
     @GetMapping
     public ResponseEntity<?> groupRead(
-            @RequestBody GroupUpdateRequestDTO requestDTO,
+            @RequestBody GroupReadRequestDTO requestDTO,
             @CookieValue("Authorization") String jwtString
     ) {
+        try {
+            // Get user from JWT
+            User user = userService.getUserFromJWTString(jwtString);
 
+            // Get UserGroup and Group from group id and user
+            UserGroup userGroup = userGroupService.getUserGroupByIdAndUser(requestDTO.getGroupId(), user);
+            Group group = userGroup.getGroup();
+
+            // Formulate Response with DTO
+            GroupReadSuccessResponseDTO responseDTO = new GroupReadSuccessResponseDTO();
+            responseDTO.setSuccess(true);
+            responseDTO.setGroupName(group.getGroupName());
+            responseDTO.setGroupColor(userGroup.getColor());
+            for (UserGroup curUserGroup : group.getUserGroupList()) {
+                GroupReadSuccessResponseDTO.UserDTO userDTO = new GroupReadSuccessResponseDTO.UserDTO();
+                userDTO.setUserId(curUserGroup.getUser().getId());
+                responseDTO.addUserDTOToList(userDTO);
+            }
+
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+        } catch (Exception e) {
+            GroupReadFailResponseDTO responseDTO = new GroupReadFailResponseDTO();
+            responseDTO.setSuccess(false);
+            return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
+        }
     }
 
 }
