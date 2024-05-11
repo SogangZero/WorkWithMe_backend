@@ -20,9 +20,13 @@ public class Group {
     private String groupName;
 
     @OneToMany(mappedBy = "group")
-    Collection<UserGroup> userGroup = new ArrayList<>();
+    Collection<UserGroup> userGroupList = new ArrayList<>();
 
     public Group(String groupName) {
         this.groupName = groupName;
+    }
+
+    public void addUserGroup(UserGroup userGroup) {
+        this.userGroupList.add(userGroup);
     }
 }
