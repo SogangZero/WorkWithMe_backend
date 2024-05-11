@@ -23,4 +23,8 @@ public class UserGroup {
     @ManyToOne
     Group group;
 
+    public void setGroup(Group group) {
+        group.addUserGroup(this);
+        this.group = group;
+    }
 }

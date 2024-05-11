@@ -6,6 +6,7 @@ import com.wwme.wwme.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -15,12 +16,9 @@ public class UserServiceImpl implements UserService{
     private final UserRepository userRepository;
 
     @Override
-    public User getUserFromJWTString(String jwtString) {
+    public User getUserFromJWTString(String jwtString) throws NoSuchElementException {
         String userKey = jwtUtil.getUserKey(jwtString);
         Optional<User> optionalUserKey = userRepository.findByUserKey(userKey);
-        if(optionalUserKey.isEmpty()) {
-            return null;
-        }
-        return optionalUserKey.get();
+        return optionalUserKey.orElseThrow();
     }
 }
