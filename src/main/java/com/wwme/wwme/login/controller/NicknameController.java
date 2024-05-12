@@ -2,14 +2,11 @@ package com.wwme.wwme.login.controller;
 
 import com.wwme.wwme.login.jwt.JWTUtil;
 import com.wwme.wwme.login.service.NicknameService;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @Slf4j
 @Controller

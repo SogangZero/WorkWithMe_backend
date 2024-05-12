@@ -2,11 +2,9 @@ package com.wwme.wwme.login.jwt;
 
 import com.wwme.wwme.login.domain.dto.CustomOAuth2User;
 import com.wwme.wwme.login.domain.dto.UserDTO;
-import com.wwme.wwme.login.domain.entity.UserEntity;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
