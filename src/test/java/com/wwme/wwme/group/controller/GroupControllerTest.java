@@ -5,6 +5,7 @@ import com.wwme.wwme.group.DTO.GroupCreateRequestDTO;
 import com.wwme.wwme.group.DTO.GroupCreateSuccessResponseDTO;
 import com.wwme.wwme.group.domain.Group;
 import com.wwme.wwme.group.service.GroupService;
+import com.wwme.wwme.group.service.UserGroupService;
 import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.service.UserService;
 import jakarta.servlet.http.Cookie;
@@ -42,6 +43,9 @@ class GroupControllerTest {
 
     @MockBean
     private UserService userService;
+
+    @MockBean
+    private UserGroupService userGroupService;
 
     @Test
     void contextLoads() {
@@ -83,4 +87,9 @@ class GroupControllerTest {
                 .andExpect(content().json(response));
     }
 
+
+    @Test
+    void groupUpdateSuccess() {
+
+    }
 }

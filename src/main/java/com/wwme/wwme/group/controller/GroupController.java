@@ -8,10 +8,12 @@ import com.wwme.wwme.group.service.UserGroupService;
 import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Collection;
+import java.util.List;
 
 @RestController
 @RequestMapping("/group")
@@ -38,7 +40,7 @@ public class GroupController {
                     requestDTO.getGroupColor()
             );
 
-            // Return response
+            // Formulate response
             GroupCreateSuccessResponseDTO responseDTO = new GroupCreateSuccessResponseDTO();
             responseDTO.setGroupId(createdGroup.getId());
             responseDTO.setSuccess(true);
@@ -69,7 +71,7 @@ public class GroupController {
                     user
             );
 
-            // Return response
+            // Formulate response
             GroupUpdateSuccessResponseDTO responseDTO = new GroupUpdateSuccessResponseDTO();
             responseDTO.setSuccess(true);
             responseDTO.setGroupId(updatedGroup.getId());
@@ -97,7 +99,7 @@ public class GroupController {
             UserGroup userGroup = userGroupService.getUserGroupByIdAndUser(requestDTO.getGroupId(), user);
             Group group = userGroup.getGroup();
 
-            // Formulate Response with DTO
+            // Formulate Response
             GroupReadSuccessResponseDTO responseDTO = new GroupReadSuccessResponseDTO();
             responseDTO.setSuccess(true);
             responseDTO.setGroupName(group.getGroupName());
@@ -116,4 +118,39 @@ public class GroupController {
         }
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllGroupOfUser(
+            @CookieValue("Authorization") String jwtString
+    ){
+        try {
+            // Get user from JWT
+            User user = userService.getUserFromJWTString(jwtString);
+
+            // Get all groups from user
+            Collection<UserGroup> userGroups = userGroupService.getAllUserGroupOfUser(user);
+
+            // Formulate Response
+            GroupReadAllSuccessResponseDTO responseDTO = new GroupReadAllSuccessResponseDTO();
+            responseDTO.setSuccess(true);
+            List<GroupReadAllSuccessResponseDTO.GroupDTO> groupDTOList = userGroups.stream()
+                    .map(userGroup -> {
+                        GroupReadAllSuccessResponseDTO.GroupDTO groupDTO =
+                                new GroupReadAllSuccessResponseDTO.GroupDTO();
+                        Group group = userGroup.getGroup();
+                        groupDTO.setGroupId(group.getId());
+                        groupDTO.setGroupName(group.getGroupName());
+                        groupDTO.setGroupColor(userGroup.getColor());
+                        return groupDTO;
+                    })
+                    .toList();
+            responseDTO.setGroupDTOList(groupDTOList);
+
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+        }
+        catch (Exception e) {
+            GroupReadAllFailResponseDTO responseDTO = new GroupReadAllFailResponseDTO();
+            responseDTO.setSuccess(false);
+            return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
+        }
+    }
 }

@@ -10,8 +10,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,16 +40,6 @@ public class GroupServiceImpl implements GroupService {
         return newGroup;
     }
 
-    /**
-     * Updates Group with given group name and color
-     * @param groupId id of group
-     * @param groupName new group name
-     * @param color new color
-     * @param user user associated with the group being updated (needed for updating color)
-     * @throws java.util.NoSuchElementException
-     *              Group is missing or UserGroup is missing
-     * @return updated group
-     */
     @Override
     public Group updateGroupNameAndColor(long groupId, String groupName, String color, User user) throws NoSuchElementException {
         // Get Group and UserGroup from Database
@@ -65,6 +58,4 @@ public class GroupServiceImpl implements GroupService {
 
         return group;
     }
-
-
 }
