@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -24,9 +25,11 @@ public class User {
     private String nickname;
     private LocalDateTime register_date;
     private String social_provider;
+    public String role;
 
-    @OneToMany(mappedBy = "user")
-    List<UserTask> userTaskList;
+    //Cascade : 부모 (one side) 가 없어지면 자식도 모두 사라진다.
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<UserTask> userTaskList = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
     Collection<UserGroup> userGroup;

@@ -7,7 +7,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -21,9 +24,26 @@ public class Tag {
 
     private String tag_name;
 
-    @ManyToOne
+    @ManyToOne()
     private Group group;
 
-    @OneToMany(mappedBy = "tag", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Task> task_list;
+    @OneToMany(mappedBy = "tag")
+    private List<Task> task_list = new ArrayList<>();
+
+
+    public void addToTaskList(Task task){
+        task_list.add(task);
+    }
+
+    public void deleteFromTaskList(Long taskId){
+        Iterator<Task> it = task_list.iterator();
+
+        while(it.hasNext()){
+            Task t =  (Task) it.next();
+            if(Objects.equals(t.getId(), taskId)){
+                it.remove();
+                break;
+            }
+        }
+    }
 }

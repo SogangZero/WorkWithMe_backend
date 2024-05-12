@@ -9,6 +9,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -27,14 +28,14 @@ public class Task {
     private Boolean total_is_done;
     //건의사항 : 완료한 날짜/시간를 넣자
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "tag_id")
     private Tag tag;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "group_id")
     private Group group;
 
-    @OneToMany(mappedBy = "task") //the userTask entity controlls the relationship, and there is a "task" field in usertask
-    private List<UserTask> userTaskList;
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true) //the userTask entity controlls the relationship, and there is a "task" field in usertask
+    private List<UserTask> userTaskList = new ArrayList<>();
 }

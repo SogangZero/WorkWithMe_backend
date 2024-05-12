@@ -1,11 +1,8 @@
-package com.wwme.wwme.task;
+package com.wwme.wwme.task.repository;
 
 
 import com.wwme.wwme.task.domain.Task;
 import com.wwme.wwme.task.domain.UserTask;
-import com.wwme.wwme.task.repository.TagRepository;
-import com.wwme.wwme.task.repository.TaskRepository;
-import com.wwme.wwme.task.repository.UserTaskRepository;
 import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.repository.UserRepository;
 import org.assertj.core.api.Assertions;
@@ -27,8 +24,11 @@ public class UserTaskRepositoryTest {
     private UserTaskRepository userTaskRepository;
 
 
-    private User savedUser;
-    private Task savedTask;
+    private User savedUser1;
+    private Task savedTask1;
+    private User savedUser2;
+    private Task savedTask2;
+
 
     @Autowired
     public UserTaskRepositoryTest(TagRepository tagRepository, TaskRepository taskRepository, UserRepository userRepository, UserTaskRepository userTaskRepository) {
@@ -40,41 +40,71 @@ public class UserTaskRepositoryTest {
 
 
     @BeforeEach
-    void insertUserAndTest(){
+    void insertUserAndTask(){
         userRepository.deleteAll();
         taskRepository.deleteAll();
 
-        userRepository.deleteAll();
         //insert Test task
         Task task = new Task();
         task.setTask_name("testTask1");
         task.setStart_time(LocalDateTime.now());
         task.setEnd_time(LocalDateTime.now().plusDays(1));
         task.setTotal_is_done(false);
-        savedTask = taskRepository.save(task);
+        savedTask1 = taskRepository.save(task);
+
+        Task task2 = new Task();
+        task2.setTask_name("testTask2");
+        task2.setStart_time(LocalDateTime.now());
+        task2.setEnd_time(LocalDateTime.now().plusDays(1));
+        task2.setTotal_is_done(false);
+        savedTask2 = taskRepository.save(task2);
 
         //insert Test User
         User user = new User();
         user.setRegister_date(LocalDateTime.now());
         user.setNickname("testUser1");
         user.setSocial_provider("seswses?");
-        savedUser = userRepository.save(user);
+        savedUser1 = userRepository.save(user);
+
+        User user2 = new User();
+        user2.setRegister_date(LocalDateTime.now());
+        user2.setNickname("testUser2");
+        user2.setSocial_provider("what?");
+        savedUser2 = userRepository.save(user2);
     }
 
     @Test
-    void testUserTaskRelationship() {
+    void insertUserTask() {
 
-        Assertions.assertThat(savedUser).isNotNull();
-        Assertions.assertThat(savedTask).isNotNull();
+        Assertions.assertThat(savedUser1).isNotNull();
+        Assertions.assertThat(savedTask1).isNotNull();
 
         UserTask userTask = new UserTask();
-        userTask.setUser(savedUser);
-        userTask.setTask(savedTask);
+        userTask.setUser(savedUser1);
+        userTask.setTask(savedTask1);
         userTask.setIs_done(false);
 
         UserTask savedUserTask = userTaskRepository.save(userTask);
-        Assertions.assertThat(savedUserTask.getUser().getId()).isEqualTo(savedUser.getId());
-        Assertions.assertThat(savedUserTask.getTask().getId()).isEqualTo(savedTask.getId());
+        Assertions.assertThat(savedUserTask.getUser().getId()).isEqualTo(savedUser1.getId());
+        Assertions.assertThat(savedUserTask.getTask().getId()).isEqualTo(savedTask1.getId());
 
     }
+
+    @Test
+    void cascadeUserTaskTest(){
+        Assertions.assertThat(savedUser1).isNotNull();
+        Assertions.assertThat(savedTask1).isNotNull();
+
+        UserTask userTask = new UserTask();
+        userTask.setUser(savedUser1);
+        userTask.setTask(savedTask1);
+        userTask.setIs_done(false);
+        UserTask savedUserTask = userTaskRepository.save(userTask);
+
+
+        userRepository.deleteById(savedUser1.getId());
+
+        Assertions.assertThat(userTaskRepository.findById(savedUserTask.getId())).isEmpty();
+    }
+
 }

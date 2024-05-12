@@ -23,4 +23,5 @@ public class TaskDTO {
     private Boolean is_done;
     private Long tag_id;
     private Long group_id;
+    private Long user_id;
 }

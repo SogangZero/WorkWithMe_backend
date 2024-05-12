@@ -1,13 +1,16 @@
 package com.wwme.wwme.task.controller;
 
 import com.wwme.wwme.task.domain.DTO.TaskDTO;
+import com.wwme.wwme.task.domain.Task;
 import com.wwme.wwme.task.service.TaskCRUDService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -41,14 +44,20 @@ public class TaskCRUDController {
         return ResponseEntity.ok(taskDTO);
     }
 
-    @PostMapping("/group")
+    @GetMapping("/group")
     public ResponseEntity<Map<String, List<TaskDTO>>> getTaskListByGroup(@RequestBody TaskDTO taskDTO){
-        return null;
+        List<TaskDTO> taskList =  taskCRUDService.readTaskListByGroup(taskDTO);
+        Map<String,List<TaskDTO>> listMap = new HashMap<>();
+        listMap.put("task_list",taskList);
+        return ResponseEntity.ok(listMap);
     }
 
-    @PostMapping("/user")
+    @GetMapping("/user")
     public ResponseEntity<Map<String, List<TaskDTO>>> getTaskListByUser(@RequestBody TaskDTO taskDTO){
-        return null;
+        List<TaskDTO> taskList =  taskCRUDService.readTaskListByUser(taskDTO);
+        Map<String,List<TaskDTO>> listMap = new HashMap<>();
+        listMap.put("task_list",taskList);
+        return ResponseEntity.ok(listMap);
     }
 
     @DeleteMapping("/")
