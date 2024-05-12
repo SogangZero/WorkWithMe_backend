@@ -73,7 +73,13 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         System.out.println("access = " + access);
         response.addCookie(createCookie("refresh", refresh));
         response.setStatus(HttpStatus.OK.value());
-        response.sendRedirect("http://localhost:8080");
+
+        if (role.equals("ROLE_TEMP")) {
+            response.sendRedirect("http://localhost:8080/login/nickname");
+        } else if (role.equals("ROLE_USER")) {
+            response.sendRedirect("http://localhost:8080");
+        }
+
     }
 
     private void addRefreshToken(String userKey, String refresh, Long expiredMs) {

@@ -25,13 +25,14 @@ public class NicknameController {
     public String saveNickname(HttpServletRequest request,
                                @RequestParam("nickname") String nickname) {
         System.out.println("nickname = " + nickname);
-        String authorization = null;
-        Cookie[] cookies = request.getCookies();
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals("Authorization")) {
-                authorization = cookie.getValue();
-            }
-        }
+        String authorization = request.getHeader("access");
+//        Cookie[] cookies = request.getCookies();
+//        for (Cookie cookie : cookies) {
+//            if (cookie.getName().equals("access")) {
+//                authorization = cookie.getValue();
+//            }
+//        }
+
         String userKey = jwtUtil.getUserKey(authorization);
         nicknameService.saveNicknameAndChangeRole(nickname, userKey);
 
