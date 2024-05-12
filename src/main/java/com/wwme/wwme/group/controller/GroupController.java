@@ -81,7 +81,7 @@ public class GroupController {
             GroupUpdateFailResponseDTO responseDTO = new GroupUpdateFailResponseDTO();
             responseDTO.setSuccess(false);
 
-            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+            return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
         }
     }
 
