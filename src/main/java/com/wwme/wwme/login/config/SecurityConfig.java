@@ -1,8 +1,10 @@
 package com.wwme.wwme.login.config;
 
+import com.wwme.wwme.login.jwt.CustomLogoutFilter;
 import com.wwme.wwme.login.jwt.JWTFilter;
 import com.wwme.wwme.login.jwt.JWTUtil;
 import com.wwme.wwme.login.oauth2.CustomSuccessHandler;
+import com.wwme.wwme.login.repository.RefreshRepository;
 import com.wwme.wwme.login.service.CustomOAuth2UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
@@ -28,6 +31,7 @@ public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomSuccessHandler customSuccessHandler;
     private final JWTUtil jwtUtil;
+    private final RefreshRepository refreshRepository;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -61,6 +65,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/", "/login", "/favicon.ico").permitAll()
+                        .requestMatchers("/reissue").permitAll()
                         .requestMatchers("/login/oauth2/code/**").permitAll()
                         .anyRequest().authenticated()
                 );
@@ -73,6 +78,10 @@ public class SecurityConfig {
         //HTTP basic login disable
         http
                 .httpBasic(AbstractHttpConfigurer::disable);
+
+        //add LogoutFilter
+        http
+                .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshRepository), LogoutFilter.class);
 
         //add JWTFilter
         http
