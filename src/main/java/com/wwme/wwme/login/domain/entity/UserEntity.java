@@ -15,7 +15,7 @@ public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String userKey;//before username
+    private String userKey;
     private String name;
     private String socialProvider;
 

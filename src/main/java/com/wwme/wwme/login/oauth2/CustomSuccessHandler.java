@@ -33,25 +33,6 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                                         HttpServletResponse response,
                                         Authentication authentication)
             throws IOException, ServletException {
-//        //단일 토큰 방식 -> 주석 처리
-//        CustomOAuth2User customUserDetails = (CustomOAuth2User) authentication.getPrincipal();
-//        String userKey = customUserDetails.getUserKey();
-//
-//        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-//        Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
-//        GrantedAuthority auth = iterator.next();
-//        String role = auth.getAuthority();
-//
-//        String token = jwtUtil.createJwt(userKey, role, 1000 * 60 * 60L);
-//        log.info("String role : {}", role);
-//        response.addCookie(createCookie("Authorization", token));
-//        if (role.equals("ROLE_TEMP")) {
-//            log.info("ROLE TEMP USER LOGGED IN");
-//            response.sendRedirect("http://localhost:8080/login/nickname"); //닉네임 설정을 안 한 유저가 로그인 성공
-//        } else {
-//            log.info("ROLE USER USER LOGGED IN");
-//            response.sendRedirect("http://localhost:8080/"); //닉네임 설정을 한 유저가 로그인 성공
-//        }
         //get user info
         CustomOAuth2User customUserDetails = (CustomOAuth2User) authentication.getPrincipal();
         String userKey = customUserDetails.getUserKey();
@@ -70,16 +51,18 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         //response setting
         response.setHeader("access", access);
-        System.out.println("access = " + access);
         response.addCookie(createCookie("refresh", refresh));
         response.setStatus(HttpStatus.OK.value());
+
+        log.info("Log Success Handler {}[{}]", userKey, role);
+        log.info("access Token : {}", access);
+        log.info("refresh Token : {}", refresh);
 
         if (role.equals("ROLE_TEMP")) {
             response.sendRedirect("http://localhost:8080/login/nickname");
         } else if (role.equals("ROLE_USER")) {
             response.sendRedirect("http://localhost:8080");
         }
-
     }
 
     private void addRefreshToken(String userKey, String refresh, Long expiredMs) {
@@ -96,10 +79,8 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private Cookie createCookie(String key, String value) {
         Cookie cookie = new Cookie(key, value);
         cookie.setMaxAge(24 * 60 * 60);
-//        cookie.setPath("/");
         cookie.setHttpOnly(true);
 
         return cookie;
     }
-
 }

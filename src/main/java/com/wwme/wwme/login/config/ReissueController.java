@@ -1,25 +1,25 @@
 package com.wwme.wwme.login.config;
 
-import com.wwme.wwme.login.domain.entity.RefreshEntity;
+import com.wwme.wwme.login.exception.InvalidRefreshTokenException;
+import com.wwme.wwme.login.exception.NullRefreshTokenException;
 import com.wwme.wwme.login.jwt.JWTUtil;
-import com.wwme.wwme.login.repository.RefreshRepository;
-import io.jsonwebtoken.ExpiredJwtException;
+import com.wwme.wwme.login.service.ReissueService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Date;
-
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class ReissueController {
     private final JWTUtil jwtUtil;
-    private final RefreshRepository refreshRepository;
+    private final ReissueService reissueService;
 
     @PostMapping("/reissue")
     public ResponseEntity<?> reissue(HttpServletRequest request,
@@ -28,63 +28,29 @@ public class ReissueController {
         String refresh = null;
         Cookie[] cookies = request.getCookies();
 
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals("refresh")) {
-                refresh = cookie.getValue();
-            }
-        }
-
-        if (refresh == null) {
-            return new ResponseEntity<>("refresh token null", HttpStatus.BAD_REQUEST);
-        }
-
-        //expired check
         try {
-            jwtUtil.isExpired(refresh);
-        } catch (ExpiredJwtException e) {
-            return new ResponseEntity<>("refresh token expired", HttpStatus.BAD_REQUEST);
+            refresh = reissueService.validateRefreshToken(cookies);
+        } catch (NullRefreshTokenException | InvalidRefreshTokenException e) {
+            log.info("User has expired or invalid refresh token");
+            return new ResponseEntity<>(e.toString(), HttpStatus.BAD_REQUEST);
         }
 
-        //check if the token is refresh
-        String category = jwtUtil.getCategory(refresh);
-        if (!category.equals("refresh")) {
-            return new ResponseEntity<>("invalid refresh token", HttpStatus.BAD_REQUEST);
-        }
-
-        //check if the refresh token is in DB
-        Boolean isExist = refreshRepository.existsByRefresh(refresh);
-        if (!isExist) {
-            return new ResponseEntity<>("invalid refresh token", HttpStatus.BAD_REQUEST);
-        }
 
         String userKey = jwtUtil.getUserKey(refresh);
         String role = jwtUtil.getRole(refresh);
 
         //make new JWT
-        String newAccess = jwtUtil.createJwt("access", userKey, role, 10 * 60 * 1000L);//10 minutes
-        String newRefresh = jwtUtil.createJwt("refresh", userKey, role, 24 * 60 * 60 * 1000L);//24 hours
+        String newAccess = reissueService.generateAccessToken(userKey, role);
+        String newRefresh = reissueService.exchangeRefreshToken(userKey, role, refresh);
 
-
-        //delete old refresh token and save new refresh token
-        refreshRepository.deleteByRefresh(refresh);
-        addRefreshToken(userKey, refresh, 24 * 60 * 60 * 1000L);
-
+        log.info("User[{}] re-generate access and refresh token", userKey);
         response.setHeader("access", newAccess);
         response.addCookie(createCookie("refresh", newRefresh));
         
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    private void addRefreshToken(String userKey, String refresh, Long expiredMs) {
-        Date date = new Date(System.currentTimeMillis() + expiredMs);
-        RefreshEntity refreshEntity = new RefreshEntity();
 
-        refreshEntity.setUserKey(userKey);
-        refreshEntity.setRefresh(refresh);
-        refreshEntity.setExpiration(date.toString());
-
-        refreshRepository.save(refreshEntity);
-    }
 
     private Cookie createCookie(String key, String value) {
         Cookie cookie = new Cookie(key, value);

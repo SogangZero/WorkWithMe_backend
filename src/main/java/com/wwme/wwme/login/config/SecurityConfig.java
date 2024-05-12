@@ -56,7 +56,6 @@ public class SecurityConfig {
                     }
                 }));
 
-
         //csrf disable
         http
                 .csrf(AbstractHttpConfigurer::disable);
@@ -69,7 +68,6 @@ public class SecurityConfig {
                         .requestMatchers("/login/oauth2/code/**").permitAll()
                         .anyRequest().authenticated()
                 );
-
 
         //From login disable
         http
@@ -98,9 +96,6 @@ public class SecurityConfig {
         http
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-
-
-
 
         return http.build();
     }
