@@ -1,4 +1,4 @@
-package com.wwme.wwme.login.config;
+package com.wwme.wwme.login.controller;
 
 import com.wwme.wwme.login.exception.InvalidRefreshTokenException;
 import com.wwme.wwme.login.exception.NullRefreshTokenException;
