@@ -18,7 +18,7 @@ public class UserGroupServiceImpl implements UserGroupService{
     private final UserGroupRepository userGroupRepository;
 
     @Override
-    public UserGroup getUserGroupByIdAndUser(long groupId, User user) throws NoSuchElementException, IllegalAccessException {
+    public UserGroup getUserGroupByIdAndUser(long groupId, User user) throws NoSuchElementException {
         Group group = groupRepository.findById(groupId).orElseThrow();
 
         // if matching user is inside found group return userGroup

@@ -2,24 +2,30 @@ package com.wwme.wwme.group.service;
 
 import com.wwme.wwme.group.domain.Group;
 import com.wwme.wwme.group.domain.UserGroup;
+import com.wwme.wwme.group.repository.GroupRepository;
 import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.repository.UserRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
+import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @Transactional
 public class UserGroupServiceImplTest {
-
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    GroupRepository groupRepository;
 
     @Autowired
     GroupService groupService;
@@ -34,18 +40,37 @@ public class UserGroupServiceImplTest {
         String color = "FAFAFA";
         Group newGroup = groupService.createGroupWithUserAndColor(groupName, user, color);
 
-        try {
-            UserGroup userGroup = userGroupService.getUserGroupByIdAndUser(newGroup.getId(), user);
+        UserGroup userGroup = Assertions.assertDoesNotThrow(
+                () -> userGroupService.getUserGroupByIdAndUser(newGroup.getId(), user)
+        );
 
-            assertThat(userGroup.getGroup()).isEqualTo(newGroup);
-            assertThat(userGroup.getUser()).isEqualTo(user);
-        } catch (Exception e) {
-            fail("Exception raised: " + e.getMessage());
-        }
+        assertThat(userGroup.getGroup()).isEqualTo(newGroup);
+        assertThat(userGroup.getUser()).isEqualTo(user);
     }
 
     @Test
-    void getUserGroupOfUserSuccess() {
+    void getUserGroupByIdAndUserFail_InvalidGroupId() {
+        User user = userRepository.save(new User());
+
+        assertThrows(
+                NoSuchElementException.class,
+                () -> userGroupService.getUserGroupByIdAndUser(0, user)
+        );
+    }
+
+    @Test
+    void getUserGroupByIdAndUserFail_NoUserGroup() {
+        User user = userRepository.save(new User());
+        Group group = groupRepository.save(new Group());
+
+        assertThrows(
+                NoSuchElementException.class,
+                () -> userGroupService.getUserGroupByIdAndUser(group.getId(), user)
+        );
+    }
+
+    @Test
+    void getAllUserGroupOfUserSuccess() {
         User user = userRepository.save(new User());
 
         String groupName1 = "gn1";
@@ -63,5 +88,4 @@ public class UserGroupServiceImplTest {
                         userGroup -> assertThat(userGroup.getGroup()).isEqualTo(group2)
                 );
     }
-
 }

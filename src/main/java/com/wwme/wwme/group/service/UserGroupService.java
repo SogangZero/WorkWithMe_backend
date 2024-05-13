@@ -13,10 +13,9 @@ public interface UserGroupService {
      * @param groupId id of group associated with UserGroup
      * @param user User associated with UserGroup
      * @return UserGroup that is found
-     * @throws NoSuchElementException group id is invalid
-     * @throws IllegalAccessException group doesn't contain the user
+     * @throws NoSuchElementException group id is invalid or group doesn't contain the user
      */
-    UserGroup getUserGroupByIdAndUser(long groupId, User user) throws NoSuchElementException, IllegalAccessException;
+    UserGroup getUserGroupByIdAndUser(long groupId, User user) throws NoSuchElementException;
 
     /**
      * Finds all UserGroup of user. Order might not be preserved

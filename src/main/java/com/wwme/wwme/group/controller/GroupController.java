@@ -23,7 +23,13 @@ public class GroupController {
     private final UserService userService;
     private final UserGroupService userGroupService;
 
-    // Create group
+    /**
+     * POST /group <br>
+     * Creates a group, and returns the created group information <br>
+     * @param requestDTO DTO for request body json
+     * @param jwtString JWT
+     * @return
+     */
     @PostMapping
     public ResponseEntity<?> groupCreate(
             @RequestBody GroupCreateRequestDTO requestDTO,
@@ -53,7 +59,14 @@ public class GroupController {
         }
     }
 
-    // Update Group
+    /**
+     * PUT /group <br>
+     * Updates the group name and color of given group id <br>
+     * User has to be inside the group
+     * @param requestDTO DTO for body json
+     * @param jwtString JWT
+     * @return
+     */
     @PutMapping
     public ResponseEntity<?> groupUpdate(
             @RequestBody GroupUpdateRequestDTO requestDTO,
@@ -85,7 +98,14 @@ public class GroupController {
         }
     }
 
-    // Get group information based on group id
+    /**
+     * GET /group <br>
+     * Returns one group information with the given group id <br>
+     * User has to be inside the group
+     * @param requestDTO request body json
+     * @param jwtString JWT
+     * @return
+     */
     @GetMapping
     public ResponseEntity<?> groupRead(
             @RequestBody GroupReadRequestDTO requestDTO,
@@ -118,8 +138,14 @@ public class GroupController {
         }
     }
 
+    /**
+     * GET /group/all <br>
+     * Returns all group information of current user defined by JWT
+     * @param jwtString JWT
+     * @return
+     */
     @GetMapping("/all")
-    public ResponseEntity<?> getAllGroupOfUser(
+    public ResponseEntity<?> groupReadAllOfUser(
             @CookieValue("Authorization") String jwtString
     ){
         try {

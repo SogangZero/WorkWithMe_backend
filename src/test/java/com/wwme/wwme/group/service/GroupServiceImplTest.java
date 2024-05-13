@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @Transactional
@@ -79,7 +80,7 @@ class GroupServiceImplTest {
         String newGroupName = "newName";
         String newColor = "ABABAB";
 
-        Assertions.assertThrows(NoSuchElementException.class, () -> {
+        assertThrows(NoSuchElementException.class, () -> {
             User user2 = new User();
             user2.setId(user.getId()+1);
             groupService.updateGroupNameAndColor(newGroup.getId(), newGroupName, newColor, user2);
@@ -98,7 +99,7 @@ class GroupServiceImplTest {
         String newGroupName = "newName";
         String newColor = "ABABAB";
 
-        Assertions.assertThrows(NoSuchElementException.class, () -> {
+        assertThrows(NoSuchElementException.class, () -> {
             groupService.updateGroupNameAndColor(newGroup.getId()+1, newGroupName, newColor, user);
         });
     }
@@ -115,7 +116,7 @@ class GroupServiceImplTest {
         String newGroupName = "newName";
         String newColor = "ABABAB";
 
-        Assertions.assertThrows(NoSuchElementException.class, () -> {
+        assertThrows(NoSuchElementException.class, () -> {
             User user2 = userRepository.save(new User());
             // there is no relationship between newGroup and user2
             // so no UserGroup is present

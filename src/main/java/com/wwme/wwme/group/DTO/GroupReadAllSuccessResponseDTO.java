@@ -9,6 +9,7 @@ import java.util.List;
 @Data
 public class GroupReadAllSuccessResponseDTO {
     boolean success;
+    @JsonProperty("group_list")
     List<GroupDTO> groupDTOList = new ArrayList<>();
 
     @Data
