@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @Slf4j
 @Controller
 @RequiredArgsConstructor
@@ -22,7 +24,8 @@ public class NicknameController {
 
     @PostMapping("/login/nickname")
     public String saveNickname(HttpServletRequest request,
-                               @RequestParam("nickname") String nickname) {
+                               @RequestBody() Map<String, String> param) {
+        String nickname = param.get("nickname");
         String authorization = request.getHeader("access");
         String userKey = jwtUtil.getUserKey(authorization);
         nicknameService.saveNicknameAndChangeRole(nickname, userKey);
