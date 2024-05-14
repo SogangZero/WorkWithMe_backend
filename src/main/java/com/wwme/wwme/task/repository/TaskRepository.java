@@ -12,7 +12,7 @@ import java.util.List;
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long> {
 
-    @Query("SELECT t FROM Task t JOIN t.userTaskList ut WHERE (t.group.id = :group_id)" +
+    @Query("SELECT t FROM Task t LEFT JOIN t.userTaskList ut WHERE (t.group.id = :group_id)" +
             "AND (:user_id IS NULL OR ut.user.id = :user_id)" +
             "AND (:tag_id IS NULL OR t.tag.id = :tag_id)" +
             "AND (:start_time IS NULL OR t.start_time >= :start_time)" +
@@ -25,7 +25,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
                                           @Param("end_time") LocalDateTime end_time,
                                           @Param("is_done") Boolean is_done);
 
-    @Query("SELECT t FROM Task t JOIN t.userTaskList ut WHERE (ut.user.id = :user_id)" +
+    @Query("SELECT t FROM Task t LEFT JOIN t.userTaskList ut WHERE (ut.user.id = :user_id)" +
             "AND (:tag_id IS NULL OR t.tag.id = :tag_id)" +
             "AND (:start_time IS NULL OR t.start_time >= :start_time)" +
             "AND (:end_time IS NULL OR t.end_time <= :end_time)" +
