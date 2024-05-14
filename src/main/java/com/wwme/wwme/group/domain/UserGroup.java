@@ -17,10 +17,10 @@ public class UserGroup {
 
     String color;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
     User user;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
     Group group;
 
     public void setGroup(Group group) {
