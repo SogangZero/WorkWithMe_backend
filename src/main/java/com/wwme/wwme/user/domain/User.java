@@ -2,12 +2,14 @@ package com.wwme.wwme.user.domain;
 
 import com.wwme.wwme.group.domain.UserGroup;
 import com.wwme.wwme.task.domain.Task;
+import com.wwme.wwme.task.domain.UserTask;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -24,13 +26,12 @@ public class User {
     private LocalDateTime register_date;
 
     private String userKey;
-    private String name;
     private String social_provider;
+    public String role;
 
-    private String role;
-
-    @ManyToMany
-    List<Task> task_list;
+    //Cascade : 부모 (one side) 가 없어지면 자식도 모두 사라진다.
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<UserTask> userTaskList = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
     Collection<UserGroup> userGroup;
