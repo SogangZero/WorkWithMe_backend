@@ -1,7 +1,7 @@
 package com.wwme.wwme.login.service;
 
-import com.wwme.wwme.login.domain.entity.UserEntity;
-import com.wwme.wwme.login.repository.UserRepository;
+import com.wwme.wwme.user.domain.User;
+import com.wwme.wwme.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,12 +21,12 @@ public class NicknameService {
             throw new IllegalArgumentException();
         }
 
-        UserEntity user = userRepository.findByUserKey(userKey);
+        User user = userRepository.findByUserKey(userKey).orElseThrow();
 
         user.setNickname(nickname);
         user.setRole("ROLE_USER");
-        user.setRegistrationDate(LocalDateTime.now());
+        user.setRegisterDate(LocalDateTime.now());
 
-        log.info("User {} set nickname {}", user.getName(), user.getNickname());
+        log.info("User {} set nickname {}", user.getUserKey(), user.getNickname());
     }
 }

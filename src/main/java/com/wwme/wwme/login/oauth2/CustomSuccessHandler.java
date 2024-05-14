@@ -2,10 +2,10 @@ package com.wwme.wwme.login.oauth2;
 
 import com.wwme.wwme.login.domain.dto.CustomOAuth2User;
 import com.wwme.wwme.login.domain.entity.RefreshEntity;
-import com.wwme.wwme.login.domain.entity.UserEntity;
 import com.wwme.wwme.login.jwt.JWTUtil;
 import com.wwme.wwme.login.repository.RefreshRepository;
-import com.wwme.wwme.login.repository.UserRepository;
+import com.wwme.wwme.user.domain.User;
+import com.wwme.wwme.user.repository.UserRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -61,7 +61,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         log.info("access Token : {}", access);
         log.info("refresh Token : {}", refresh);
 
-        UserEntity user = userRepository.findByUserKey(userKey);
+        User user = userRepository.findByUserKey(userKey).orElseThrow(); //NoSuchElementException
         if (user.getNickname() == null) {
             response.sendRedirect("http://localhost:8080/login/nickname");
         } else {

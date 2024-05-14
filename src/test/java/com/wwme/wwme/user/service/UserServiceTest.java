@@ -29,7 +29,7 @@ public class UserServiceTest {
         user.setRole(role);
         user = userRepository.save(user);
 
-        String jwtString = jwtUtil.createJwt(user.getUserKey(), user.getRole(), 100000L);
+        String jwtString = jwtUtil.createJwt("test", user.getUserKey(), user.getRole(), 100000L);
 
         User userFromJwt = userService.getUserFromJWTString(jwtString);
 
