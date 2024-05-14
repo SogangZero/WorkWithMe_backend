@@ -1,5 +1,6 @@
 package com.wwme.wwme.group.service;
 
+import com.wwme.wwme.group.domain.Group;
 import com.wwme.wwme.group.domain.UserGroup;
 import com.wwme.wwme.user.domain.User;
 
@@ -23,4 +24,8 @@ public interface UserGroupService {
      * @return Collection of UserGroup
      */
     Collection<UserGroup> getAllUserGroupOfUser(User user);
+
+    UserGroup addUserToGroupWithColor(Group group, User user, String color);
+
+    void removeUserFromGroup(long groupId, User user);
 }

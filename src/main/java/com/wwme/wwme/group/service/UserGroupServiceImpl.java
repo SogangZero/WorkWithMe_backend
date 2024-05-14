@@ -32,4 +32,26 @@ public class UserGroupServiceImpl implements UserGroupService{
     public Collection<UserGroup> getAllUserGroupOfUser(User user) {
         return userGroupRepository.findByUser(user);
     }
+
+    @Override
+    public UserGroup addUserToGroupWithColor(Group group, User user, String color) {
+        if (userGroupRepository.findByUserAndGroup(user, group).isPresent()){
+            throw new IllegalArgumentException();
+        }
+
+        UserGroup userGroup = new UserGroup();
+        userGroup.setGroup(group);
+        userGroup.setUser(user);
+        userGroup.setColor(color);
+
+        userGroup = userGroupRepository.save(userGroup);
+        return userGroup;
+    }
+
+    @Override
+    public void removeUserFromGroup(long groupId, User user) {
+        Group group = groupRepository.findById(groupId).orElseThrow();
+        UserGroup userGroup = userGroupRepository.findByUserAndGroup(user, group).orElseThrow();
+        userGroupRepository.delete(userGroup);
+    }
 }

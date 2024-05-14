@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
@@ -16,6 +17,7 @@ import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
@@ -40,7 +42,7 @@ public class UserGroupServiceImplTest {
         String color = "FAFAFA";
         Group newGroup = groupService.createGroupWithUserAndColor(groupName, user, color);
 
-        UserGroup userGroup = Assertions.assertDoesNotThrow(
+        UserGroup userGroup = assertDoesNotThrow(
                 () -> userGroupService.getUserGroupByIdAndUser(newGroup.getId(), user)
         );
 
@@ -87,5 +89,49 @@ public class UserGroupServiceImplTest {
                         userGroup -> assertThat(userGroup.getGroup()).isEqualTo(group1),
                         userGroup -> assertThat(userGroup.getGroup()).isEqualTo(group2)
                 );
+    }
+
+    @Test
+    void addUserToGroupWithColorSuccess() {
+        String groupName = "abcdefgh";
+        String groupColor = "FAFAFA";
+        String groupColor2 = "AFAFAF";
+        User user = userRepository.save(new User());
+        User user2 = userRepository.save(new User());
+        Group group = groupService.createGroupWithUserAndColor(groupName, user, groupColor);
+        UserGroup userGroup =
+                assertDoesNotThrow(() -> userGroupService.addUserToGroupWithColor(group, user2, groupColor2));
+
+        assertThat(userGroup.getUser()).isEqualTo(user2);
+        assertThat(userGroup.getGroup()).isEqualTo(group);
+        assertThat(userGroup.getColor()).isEqualTo(groupColor2);
+    }
+
+    @Test
+    void addUserToGroupWithColorFail_UserAlreadyInGroup() {
+        String groupName = "abcdefgh";
+        String groupColor = "FAFAFA";
+        String groupColor2 = "AFAFAF";
+        User user = userRepository.save(new User());
+        Group group = groupService.createGroupWithUserAndColor(groupName, user, groupColor);
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> userGroupService.addUserToGroupWithColor(group, user, groupColor2)
+        );
+    }
+
+    @Test
+    void addUserToGroupWithColorFail_NotSavedUser() {
+        String groupName = "abcdefgh";
+        String groupColor = "FAFAFA";
+        String groupColor2 = "AFAFAF";
+        User user = userRepository.save(new User());
+        User user2 = new User();
+        Group group = groupService.createGroupWithUserAndColor(groupName, user, groupColor);
+
+        assertThrows(
+                InvalidDataAccessApiUsageException.class,
+                () -> userGroupService.addUserToGroupWithColor(group, user2, groupColor2)
+        );
     }
 }

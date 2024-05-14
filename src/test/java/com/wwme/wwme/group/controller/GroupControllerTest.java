@@ -5,6 +5,7 @@ import com.nimbusds.common.contenttype.ContentType;
 import com.wwme.wwme.group.DTO.*;
 import com.wwme.wwme.group.domain.Group;
 import com.wwme.wwme.group.domain.UserGroup;
+import com.wwme.wwme.group.service.GroupInvitationService;
 import com.wwme.wwme.group.service.GroupService;
 import com.wwme.wwme.group.service.UserGroupService;
 import com.wwme.wwme.user.domain.User;
@@ -52,6 +53,9 @@ class GroupControllerTest {
     @MockBean
     private UserGroupService userGroupService;
 
+    @MockBean
+    private GroupInvitationService groupInvitationService;
+
     @Test
     void contextLoads() {
         assertThat(groupController).isNotNull();
@@ -63,12 +67,17 @@ class GroupControllerTest {
         String groupName = "group_name";
         String groupColor = "FFFFFF";
         String jwtString = "exampleJWTString";
+        String invitationCode = "invCode";
 
         GroupCreateRequestDTO requestDTO =
                 new GroupCreateRequestDTO(groupName, groupColor);
 
         GroupCreateSuccessResponseDTO responseDTO =
-                new GroupCreateSuccessResponseDTO(true, groupId, "temptemp");
+                new GroupCreateSuccessResponseDTO(
+                        true,
+                        groupId,
+                        "/group/invitation/" + invitationCode
+                );
 
         final String request = objectMapper.writeValueAsString(requestDTO);
         final String response = objectMapper.writeValueAsString(responseDTO);
@@ -83,11 +92,13 @@ class GroupControllerTest {
         when(groupService.createGroupWithUserAndColor(groupName, mockedUser, groupColor))
                 .thenReturn(mockedGroup);
 
+        when(groupInvitationService.createGroupInvitation(mockedGroup))
+                .thenReturn(invitationCode);
+
         mockMvc.perform(post("/group")
                         .cookie(new Cookie("Authorization", jwtString))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(request))
-                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().json(response));
     }
@@ -147,7 +158,6 @@ class GroupControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(request)
                 )
-                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().json(response));
 
@@ -181,7 +191,6 @@ class GroupControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(request)
                 )
-                .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().json(response));
     }
@@ -253,7 +262,6 @@ class GroupControllerTest {
                         .cookie(new Cookie("Authorization", jwtString))
                         .contentType(MediaType.APPLICATION_JSON)
                 )
-                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().json(response));
 
@@ -275,7 +283,6 @@ class GroupControllerTest {
                         .cookie(new Cookie("Authorization", jwtString))
                         .contentType(MediaType.APPLICATION_JSON)
                 )
-                .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().json(response));
 
@@ -318,7 +325,6 @@ class GroupControllerTest {
                         .cookie(new Cookie("Authorization", jwtString))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(request))
-                .andDo(print())
                 .andExpect(content().json(response));
     }
 }
