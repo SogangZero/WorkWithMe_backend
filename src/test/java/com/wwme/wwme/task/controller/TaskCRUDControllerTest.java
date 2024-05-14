@@ -26,10 +26,10 @@ public class TaskCRUDControllerTest {
     @Test
     public void testCreateTask() throws Exception {
         TaskDTO taskDTO = new TaskDTO();  // assuming a proper constructor/setters
-        taskDTO.setTask_name("newTask1");
+        taskDTO.setTaskName("newTask1");
 
         Task task = new Task();
-        task.setTask_name("newTask1");
+        task.setTaskName("newTask1");
         task.setId(1L);
 
         when(taskCRUDService.createUpdateTask(any(TaskDTO.class))).thenReturn(task);

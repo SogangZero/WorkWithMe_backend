@@ -1,6 +1,7 @@
 package com.wwme.wwme.task.domain.DTO;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -12,16 +13,25 @@ import java.time.LocalDateTime;
 @Setter
 public class TaskDTO {
     private Long id;
-    private String task_name;
+    @JsonProperty("task_name")
+    private String taskName;
 
+    @JsonProperty("start_time")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS")
-    private LocalDateTime start_time;
+    private LocalDateTime startTime;
 
+    @JsonProperty("end_time")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS")
-    private LocalDateTime end_time;
-    private String task_type;
-    private Boolean is_done;
-    private Long tag_id;
-    private Long group_id;
-    private Long user_id;
+    private LocalDateTime endTime;
+
+    @JsonProperty("task_type")
+    private String taskType;
+    @JsonProperty("is_done")
+    private Boolean isDone;
+    @JsonProperty("tag_id")
+    private Long tagId;
+    @JsonProperty("group_id")
+    private Long groupId;
+    @JsonProperty("user_id")
+    private Long userId;
 }

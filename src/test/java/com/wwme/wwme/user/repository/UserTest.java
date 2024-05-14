@@ -1,14 +1,12 @@
 package com.wwme.wwme.user.repository;
 
 import com.wwme.wwme.user.domain.User;
-import com.wwme.wwme.user.repository.UserRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @SpringBootTest
 public class UserTest {
@@ -23,9 +21,9 @@ public class UserTest {
     @Test
     void insertUser(){
         User user = new User();
-        user.setRegister_date(LocalDateTime.now());
+        user.setRegisterDate(LocalDateTime.now());
         user.setNickname("dohkun");
-        user.setSocial_provider("whatissocialprovider?");
+        user.setSocialProvider("whatissocialprovider?");
 
         User findUser = userRepository.save(user);
 

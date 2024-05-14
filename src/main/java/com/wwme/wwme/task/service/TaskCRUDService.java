@@ -7,7 +7,6 @@ import com.wwme.wwme.task.domain.Tag;
 import com.wwme.wwme.task.domain.Task;
 import com.wwme.wwme.task.repository.TagRepository;
 import com.wwme.wwme.task.repository.TaskRepository;
-import com.wwme.wwme.task.repository.UserTaskRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -38,8 +37,8 @@ public class TaskCRUDService {
 
     public List<TaskDTO> readTaskListByGroup(TaskDTO taskDTO){
         List<Task> task = taskRepository.findTasksByGroupAndFilters(
-                taskDTO.getGroup_id(),taskDTO.getUser_id(),taskDTO.getTag_id(),taskDTO.getStart_time(),
-                taskDTO.getEnd_time(),taskDTO.getIs_done());
+                taskDTO.getGroupId(),taskDTO.getUserId(),taskDTO.getTagId(),taskDTO.getStartTime(),
+                taskDTO.getEndTime(),taskDTO.getIsDone());
 
         List<TaskDTO> taskDTOS = new ArrayList<>();
         for(Task t : task){
@@ -52,8 +51,8 @@ public class TaskCRUDService {
 
     public List<TaskDTO> readTaskListByUser(TaskDTO taskDTO){
         List<Task> task = taskRepository.findTaskByUserIdAndFilters(
-                taskDTO.getUser_id(),taskDTO.getTag_id(),taskDTO.getStart_time(),
-                taskDTO.getEnd_time(),taskDTO.getIs_done());
+                taskDTO.getUserId(),taskDTO.getTagId(),taskDTO.getStartTime(),
+                taskDTO.getEndTime(),taskDTO.getIsDone());
 
         List<TaskDTO> taskDTOS = new ArrayList<>();
         for(Task t : task){
@@ -88,18 +87,18 @@ public class TaskCRUDService {
         if(taskDTO.getId() != null){
             task.setId(taskDTO.getId());
         }
-        task.setTask_name(taskDTO.getTask_name());
-        task.setStart_time(taskDTO.getStart_time());
-        task.setEnd_time(taskDTO.getEnd_time());
-        task.setTask_type(taskDTO.getTask_type());
-        task.setTotal_is_done(taskDTO.getIs_done());
+        task.setTaskName(taskDTO.getTaskName());
+        task.setStartTime(taskDTO.getStartTime());
+        task.setEndTime(taskDTO.getEndTime());
+        task.setTaskType(taskDTO.getTaskType());
+        task.setTotalIsDone(taskDTO.getIsDone());
 
-        if(taskDTO.getTag_id() != null){
-            Tag tag = tagRepository.findById(taskDTO.getTag_id()).orElseThrow(() -> new RuntimeException("Tag not found"));
+        if(taskDTO.getTagId() != null){
+            Tag tag = tagRepository.findById(taskDTO.getTagId()).orElseThrow(() -> new RuntimeException("Tag not found"));
             task.setTag(tag);
         }
-        if(taskDTO.getGroup_id() != null){
-            Group group = groupRepository.findById(taskDTO.getGroup_id()).orElseThrow(() -> new RuntimeException("Group not found"));
+        if(taskDTO.getGroupId() != null){
+            Group group = groupRepository.findById(taskDTO.getGroupId()).orElseThrow(() -> new RuntimeException("Group not found"));
             task.setGroup(group);
         }
 
@@ -110,19 +109,19 @@ public class TaskCRUDService {
         TaskDTO taskDTO = new TaskDTO();
 
         taskDTO.setId(task.getId());
-        taskDTO.setTask_name(task.getTask_name());
-        taskDTO.setStart_time(task.getStart_time());
-        taskDTO.setEnd_time(task.getEnd_time());
-        taskDTO.setTask_type(task.getTask_type());
+        taskDTO.setTaskName(task.getTaskName());
+        taskDTO.setStartTime(task.getStartTime());
+        taskDTO.setEndTime(task.getEndTime());
+        taskDTO.setTaskType(task.getTaskType());
         if(task.getGroup() != null){
-            taskDTO.setGroup_id(task.getGroup().getId());
+            taskDTO.setGroupId(task.getGroup().getId());
         }
 
         if(task.getTag() != null){
-            taskDTO.setTag_id(task.getTag().getId());
+            taskDTO.setTagId(task.getTag().getId());
         }
 
-        taskDTO.setIs_done(task.getTotal_is_done());
+        taskDTO.setIsDone(task.getTotalIsDone());
 
         return taskDTO;
     }

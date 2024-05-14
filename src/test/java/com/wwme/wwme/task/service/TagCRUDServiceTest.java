@@ -45,25 +45,25 @@ public class TagCRUDServiceTest {
         taskRepository.deleteAll();
 
         Tag tag1 = new Tag();
-        tag1.setTag_name("testtag1");
+        tag1.setTagName("testtag1");
         savedTag1 = tagRepository.save(tag1);
 
         Tag tag2 = new Tag();
-        tag2.setTag_name("testtag1");
+        tag2.setTagName("testtag1");
         savedTag2 = tagRepository.save(tag2);
 
         Task task1 = new Task();
-        task1.setTask_name("testTask1");
-        task1.setStart_time(LocalDateTime.now());
-        task1.setEnd_time(LocalDateTime.now().plusDays(1));
-        task1.setTotal_is_done(false);
+        task1.setTaskName("testTask1");
+        task1.setStartTime(LocalDateTime.now());
+        task1.setEndTime(LocalDateTime.now().plusDays(1));
+        task1.setTotalIsDone(false);
         savedTask1 = taskRepository.save(task1);
 
         Task task2 = new Task();
-        task2.setTask_name("testTask2");
-        task2.setStart_time(LocalDateTime.now());
-        task2.setEnd_time(LocalDateTime.now().plusDays(1));
-        task2.setTotal_is_done(false);
+        task2.setTaskName("testTask2");
+        task2.setStartTime(LocalDateTime.now());
+        task2.setEndTime(LocalDateTime.now().plusDays(1));
+        task2.setTotalIsDone(false);
         savedTask2 = taskRepository.save(task2);
 
         Assertions.assertThat(taskRepository.findById(savedTask1.getId())).isPresent();
@@ -72,11 +72,11 @@ public class TagCRUDServiceTest {
         Assertions.assertThat(tagRepository.findById(savedTag2.getId())).isPresent();
 
         newTag1 = new Tag();
-        newTag1.setTag_name("newtag1");
+        newTag1.setTagName("newtag1");
 
 
         newTag2 = new Tag();
-        newTag2.setTag_name("newtag2");
+        newTag2.setTagName("newtag2");
 
 
     }
@@ -94,18 +94,18 @@ public class TagCRUDServiceTest {
     @Test
     void createTagTest(){
         Tag createdTag = tagCRUDService.createUpdateTag(tagCRUDService.convertTagToTagDTO(newTag1));
-        Assertions.assertThat(createdTag.getTag_name()).isEqualTo(newTag1.getTag_name());
+        Assertions.assertThat(createdTag.getTagName()).isEqualTo(newTag1.getTagName());
     }
 
     @Test
     void updateTagTest(){
         TagDTO tagDTO = tagCRUDService.readOneTag(savedTag1.getId());
 
-        tagDTO.setTag_name("updatedTag");
+        tagDTO.setTagName("updatedTag");
 
 
 
-        Assertions.assertThat(tagCRUDService.createUpdateTag(tagDTO).getTag_name()).isEqualTo(tagDTO.getTag_name());
+        Assertions.assertThat(tagCRUDService.createUpdateTag(tagDTO).getTagName()).isEqualTo(tagDTO.getTagName());
     }
 
 

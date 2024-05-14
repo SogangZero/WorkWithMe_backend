@@ -46,30 +46,30 @@ public class UserTaskRepositoryTest {
 
         //insert Test task
         Task task = new Task();
-        task.setTask_name("testTask1");
-        task.setStart_time(LocalDateTime.now());
-        task.setEnd_time(LocalDateTime.now().plusDays(1));
-        task.setTotal_is_done(false);
+        task.setTaskName("testTask1");
+        task.setStartTime(LocalDateTime.now());
+        task.setEndTime(LocalDateTime.now().plusDays(1));
+        task.setTotalIsDone(false);
         savedTask1 = taskRepository.save(task);
 
         Task task2 = new Task();
-        task2.setTask_name("testTask2");
-        task2.setStart_time(LocalDateTime.now());
-        task2.setEnd_time(LocalDateTime.now().plusDays(1));
-        task2.setTotal_is_done(false);
+        task2.setTaskName("testTask2");
+        task2.setStartTime(LocalDateTime.now());
+        task2.setEndTime(LocalDateTime.now().plusDays(1));
+        task2.setTotalIsDone(false);
         savedTask2 = taskRepository.save(task2);
 
         //insert Test User
         User user = new User();
-        user.setRegister_date(LocalDateTime.now());
+        user.setRegisterDate(LocalDateTime.now());
         user.setNickname("testUser1");
-        user.setSocial_provider("seswses?");
+        user.setSocialProvider("seswses?");
         savedUser1 = userRepository.save(user);
 
         User user2 = new User();
-        user2.setRegister_date(LocalDateTime.now());
+        user2.setRegisterDate(LocalDateTime.now());
         user2.setNickname("testUser2");
-        user2.setSocial_provider("what?");
+        user2.setSocialProvider("what?");
         savedUser2 = userRepository.save(user2);
     }
 
@@ -82,7 +82,7 @@ public class UserTaskRepositoryTest {
         UserTask userTask = new UserTask();
         userTask.setUser(savedUser1);
         userTask.setTask(savedTask1);
-        userTask.setIs_done(false);
+        userTask.setIsDone(false);
 
         UserTask savedUserTask = userTaskRepository.save(userTask);
         Assertions.assertThat(savedUserTask.getUser().getId()).isEqualTo(savedUser1.getId());
@@ -98,7 +98,7 @@ public class UserTaskRepositoryTest {
         UserTask userTask = new UserTask();
         userTask.setUser(savedUser1);
         userTask.setTask(savedTask1);
-        userTask.setIs_done(false);
+        userTask.setIsDone(false);
         UserTask savedUserTask = userTaskRepository.save(userTask);
 
 

@@ -38,38 +38,38 @@ public class TaskCRUDServiceTest {
     @BeforeEach
     void createTestDB(){
         savedTask1 = new Task();
-        savedTask1.setTask_name("savedTask1");
-        savedTask1.setTask_type("personal");
-        savedTask1.setStart_time(LocalDateTime.now());
-        savedTask1.setEnd_time(LocalDateTime.now().plusDays(1));
+        savedTask1.setTaskName("savedTask1");
+        savedTask1.setTaskType("personal");
+        savedTask1.setStartTime(LocalDateTime.now());
+        savedTask1.setEndTime(LocalDateTime.now().plusDays(1));
         savedTask1.getUserTaskList().clear();
-        savedTask1.setTotal_is_done(false);
+        savedTask1.setTotalIsDone(false);
         savedTask1 = taskRepository.save(savedTask1);
 
         savedTask2 = new Task();
-        savedTask2.setTask_name("savedTask2");
-        savedTask2.setTask_type("personal");
-        savedTask2.setStart_time(LocalDateTime.now());
-        savedTask2.setEnd_time(LocalDateTime.now().plusDays(1));
+        savedTask2.setTaskName("savedTask2");
+        savedTask2.setTaskType("personal");
+        savedTask2.setStartTime(LocalDateTime.now());
+        savedTask2.setEndTime(LocalDateTime.now().plusDays(1));
         savedTask2.getUserTaskList().clear();
-        savedTask2.setTotal_is_done(false);
+        savedTask2.setTotalIsDone(false);
         savedTask2 = taskRepository.save(savedTask2);
 
         newTask1 = new Task();
-        newTask1.setTask_name("newTask1");
-        newTask1.setTask_type("personal");
-        newTask1.setStart_time(LocalDateTime.now());
-        newTask1.setEnd_time(LocalDateTime.now().plusDays(1));
+        newTask1.setTaskName("newTask1");
+        newTask1.setTaskType("personal");
+        newTask1.setStartTime(LocalDateTime.now());
+        newTask1.setEndTime(LocalDateTime.now().plusDays(1));
         newTask1.getUserTaskList().clear();
-        newTask1.setTotal_is_done(false);
+        newTask1.setTotalIsDone(false);
 
         newTask2 = new Task();
-        newTask2.setTask_name("newTask2");
-        newTask2.setTask_type("personal");
-        newTask2.setStart_time(LocalDateTime.now());
-        newTask2.setEnd_time(LocalDateTime.now().plusDays(1));
+        newTask2.setTaskName("newTask2");
+        newTask2.setTaskType("personal");
+        newTask2.setStartTime(LocalDateTime.now());
+        newTask2.setEndTime(LocalDateTime.now().plusDays(1));
         newTask2.getUserTaskList().clear();
-        newTask2.setTotal_is_done(false);
+        newTask2.setTotalIsDone(false);
 
         Assertions.assertThat(savedTask2).isNotNull();
         Assertions.assertThat(savedTask1).isNotNull();
@@ -92,17 +92,17 @@ public class TaskCRUDServiceTest {
 
         Task addedTask =  taskCRUDService.createUpdateTask(newTaskDTO1);
 
-        Assertions.assertThat(addedTask.getTask_name()).isEqualTo(newTaskDTO1.getTask_name());
+        Assertions.assertThat(addedTask.getTaskName()).isEqualTo(newTaskDTO1.getTaskName());
     }
 
     @Test
     void updateTaskTest(){
         TaskDTO taskDTO =  taskCRUDService.readOneTask(savedTask1.getId());
-        taskDTO.setTask_name("updatedTask");
+        taskDTO.setTaskName("updatedTask");
 
         Task updated = taskCRUDService.createUpdateTask(taskDTO);
 
-        Assertions.assertThat(updated.getTask_name()).isEqualTo(taskDTO.getTask_name());
+        Assertions.assertThat(updated.getTaskName()).isEqualTo(taskDTO.getTaskName());
 
     }
 

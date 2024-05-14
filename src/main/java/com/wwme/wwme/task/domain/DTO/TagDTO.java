@@ -1,5 +1,7 @@
 package com.wwme.wwme.task.domain.DTO;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -9,6 +11,8 @@ import lombok.Setter;
 @Setter
 public class TagDTO {
     private Long id;
-    private Long group_id;
-    private String tag_name;
+    @JsonProperty("group_id")
+    private Long groupId;
+    @JsonProperty("tag_name")
+    private String tagName;
 }

@@ -22,21 +22,21 @@ public class Tag {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private String tag_name;
+    private String tagName;
 
     @ManyToOne()
     private Group group;
 
     @OneToMany(mappedBy = "tag")
-    private List<Task> task_list = new ArrayList<>();
+    private List<Task> taskList = new ArrayList<>();
 
 
     public void addToTaskList(Task task){
-        task_list.add(task);
+        taskList.add(task);
     }
 
     public void deleteFromTaskList(Long taskId){
-        Iterator<Task> it = task_list.iterator();
+        Iterator<Task> it = taskList.iterator();
 
         while(it.hasNext()){
             Task t =  (Task) it.next();

@@ -15,9 +15,9 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     @Query("SELECT t FROM Task t LEFT JOIN t.userTaskList ut WHERE (t.group.id = :group_id)" +
             "AND (:user_id IS NULL OR ut.user.id = :user_id)" +
             "AND (:tag_id IS NULL OR t.tag.id = :tag_id)" +
-            "AND (:start_time IS NULL OR t.start_time >= :start_time)" +
-            "AND (:end_time IS NULL OR t.end_time <= :end_time)" +
-            "AND (:is_done IS NULL OR t.total_is_done = :is_done)")
+            "AND (:start_time IS NULL OR t.startTime >= :start_time)" +
+            "AND (:end_time IS NULL OR t.endTime <= :end_time)" +
+            "AND (:is_done IS NULL OR t.totalIsDone = :is_done)")
     List<Task> findTasksByGroupAndFilters(@Param("group_id") Long group_id,
                                           @Param("user_id") Long user_id,
                                           @Param("tag_id") Long tag_id,
@@ -27,9 +27,9 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 
     @Query("SELECT t FROM Task t LEFT JOIN t.userTaskList ut WHERE (ut.user.id = :user_id)" +
             "AND (:tag_id IS NULL OR t.tag.id = :tag_id)" +
-            "AND (:start_time IS NULL OR t.start_time >= :start_time)" +
-            "AND (:end_time IS NULL OR t.end_time <= :end_time)" +
-            "AND (:is_done IS NULL OR t.total_is_done = :is_done)")
+            "AND (:start_time IS NULL OR t.startTime >= :start_time)" +
+            "AND (:end_time IS NULL OR t.endTime <= :end_time)" +
+            "AND (:is_done IS NULL OR t.totalIsDone = :is_done)")
     List<Task> findTaskByUserIdAndFilters(@Param("user_id") Long user_id,
                                           @Param("tag_id") Long tag_id,
                                           @Param("start_time") LocalDateTime start_time,

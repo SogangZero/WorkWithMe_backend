@@ -4,8 +4,6 @@ import com.wwme.wwme.group.domain.Group;
 import com.wwme.wwme.group.repository.GroupRepository;
 import com.wwme.wwme.task.domain.Tag;
 import com.wwme.wwme.task.domain.Task;
-import com.wwme.wwme.task.repository.TagRepository;
-import com.wwme.wwme.task.repository.TaskRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -35,10 +33,10 @@ public class TaskRepositoryTest {
     @Test
     void insertTaskTest(){
         Task task = new Task();
-        task.setTask_name("testTask1");
-        task.setStart_time(LocalDateTime.now());
-        task.setEnd_time(LocalDateTime.now().plusDays(1));
-        task.setTotal_is_done(false);
+        task.setTaskName("testTask1");
+        task.setStartTime(LocalDateTime.now());
+        task.setEndTime(LocalDateTime.now().plusDays(1));
+        task.setTotalIsDone(false);
 
 
         Assertions.assertThat(taskRepository.save(task)).isEqualTo(task);
@@ -49,13 +47,13 @@ public class TaskRepositoryTest {
     void updateTaskTest(){
 
         Task task = new Task();
-        task.setTask_name("testTask1");
-        task.setStart_time(LocalDateTime.now());
-        task.setEnd_time(LocalDateTime.now().plusDays(1));
-        task.setTotal_is_done(false);
+        task.setTaskName("testTask1");
+        task.setStartTime(LocalDateTime.now());
+        task.setEndTime(LocalDateTime.now().plusDays(1));
+        task.setTotalIsDone(false);
 
         Task updtTask = taskRepository.save(task);
-        updtTask.setTask_name("testUpdateTask1");
+        updtTask.setTaskName("testUpdateTask1");
 
         Assertions.assertThat(taskRepository.save(updtTask).getId()).isEqualTo(updtTask.getId());
     }
@@ -63,15 +61,15 @@ public class TaskRepositoryTest {
     @Test
     void addTagToTaskTest(){
         Task task = new Task();
-        task.setTask_name("testTask1");
-        task.setStart_time(LocalDateTime.now());
-        task.setEnd_time(LocalDateTime.now().plusDays(1));
+        task.setTaskName("testTask1");
+        task.setStartTime(LocalDateTime.now());
+        task.setEndTime(LocalDateTime.now().plusDays(1));
         task.getUserTaskList().clear();
-        task.setTotal_is_done(false);
+        task.setTotalIsDone(false);
 
         Tag tag = new Tag();
-        tag.setTag_name("testTag1");
-        tag.getTask_list().clear();
+        tag.setTagName("testTag1");
+        tag.getTaskList().clear();
         Tag saveTag = tagRepository.save(tag);
 
 
@@ -86,11 +84,11 @@ public class TaskRepositoryTest {
     void deleteTaskTest(){
         Task task = new Task();
         task.setId(1L);
-        task.setTask_name("testTask1");
-        task.setStart_time(LocalDateTime.now());
-        task.setEnd_time(LocalDateTime.now().plusDays(1));
+        task.setTaskName("testTask1");
+        task.setStartTime(LocalDateTime.now());
+        task.setEndTime(LocalDateTime.now().plusDays(1));
         task.getUserTaskList().clear();
-        task.setTotal_is_done(false);
+        task.setTotalIsDone(false);
 
         Task saveTask = taskRepository.save(task);
 
@@ -102,32 +100,32 @@ public class TaskRepositoryTest {
     @Test
     void findTasksByGroupAndFiltersTest(){
         Task task1 = new Task();
-        task1.setTask_name("testTask1");
-        task1.setStart_time(LocalDateTime.now());
-        task1.setEnd_time(LocalDateTime.now().plusDays(1));
+        task1.setTaskName("testTask1");
+        task1.setStartTime(LocalDateTime.now());
+        task1.setEndTime(LocalDateTime.now().plusDays(1));
         task1.getUserTaskList().clear();
-        task1.setTotal_is_done(false);
+        task1.setTotalIsDone(false);
         Task savedTask1 = taskRepository.save(task1);
         Assertions.assertThat(taskRepository.findById(savedTask1.getId())).isNotEmpty();
 
 
         Task task2 = new Task();
-        task2.setTask_name("testTask2");
-        task2.setStart_time(LocalDateTime.now());
-        task2.setEnd_time(LocalDateTime.now().plusDays(1));
+        task2.setTaskName("testTask2");
+        task2.setStartTime(LocalDateTime.now());
+        task2.setEndTime(LocalDateTime.now().plusDays(1));
         task2.getUserTaskList().clear();
-        task2.setTotal_is_done(false);
+        task2.setTotalIsDone(false);
         Task savedTask2 = taskRepository.save(task2);
         Assertions.assertThat(savedTask2).isNotNull();
 
 
 
         Task task3 = new Task();
-        task3.setTask_name("testTask3");
-        task3.setStart_time(LocalDateTime.now());
-        task3.setEnd_time(LocalDateTime.now().plusDays(1));
+        task3.setTaskName("testTask3");
+        task3.setStartTime(LocalDateTime.now());
+        task3.setEndTime(LocalDateTime.now().plusDays(1));
         task3.getUserTaskList().clear();
-        task3.setTotal_is_done(false);
+        task3.setTotalIsDone(false);
         Task savedTask3 = taskRepository.save(task3);
         Assertions.assertThat(savedTask3).isNotNull();
 

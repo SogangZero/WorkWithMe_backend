@@ -2,9 +2,6 @@ package com.wwme.wwme.task.repository;
 
 import com.wwme.wwme.task.domain.Tag;
 import com.wwme.wwme.task.domain.Task;
-import com.wwme.wwme.task.repository.TagRepository;
-import com.wwme.wwme.task.repository.TaskRepository;
-import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,25 +37,25 @@ public class TagRepositoryTest {
         taskRepository.deleteAll();
 
         Tag tag1 = new Tag();
-        tag1.setTag_name("testtag1");
+        tag1.setTagName("testtag1");
         savedTag1 = tagRepository.save(tag1);
 
         Tag tag2 = new Tag();
-        tag2.setTag_name("testtag1");
+        tag2.setTagName("testtag1");
         savedTag2 = tagRepository.save(tag2);
 
         Task task1 = new Task();
-        task1.setTask_name("testTask1");
-        task1.setStart_time(LocalDateTime.now());
-        task1.setEnd_time(LocalDateTime.now().plusDays(1));
-        task1.setTotal_is_done(false);
+        task1.setTaskName("testTask1");
+        task1.setStartTime(LocalDateTime.now());
+        task1.setEndTime(LocalDateTime.now().plusDays(1));
+        task1.setTotalIsDone(false);
         savedTask1 = taskRepository.save(task1);
 
         Task task2 = new Task();
-        task2.setTask_name("testTask2");
-        task2.setStart_time(LocalDateTime.now());
-        task2.setEnd_time(LocalDateTime.now().plusDays(1));
-        task2.setTotal_is_done(false);
+        task2.setTaskName("testTask2");
+        task2.setStartTime(LocalDateTime.now());
+        task2.setEndTime(LocalDateTime.now().plusDays(1));
+        task2.setTotalIsDone(false);
         savedTask2 = taskRepository.save(task2);
 
         Assertions.assertThat(taskRepository.findById(savedTask1.getId())).isPresent();
@@ -76,7 +73,7 @@ public class TagRepositoryTest {
 
         Tag taskAddedTag =  tagRepository.findById(savedTag1.getId()).orElseThrow(()-> new EntityNotFoundException("Task with the Tag added not found in DB"));
 
-        Assertions.assertThat(taskAddedTag.getTask_list()).contains(savedTask1,savedTask2);
+        Assertions.assertThat(taskAddedTag.getTaskList()).contains(savedTask1,savedTask2);
     }
 
     /**

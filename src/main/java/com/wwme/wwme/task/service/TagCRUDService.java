@@ -37,9 +37,9 @@ public class TagCRUDService {
         if(tagDTO.getId() != null){
             tag.setId(tagDTO.getId());
         }
-        tag.setTag_name(tagDTO.getTag_name());
-        if(tagDTO.getGroup_id() != null){
-            tag.setGroup(groupRepository.findById(tagDTO.getGroup_id()).orElseThrow(()-> new RuntimeException("Could not find group Id for tagDTO")));
+        tag.setTagName(tagDTO.getTagName());
+        if(tagDTO.getGroupId() != null){
+            tag.setGroup(groupRepository.findById(tagDTO.getGroupId()).orElseThrow(()-> new RuntimeException("Could not find group Id for tagDTO")));
         }
 
         return tagRepository.save(tag);
@@ -48,9 +48,9 @@ public class TagCRUDService {
     public TagDTO convertTagToTagDTO(Tag tag){
         TagDTO tagDTO = new TagDTO();
         if(tag.getGroup() != null){
-            tagDTO.setGroup_id(tag.getGroup().getId());
+            tagDTO.setGroupId(tag.getGroup().getId());
         }
-        tagDTO.setTag_name(tag.getTag_name());
+        tagDTO.setTagName(tag.getTagName());
         tagDTO.setId(tag.getId());
 
         return tagDTO;

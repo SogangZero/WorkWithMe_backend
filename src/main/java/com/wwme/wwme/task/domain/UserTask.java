@@ -26,5 +26,5 @@ public class UserTask {
     @JoinColumn(name = "task_id")
     Task task;
 
-    Boolean is_done = false;
+    Boolean isDone = false;
 }
