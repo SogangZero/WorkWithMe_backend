@@ -26,13 +26,13 @@ public class TaskCRUDController {
     }
 
 
-    @PostMapping("/")
+    @PostMapping
     public ResponseEntity<Object> createTask(@RequestBody TaskDTO taskDTO){
         taskCRUDService.createUpdateTask(taskDTO);
         return ResponseEntity.ok(Collections.singletonMap("success",true));
     }
 
-    @PutMapping("/")
+    @PutMapping
     public ResponseEntity<Object> updateTask(@RequestBody TaskDTO taskDTO){
         taskCRUDService.createUpdateTask(taskDTO);
         return ResponseEntity.ok(Collections.singletonMap("success",true));
