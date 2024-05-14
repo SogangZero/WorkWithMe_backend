@@ -2,8 +2,10 @@ package com.wwme.wwme.login.oauth2;
 
 import com.wwme.wwme.login.domain.dto.CustomOAuth2User;
 import com.wwme.wwme.login.domain.entity.RefreshEntity;
+import com.wwme.wwme.login.domain.entity.UserEntity;
 import com.wwme.wwme.login.jwt.JWTUtil;
 import com.wwme.wwme.login.repository.RefreshRepository;
+import com.wwme.wwme.login.repository.UserRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,6 +29,7 @@ import java.util.Iterator;
 public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private final JWTUtil jwtUtil;
     private final RefreshRepository refreshRepository;
+    private final UserRepository userRepository;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
@@ -58,9 +61,10 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         log.info("access Token : {}", access);
         log.info("refresh Token : {}", refresh);
 
-        if (role.equals("ROLE_TEMP")) {
+        UserEntity user = userRepository.findByUserKey(userKey);
+        if (user.getNickname() == null) {
             response.sendRedirect("http://localhost:8080/login/nickname");
-        } else if (role.equals("ROLE_USER")) {
+        } else {
             response.sendRedirect("http://localhost:8080");
         }
     }
