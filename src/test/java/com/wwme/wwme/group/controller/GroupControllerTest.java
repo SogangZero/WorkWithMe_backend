@@ -8,6 +8,7 @@ import com.wwme.wwme.group.domain.UserGroup;
 import com.wwme.wwme.group.service.GroupInvitationService;
 import com.wwme.wwme.group.service.GroupService;
 import com.wwme.wwme.group.service.UserGroupService;
+import com.wwme.wwme.login.config.SecurityTestConfig;
 import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.service.UserService;
 import jakarta.servlet.http.Cookie;
@@ -16,7 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
@@ -31,9 +34,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(
-        controllers = GroupController.class,
-        excludeAutoConfiguration = SecurityAutoConfiguration.class
+        controllers = GroupController.class
+        //excludeAutoConfiguration = SecurityTestConfig.class
 )
+@WithMockUser(username = "test", roles = "USER")
+@Import(SecurityTestConfig.class)
 class GroupControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -94,7 +99,6 @@ class GroupControllerTest {
 
         when(groupInvitationService.createGroupInvitation(mockedGroup))
                 .thenReturn(invitationCode);
-
         mockMvc.perform(post("/group")
                         .cookie(new Cookie("Authorization", jwtString))
                         .contentType(MediaType.APPLICATION_JSON)
