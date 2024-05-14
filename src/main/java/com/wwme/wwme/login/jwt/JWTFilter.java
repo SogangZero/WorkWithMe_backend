@@ -5,16 +5,17 @@ import com.wwme.wwme.login.domain.dto.UserDTO;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -26,51 +27,45 @@ public class JWTFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException {
-
-        log.info("HTTP REQUEST : {}",request.getRequestURI());
-        if (request.getRequestURI().equals("/") || request.getRequestURI().equals("/login")) {
+        String accessToken = request.getHeader("access");
+        if (accessToken == null) {
+            log.info("AccessToken is null");
             filterChain.doFilter(request, response);
             return;
         }
-        //get cookies -> find cookie in the authorization key
-        String authorization = null;
-        Cookie[] cookies = request.getCookies();
-        for (Cookie cookie : cookies) {
-            log.info("Cookie : {}", cookie.getName());
-            if (cookie.getName().equals("Authorization")) {
-                authorization = cookie.getValue();
-            }
-        }
 
-        //validate authorization header
-        if (authorization == null) {
-            log.info("token null");
-            filterChain.doFilter(request, response);
+        try {
+            jwtUtil.isExpired(accessToken);
+        } catch (ExpiredJwtException e) {
+            log.info("AccessToken is expired");
+            PrintWriter writer = response.getWriter();
+            writer.print("Access token expired");
 
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 
-        String token = authorization;
+        String category = jwtUtil.getCategory(accessToken);
+        if (!category.equals("access")) {
+            log.info("AccessToken is invalid");
+            PrintWriter writer = response.getWriter();
+            writer.print("invalid access token");
 
-        //validate token's expired time
-        if (jwtUtil.isExpired(token)) {
-            log.info("token expired");
-
-            filterChain.doFilter(request, response);
-
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 
-        String userKey = jwtUtil.getUserKey(token);
-        String role = jwtUtil.getRole(token);
+        String userKey = jwtUtil.getUserKey(accessToken);
+        String role = jwtUtil.getRole(accessToken);
 
+        log.info("UserKey {}[{}] has access token {}", userKey, role, accessToken);
         UserDTO userDTO = new UserDTO();
         userDTO.setUserKey(userKey);
         userDTO.setRole(role);
 
         CustomOAuth2User customOAuth2User = new CustomOAuth2User(userDTO);
 
-        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(customOAuth2User, null, customOAuth2User.getAuthorities());
+        Authentication authToken = new UsernamePasswordAuthenticationToken(customOAuth2User, null, customOAuth2User.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authToken);
 
         filterChain.doFilter(request, response);

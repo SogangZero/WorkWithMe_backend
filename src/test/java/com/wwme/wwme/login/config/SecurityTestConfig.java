@@ -1,5 +1,6 @@
 package com.wwme.wwme.login.config;
 
+import com.wwme.wwme.login.domain.dto.CustomOAuth2User;
 import com.wwme.wwme.login.jwt.CustomLogoutFilter;
 import com.wwme.wwme.login.jwt.JWTFilter;
 import com.wwme.wwme.login.jwt.JWTUtil;
@@ -7,9 +8,13 @@ import com.wwme.wwme.login.oauth2.CustomSuccessHandler;
 import com.wwme.wwme.login.repository.RefreshRepository;
 import com.wwme.wwme.login.service.CustomOAuth2UserService;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
+import org.aspectj.lang.annotation.RequiredTypes;
+import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.MockBeans;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -22,38 +27,22 @@ import org.springframework.web.cors.CorsConfigurationSource;
 
 import java.util.Collections;
 
-@Configuration
+@TestConfiguration
 @EnableWebSecurity
-@RequiredArgsConstructor
-public class SecurityConfig {
-    private final CustomOAuth2UserService customOAuth2UserService;
-    private final CustomSuccessHandler customSuccessHandler;
-    private final JWTUtil jwtUtil;
-    private final RefreshRepository refreshRepository;
+@MockBeans({
+        @MockBean(JWTUtil.class),
+        @MockBean(RefreshRepository.class),
+        @MockBean(CustomOAuth2UserService.class),
+        @MockBean(CustomSuccessHandler.class)
+})
+public class SecurityTestConfig {
+    @Autowired private JWTUtil jwtUtil;
+    @Autowired private RefreshRepository refreshRepository;
+    @Autowired private CustomOAuth2UserService customOAuth2UserService;
+    @Autowired private CustomSuccessHandler customSuccessHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                .cors(corsCustomizer -> corsCustomizer.configurationSource(new CorsConfigurationSource() {
-
-                    @Override
-                    public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
-
-                        CorsConfiguration configuration = new CorsConfiguration();
-
-                        configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
-                        configuration.setAllowedMethods(Collections.singletonList("*"));
-                        configuration.setAllowCredentials(true);
-                        configuration.setAllowedHeaders(Collections.singletonList("*"));
-                        configuration.setMaxAge(3600L);
-
-                        configuration.setExposedHeaders(Collections.singletonList("Set-Cookie"));
-                        configuration.setExposedHeaders(Collections.singletonList("Authorization"));
-
-                        return configuration;
-                    }
-                }));
-
         //csrf disable
         http
                 .csrf(AbstractHttpConfigurer::disable);
@@ -67,7 +56,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 );
 
-        //From login disable
+//From login disable
         http
                 .formLogin(AbstractHttpConfigurer::disable);
 
