@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 @DataJpaTest
+@Transactional
 public class TaskRepositoryTest {
 
     private TaskRepository taskRepository;
@@ -160,9 +161,4 @@ public class TaskRepositoryTest {
 
 
 
-    @AfterEach
-    void cleanTable(){
-        tagRepository.deleteAll();
-        taskRepository.deleteAll();
-    }
 }
