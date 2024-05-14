@@ -17,6 +17,10 @@ public class NicknameService {
     private final UserRepository userRepository;
 
     public void saveNicknameAndChangeRole(String nickname, String userKey) {
+        if (nickname == null || nickname.isEmpty()) {
+            throw new IllegalArgumentException();
+        }
+
         UserEntity user = userRepository.findByUserKey(userKey);
 
         user.setNickname(nickname);

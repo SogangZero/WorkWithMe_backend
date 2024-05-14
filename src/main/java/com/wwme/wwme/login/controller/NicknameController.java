@@ -28,7 +28,11 @@ public class NicknameController {
         String nickname = param.get("nickname");
         String authorization = request.getHeader("access");
         String userKey = jwtUtil.getUserKey(authorization);
-        nicknameService.saveNicknameAndChangeRole(nickname, userKey);
+        try {
+            nicknameService.saveNicknameAndChangeRole(nickname, userKey);
+        } catch (IllegalArgumentException e) {
+            return "redirect:/login/nickname";
+        }
 
         log.info("User[{}] request nickname setting by {}", userKey, nickname);
 
