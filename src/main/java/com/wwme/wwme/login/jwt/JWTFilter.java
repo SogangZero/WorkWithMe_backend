@@ -1,5 +1,6 @@
 package com.wwme.wwme.login.jwt;
 
+import com.wwme.wwme.login.domain.CustomAuthenticationToken;
 import com.wwme.wwme.login.domain.dto.CustomOAuth2User;
 import com.wwme.wwme.login.domain.dto.UserDTO;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -65,7 +66,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
         CustomOAuth2User customOAuth2User = new CustomOAuth2User(userDTO);
 
-        Authentication authToken = new UsernamePasswordAuthenticationToken(customOAuth2User, null, customOAuth2User.getAuthorities());
+        Authentication authToken = new CustomAuthenticationToken(customOAuth2User, userKey, customOAuth2User.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authToken);
 
         filterChain.doFilter(request, response);
