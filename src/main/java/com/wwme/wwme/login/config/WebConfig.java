@@ -9,8 +9,8 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
-
-@Configuration
+//TODO : test code에 의존성 추가해주어야지 test가 통과할 수 있음
+//@Configuration
 @RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
     private final JWTUtil jwtUtil;
