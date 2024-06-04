@@ -9,12 +9,14 @@ import com.wwme.wwme.group.service.UserGroupService;
 import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/group")
@@ -56,7 +58,7 @@ public class GroupController {
             GroupCreateSuccessResponseDTO responseDTO = new GroupCreateSuccessResponseDTO();
             responseDTO.setGroupId(createdGroup.getId());
             responseDTO.setSuccess(true);
-            responseDTO.setGroupInvitationLink("/group/invitation/" + code);
+            responseDTO.setGroupCode(code);
             return new ResponseEntity<>(responseDTO, HttpStatus.OK);
         } catch (Exception e) {
             GroupCreateFailResponseDTO responseDTO = new GroupCreateFailResponseDTO();
@@ -70,7 +72,7 @@ public class GroupController {
      * Updates the group name and color of given group id <br>
      * User has to be inside the group
      *
-     * @param requestDTO DTO for body json
+     * @param requestDTO DTO for request
      * @param jwtString  JWT
      * @return
      */
@@ -110,13 +112,13 @@ public class GroupController {
      * Returns one group information with the given group id <br>
      * User has to be inside the group
      *
-     * @param requestDTO request body json
-     * @param jwtString  JWT
+     * @param groupId   group id that is read
+     * @param jwtString JWT
      * @return
      */
     @GetMapping
     public ResponseEntity<?> groupRead(
-            @RequestBody GroupReadRequestDTO requestDTO,
+            @RequestParam("group_id") long groupId,
             @CookieValue("Authorization") String jwtString
     ) {
         try {
@@ -124,7 +126,7 @@ public class GroupController {
             User user = userService.getUserFromJWTString(jwtString);
 
             // Get UserGroup and Group from group id and user
-            UserGroup userGroup = userGroupService.getUserGroupByIdAndUser(requestDTO.getGroupId(), user);
+            UserGroup userGroup = userGroupService.getUserGroupByIdAndUser(groupId, user);
             Group group = userGroup.getGroup();
 
             // Formulate Response
@@ -143,6 +145,31 @@ public class GroupController {
             GroupReadFailResponseDTO responseDTO = new GroupReadFailResponseDTO();
             responseDTO.setSuccess(false);
             return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/user/all")
+    public ResponseEntity<?> groupUserListRead(
+            @RequestParam(name = "group_Id") long groupId
+    ) {
+        try {
+            List<User> users = groupService.getAllUserFromGroupId(groupId);
+            String groupCode = groupService.getGroupCode(groupId);
+
+            // formulate response
+            var responseDTO = new GroupUserListReadResponseSuccessDTO();
+            responseDTO.setGroupCode(groupCode);
+            var responseUsers = users.stream().map((user) -> {
+                var curUser = new GroupUserListReadResponseSuccessDTO.User();
+                curUser.setNickname(user.getNickname());
+                curUser.setProfileImageId(0);
+                return curUser;
+            }).collect(Collectors.toList());
+            responseDTO.setUserList(responseUsers);
+
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -188,6 +215,37 @@ public class GroupController {
         }
     }
 
+    @GetMapping("/code")
+    public ResponseEntity<?> groupReadWithCode(
+            @RequestParam("group_id") String groupCode
+    ) {
+        try {
+            Group group = groupService.getGroupByCode(groupCode);
+            List<User> users = groupService.getAllUserFromGroup(group);
+
+            // formulate response
+            var responseDTO = new GroupReadWithCodeSuccessResponseDTO();
+            responseDTO.setSuccess(true);
+            responseDTO.setGroupName(group.getGroupName());
+
+            var responseUsers = users
+                    .stream()
+                    .map((user) -> {
+                        var curUser = new GroupReadWithCodeSuccessResponseDTO.User();
+                        curUser.setUserId(user.getId());
+                        curUser.setNickname(user.getNickname());
+                        return curUser;
+                    })
+                    .toList();
+
+            responseDTO.setUser(responseUsers);
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+        } catch (Exception e) {
+            var responseDTO = new GenericResponseFailDTO();
+            return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
+        }
+    }
+
     @PostMapping("/invitation/accept")
     public ResponseEntity<?> groupInvitationAccept(
             @RequestBody InvitationAcceptRequestDTO requestDTO,
@@ -215,13 +273,13 @@ public class GroupController {
 
     @DeleteMapping
     public ResponseEntity<?> groupLeave(
-            @RequestBody GroupLeaveRequestDTO requestDTO,
+            @RequestParam("group_id") long groupId,
             @CookieValue("Authorization") String jwtString
     ) {
         try {
             User user = userService.getUserFromJWTString(jwtString);
 
-            userGroupService.removeUserFromGroup(requestDTO.getGroupId(), user);
+            userGroupService.removeUserFromGroup(groupId, user);
 
             var responseDTO = new GroupLeaveResponseDTO();
             responseDTO.setSuccess(true);

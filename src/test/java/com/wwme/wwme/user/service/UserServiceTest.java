@@ -1,5 +1,6 @@
 package com.wwme.wwme.user.service;
 
+import com.wwme.wwme.login.exception.JwtTokenException;
 import com.wwme.wwme.login.jwt.JWTUtil;
 import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.repository.UserRepository;
@@ -21,7 +22,7 @@ public class UserServiceTest {
     private UserRepository userRepository;
 
     @Test
-    void getUserFromJwtStringSuccess() {
+    void getUserFromJwtStringSuccess() throws JwtTokenException {
         String userKey = "user-key";
         String role = "some-role";
         User user = new User();

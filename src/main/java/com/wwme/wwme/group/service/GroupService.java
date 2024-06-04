@@ -4,6 +4,7 @@ import com.wwme.wwme.group.domain.Group;
 import com.wwme.wwme.user.domain.User;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 public interface GroupService {
@@ -27,5 +28,12 @@ public interface GroupService {
      * @return updated group
      */
     Group updateGroupNameAndColor(long groupId, String groupName, String color, User user) throws NoSuchElementException;
+
+    List<User> getAllUserFromGroupId(long groupId);
+    List<User> getAllUserFromGroup(Group group);
+
+    String getGroupCode(long groupId);
+
+    Group getGroupByCode(String groupCode);
 
 }

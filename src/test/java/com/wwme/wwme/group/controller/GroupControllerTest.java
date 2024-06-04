@@ -9,7 +9,9 @@ import com.wwme.wwme.group.service.GroupInvitationService;
 import com.wwme.wwme.group.service.GroupService;
 import com.wwme.wwme.group.service.UserGroupService;
 import com.wwme.wwme.login.config.SecurityTestConfig;
+import com.wwme.wwme.login.config.WebConfig;
 import com.wwme.wwme.user.domain.User;
+import com.wwme.wwme.user.repository.UserRepository;
 import com.wwme.wwme.user.service.UserService;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.Test;
@@ -21,6 +23,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.util.MultiValueMap;
 
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
@@ -38,7 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         //excludeAutoConfiguration = SecurityTestConfig.class
 )
 @WithMockUser(username = "test", roles = "USER")
-@Import(SecurityTestConfig.class)
+@Import({SecurityTestConfig.class, WebConfig.class})
 class GroupControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -60,6 +63,9 @@ class GroupControllerTest {
 
     @MockBean
     private GroupInvitationService groupInvitationService;
+
+    @MockBean
+    private UserRepository userRepository;
 
     @Test
     void contextLoads() {
@@ -297,9 +303,7 @@ class GroupControllerTest {
         String jwtString = "somejwtstring";
         String groupName = "group_name";
         String groupColor = "ABCABC";
-        String request = """
-                    {"group_id": 0}
-                """;
+        String groupId = "0";
         String response = """
                     {
                         "success": true,
@@ -326,9 +330,9 @@ class GroupControllerTest {
                 .thenReturn(userGroup);
 
         mockMvc.perform(get("/group")
+                        .param("group_id", groupId)
                         .cookie(new Cookie("Authorization", jwtString))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(request))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(response));
     }
 }

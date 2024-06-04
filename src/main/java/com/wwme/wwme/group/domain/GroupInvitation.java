@@ -12,7 +12,7 @@ public class GroupInvitation {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(nullable = false)
     private Group group;
 

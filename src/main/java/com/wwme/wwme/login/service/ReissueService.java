@@ -2,10 +2,10 @@ package com.wwme.wwme.login.service;
 
 import com.wwme.wwme.login.domain.entity.RefreshEntity;
 import com.wwme.wwme.login.exception.InvalidRefreshTokenException;
+import com.wwme.wwme.login.exception.JwtTokenException;
 import com.wwme.wwme.login.exception.NullRefreshTokenException;
 import com.wwme.wwme.login.jwt.JWTUtil;
 import com.wwme.wwme.login.repository.RefreshRepository;
-import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ public class ReissueService {
     private final JWTUtil jwtUtil;
     private final RefreshRepository refreshRepository;
 
-    public String validateRefreshToken(Cookie[] cookies) throws NullRefreshTokenException, ExpiredJwtException, InvalidRefreshTokenException {
+    public String validateRefreshToken(Cookie[] cookies) throws NullRefreshTokenException, JwtTokenException, InvalidRefreshTokenException {
         String refresh = null;
         for (Cookie cookie : cookies) {
             if (cookie.getName().equals("refresh")) {
@@ -31,7 +31,10 @@ public class ReissueService {
         }
 
         //expired check
-        jwtUtil.isExpired(refresh);
+        if (jwtUtil.isExpired(refresh)) {
+            throw new InvalidRefreshTokenException("expired refresh token");
+        }
+
 
         //check if the token is refresh
         String category = jwtUtil.getCategory(refresh);
