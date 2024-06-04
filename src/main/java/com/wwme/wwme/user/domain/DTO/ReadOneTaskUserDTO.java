@@ -8,8 +8,8 @@ import lombok.Setter;
 @Setter
 @RequiredArgsConstructor
 public class ReadOneTaskUserDTO {
-    private Long userId;
+    private Long user_id;
     private String nickname;
-    private Long profileImageId;
-    private Boolean isDone;
+    private Long profile_image_id;
+    private Boolean is_done;
 }

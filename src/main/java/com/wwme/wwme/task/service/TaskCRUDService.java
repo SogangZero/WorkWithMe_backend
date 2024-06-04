@@ -25,7 +25,7 @@ public interface TaskCRUDService {
      * @param updateTaskReceiveDTO
      * @return updateTaskSendDTO
      */
-   public  UpdateTaskSendDTO updateTask(UpdateTaskReceiveDTO updateTaskReceiveDTO);
+   public  Task updateTask(UpdateTaskReceiveDTO updateTaskReceiveDTO);
 
 
     /**
@@ -57,7 +57,7 @@ public interface TaskCRUDService {
      * @param taskId
      * @return
      */
-    public ReadOneTaskSendDTO readOneTask(String taskId);
+    public ReadOneTaskSendDTO readOneTask(Long taskId);
 
     /**
      * return incomlpete task of user

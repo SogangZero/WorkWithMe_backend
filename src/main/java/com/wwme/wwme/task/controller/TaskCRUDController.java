@@ -37,7 +37,12 @@ public class TaskCRUDController {
 
     @PostMapping("/")
     public ResponseEntity<UpdateTaskSendDTO> updateTask(@RequestBody UpdateTaskReceiveDTO updateTaskReceiveDTO){
-        UpdateTaskSendDTO updateTaskSendDTO = taskCRUDService.updateTask(updateTaskReceiveDTO);
+        Task task = taskCRUDService.updateTask(updateTaskReceiveDTO);
+
+        UpdateTaskSendDTO updateTaskSendDTO = new UpdateTaskSendDTO();
+        updateTaskSendDTO.setTask_id(task.getId());
+        updateTaskSendDTO.setSuccess(true);
+
         return ResponseEntity.ok(updateTaskSendDTO);
     }
 
@@ -63,7 +68,7 @@ public class TaskCRUDController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<ReadOneTaskSendDTO> readOneTask(@ModelAttribute String task_id){
+    public ResponseEntity<ReadOneTaskSendDTO> readOneTask(@ModelAttribute Long task_id){
         ReadOneTaskSendDTO readOneTaskSendDTO = taskCRUDService.readOneTask(task_id);
 
         return ResponseEntity.ok(readOneTaskSendDTO);

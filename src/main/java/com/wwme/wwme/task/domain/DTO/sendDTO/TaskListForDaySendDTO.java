@@ -13,7 +13,7 @@ public class TaskListForDaySendDTO {
     private Boolean isComplete;
     private Long taskId;
     private String taskName;
-    private String tagId;
+    private Long tagId;
     private String tagName;
     private LocalDate endDate;
 }
