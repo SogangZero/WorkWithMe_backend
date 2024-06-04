@@ -1,10 +1,14 @@
 package com.wwme.wwme.login.controller;
 
 import com.wwme.wwme.login.config.SecurityTestConfig;
+import com.wwme.wwme.login.config.WebConfig;
+import com.wwme.wwme.login.jwt.JWTUtil;
+import com.wwme.wwme.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -13,10 +17,16 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = {AuthorizedController.class})
-@Import(SecurityTestConfig.class)
+@Import({SecurityTestConfig.class, WebConfig.class})
 public class AuthorizedControllerTest {
     @Autowired
     private MockMvc mvc;
+
+    @MockBean
+    private UserRepository userRepository;
+
+    @MockBean
+    private JWTUtil jwtUtil;
 
     @Test
     @DisplayName("권한을 받은 유저만이 /my 에 접근 가능함")

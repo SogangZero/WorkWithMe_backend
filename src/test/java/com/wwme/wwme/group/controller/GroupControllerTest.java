@@ -9,7 +9,9 @@ import com.wwme.wwme.group.service.GroupInvitationService;
 import com.wwme.wwme.group.service.GroupService;
 import com.wwme.wwme.group.service.UserGroupService;
 import com.wwme.wwme.login.config.SecurityTestConfig;
+import com.wwme.wwme.login.config.WebConfig;
 import com.wwme.wwme.user.domain.User;
+import com.wwme.wwme.user.repository.UserRepository;
 import com.wwme.wwme.user.service.UserService;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.Test;
@@ -38,7 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         //excludeAutoConfiguration = SecurityTestConfig.class
 )
 @WithMockUser(username = "test", roles = "USER")
-@Import(SecurityTestConfig.class)
+@Import({SecurityTestConfig.class, WebConfig.class})
 class GroupControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -60,6 +62,9 @@ class GroupControllerTest {
 
     @MockBean
     private GroupInvitationService groupInvitationService;
+
+    @MockBean
+    private UserRepository userRepository;
 
     @Test
     void contextLoads() {

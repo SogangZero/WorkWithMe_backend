@@ -6,6 +6,7 @@ import com.wwme.wwme.login.exception.NullRefreshTokenException;
 import com.wwme.wwme.login.jwt.JWTUtil;
 import com.wwme.wwme.login.repository.RefreshRepository;
 import com.wwme.wwme.login.service.ReissueService;
+import com.wwme.wwme.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,6 +35,8 @@ public class ReissueControllerTest {
     private ReissueService reissueService;
     @MockBean
     private JWTUtil jwtUtil;
+    @MockBean
+    private UserRepository userRepository;
 
     @Test
     @DisplayName("/reisuue POST : 서비스에서 NullRefreshTokenException이 발생하면 400 http status 반환")
