@@ -1,6 +1,7 @@
 package com.wwme.wwme.login.controller;
 
 import com.wwme.wwme.login.exception.InvalidRefreshTokenException;
+import com.wwme.wwme.login.exception.JwtTokenException;
 import com.wwme.wwme.login.exception.NullRefreshTokenException;
 import com.wwme.wwme.login.jwt.JWTUtil;
 import com.wwme.wwme.login.service.ReissueService;
@@ -23,14 +24,14 @@ public class ReissueController {
 
     @PostMapping("/reissue")
     public ResponseEntity<?> reissue(HttpServletRequest request,
-                                     HttpServletResponse response) {
+                                     HttpServletResponse response) throws JwtTokenException {
         //get refresh token
         String refresh = null;
         Cookie[] cookies = request.getCookies();
 
         try {
             refresh = reissueService.validateRefreshToken(cookies);
-        } catch (NullRefreshTokenException | InvalidRefreshTokenException e) {
+        } catch (NullRefreshTokenException | InvalidRefreshTokenException | Exception e) {
             log.info("User has expired or invalid refresh token");
             return new ResponseEntity<>(e.toString(), HttpStatus.BAD_REQUEST);
         }

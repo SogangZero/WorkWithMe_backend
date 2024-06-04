@@ -1,34 +1,41 @@
 package com.wwme.wwme.login.service;
 
+import com.wwme.wwme.login.config.WebConfig;
 import com.wwme.wwme.login.exception.InvalidRefreshTokenException;
 import com.wwme.wwme.login.exception.NullRefreshTokenException;
 import com.wwme.wwme.login.jwt.JWTUtil;
 import com.wwme.wwme.login.repository.RefreshRepository;
+import com.wwme.wwme.user.repository.UserRepository;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.matches;
 import static org.mockito.Mockito.when;
 
-@WebMvcTest(controllers = ReissueService.class)
 @ExtendWith(MockitoExtension.class)
+@WebMvcTest(ReissueService.class)
+@Import(WebConfig.class)
 public class ReissueServiceTest {
     @Autowired
     private ReissueService reissueService;
     @MockBean
     private JWTUtil jwtUtil;
     @MockBean
-    RefreshRepository refreshRepository;
+    private RefreshRepository refreshRepository;
+    @MockBean
+    private UserRepository userRepository;
 
     @Test
     @DisplayName("validateRefreshToken에서 cookie에 refresh token이 없으면 NullRefreshTokenException 발생")
@@ -96,6 +103,8 @@ public class ReissueServiceTest {
                 .thenReturn("refresh");
         when(refreshRepository.existsByRefresh(any()))
                 .thenReturn(true);
+        when(jwtUtil.isExpired(any()))
+                .thenReturn(false);
 
         assertThat(reissueService.validateRefreshToken(cookies)).isEqualTo("refreshTest");
     }

@@ -6,6 +6,7 @@ import com.wwme.wwme.login.jwt.JWTUtil;
 import com.wwme.wwme.login.oauth2.CustomSuccessHandler;
 import com.wwme.wwme.login.repository.RefreshRepository;
 import com.wwme.wwme.login.service.CustomOAuth2UserService;
+import com.wwme.wwme.user.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -30,6 +31,7 @@ public class SecurityConfig {
     private final CustomSuccessHandler customSuccessHandler;
     private final JWTUtil jwtUtil;
     private final RefreshRepository refreshRepository;
+    private final UserRepository userRepository;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -65,6 +67,7 @@ public class SecurityConfig {
                         .requestMatchers("/reissue").permitAll()
                         .requestMatchers("/login/oauth2/code/**").permitAll()
                         .anyRequest().authenticated()
+
                 );
 
         //From login disable

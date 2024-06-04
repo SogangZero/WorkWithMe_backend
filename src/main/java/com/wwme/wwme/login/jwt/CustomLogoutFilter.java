@@ -1,7 +1,7 @@
 package com.wwme.wwme.login.jwt;
 
+import com.wwme.wwme.login.exception.JwtTokenException;
 import com.wwme.wwme.login.repository.RefreshRepository;
-import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
@@ -26,13 +26,17 @@ public class CustomLogoutFilter extends GenericFilterBean {
                          ServletResponse response,
                          FilterChain chain)
             throws IOException, ServletException {
-        customDoFilter((HttpServletRequest) request, (HttpServletResponse) response, chain);
+        try {
+            customDoFilter((HttpServletRequest) request, (HttpServletResponse) response, chain);
+        } catch (JwtTokenException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void customDoFilter(HttpServletRequest request,
                                 HttpServletResponse response,
                                 FilterChain chain)
-            throws IOException, ServletException {
+            throws IOException, ServletException, JwtTokenException {
         //verify path and method
         String requestUri = request.getRequestURI();
         if (!requestUri.matches("^\\/logout$")) {
@@ -48,6 +52,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
         //get refresh token
         String refresh = null;
         Cookie[] cookies = request.getCookies();
+        System.out.println("cookies = " + cookies);
         for (Cookie cookie : cookies) {
             if (cookie.getName().equals("refresh")) {
                 refresh = cookie.getValue();
@@ -61,7 +66,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
 
         try {
             jwtUtil.isExpired(refresh);
-        } catch (ExpiredJwtException e) {
+        } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }

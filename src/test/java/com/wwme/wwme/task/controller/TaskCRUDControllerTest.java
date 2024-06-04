@@ -2,9 +2,12 @@ package com.wwme.wwme.task.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wwme.wwme.login.config.SecurityTestConfig;
+import com.wwme.wwme.login.config.WebConfig;
+import com.wwme.wwme.login.jwt.JWTUtil;
 import com.wwme.wwme.task.domain.DTO.TaskDTO;
 import com.wwme.wwme.task.domain.Task;
 import com.wwme.wwme.task.service.TaskCRUDService;
+import com.wwme.wwme.user.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -18,7 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.mockito.Mockito.*;
 @WebMvcTest(TaskCRUDController.class)
-@Import(SecurityTestConfig.class)
+@Import({SecurityTestConfig.class, WebConfig.class})
 @WithMockUser(username = "TEST", roles = "USER")
 public class TaskCRUDControllerTest {
 
@@ -27,6 +30,12 @@ public class TaskCRUDControllerTest {
 
     @MockBean
     private TaskCRUDService taskCRUDService;
+
+    @MockBean
+    private JWTUtil jwtUtil;
+
+    @MockBean
+    private UserRepository userRepository;
 
     @Test
     public void testCreateTask() throws Exception {

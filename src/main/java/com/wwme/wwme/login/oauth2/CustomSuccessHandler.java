@@ -1,6 +1,8 @@
 package com.wwme.wwme.login.oauth2;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wwme.wwme.login.domain.dto.CustomOAuth2User;
+import com.wwme.wwme.login.domain.dto.JoinStatusDTO;
 import com.wwme.wwme.login.domain.entity.RefreshEntity;
 import com.wwme.wwme.login.jwt.JWTUtil;
 import com.wwme.wwme.login.repository.RefreshRepository;
@@ -22,6 +24,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 @Component
 @Slf4j
@@ -30,6 +33,10 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private final JWTUtil jwtUtil;
     private final RefreshRepository refreshRepository;
     private final UserRepository userRepository;
+    private final ObjectMapper objectMapper;
+
+    private static final Long refreshTokenDurationMS = 24 * 60 * 60 * 1000L;
+    private static final Long accessTokenDurationMS = 10 * 60 * 1000L;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
@@ -46,11 +53,11 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String role = auth.getAuthority();
 
         //generate token
-        String access = jwtUtil.createJwt("access", userKey, role, 10 * 60 * 1000L);//10m
-        String refresh = jwtUtil.createJwt("refresh", userKey, role, 24 * 60 * 60 * 1000L);//24h
+        String access = jwtUtil.createJwt("access", userKey, role, accessTokenDurationMS);//10m
+        String refresh = jwtUtil.createJwt("refresh", userKey, role, refreshTokenDurationMS);//24h
 
         //store refresh token
-        addRefreshToken(userKey, refresh, 24 * 60 * 60 * 1000L);
+        addRefreshToken(userKey, refresh, refreshTokenDurationMS);
 
         //response setting
         response.setHeader("access", access);
@@ -61,11 +68,22 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         log.info("access Token : {}", access);
         log.info("refresh Token : {}", refresh);
 
-        User user = userRepository.findByUserKey(userKey).orElseThrow(); //NoSuchElementException
-        if (user.getNickname() == null) {
-            response.sendRedirect("http://localhost:8080/login/nickname");
-        } else {
-            response.sendRedirect("http://localhost:8080");
+        try {
+            User user = userRepository.findByUserKey(userKey).orElseThrow(NoSuchElementException::new); //NoSuchElementException
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.setContentType("application/json");
+            response.setCharacterEncoding("utf-8");
+            JoinStatusDTO joinStatusDTO = new JoinStatusDTO();
+
+            if (user.getNickname() == null) {
+                joinStatusDTO.setAlready_joined(false);
+            } else {
+                joinStatusDTO.setAlready_joined(true);
+            }
+            String jsonBody = objectMapper.writeValueAsString(joinStatusDTO);
+            response.getWriter().write(jsonBody);
+        } catch (NoSuchElementException e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
     }
 
