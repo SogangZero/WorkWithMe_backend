@@ -30,4 +30,9 @@ public class CustomAuthenticationToken extends AbstractAuthenticationToken {
     public Object getPrincipal() {
         return this.principal;
     }
+
+    @Override
+    public boolean isAuthenticated() {
+        return true;
+    }
 }
