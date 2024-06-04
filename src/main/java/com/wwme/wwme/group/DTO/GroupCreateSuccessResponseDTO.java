@@ -14,6 +14,6 @@ public class GroupCreateSuccessResponseDTO {
     @JsonProperty("group_id")
     long groupId;
 
-    @JsonProperty("group_invitation_link")
-    String groupInvitationLink;
+    @JsonProperty("group_code")
+    String groupCode;
 }

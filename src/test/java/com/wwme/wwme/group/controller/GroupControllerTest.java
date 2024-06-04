@@ -21,6 +21,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.util.MultiValueMap;
 
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
@@ -297,9 +298,7 @@ class GroupControllerTest {
         String jwtString = "somejwtstring";
         String groupName = "group_name";
         String groupColor = "ABCABC";
-        String request = """
-                    {"group_id": 0}
-                """;
+        String groupId = "0";
         String response = """
                     {
                         "success": true,
@@ -326,9 +325,9 @@ class GroupControllerTest {
                 .thenReturn(userGroup);
 
         mockMvc.perform(get("/group")
+                        .param("group_id", groupId)
                         .cookie(new Cookie("Authorization", jwtString))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(request))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(response));
     }
 }

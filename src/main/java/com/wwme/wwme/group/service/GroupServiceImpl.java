@@ -2,7 +2,9 @@ package com.wwme.wwme.group.service;
 
 
 import com.wwme.wwme.group.domain.Group;
+import com.wwme.wwme.group.domain.GroupInvitation;
 import com.wwme.wwme.group.domain.UserGroup;
+import com.wwme.wwme.group.repository.GroupInvitationRepository;
 import com.wwme.wwme.group.repository.GroupRepository;
 import com.wwme.wwme.group.repository.UserGroupRepository;
 import com.wwme.wwme.user.domain.User;
@@ -22,6 +24,7 @@ import java.util.stream.Collectors;
 public class GroupServiceImpl implements GroupService {
     private final GroupRepository groupRepository;
     private final UserGroupRepository userGroupRepository;
+    private final GroupInvitationRepository groupInvitationRepository;
 
     @Override
     public Group createGroupWithUserAndColor(String groupName, User user, String color) {
@@ -57,5 +60,32 @@ public class GroupServiceImpl implements GroupService {
         userGroupRepository.save(userGroup);
 
         return group;
+    }
+
+    @Override
+    public List<User> getAllUserFromGroupId(long groupId) {
+        Group group = groupRepository.findById(groupId).orElseThrow();
+        return getAllUserFromGroup(group);
+    }
+
+    @Override
+    public List<User> getAllUserFromGroup(Group group) {
+        Collection<UserGroup> userGroups = userGroupRepository.findByGroup(group);
+        return userGroups
+                .stream()
+                .map(UserGroup::getUser)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public String getGroupCode(long groupId) {
+        GroupInvitation groupInvitation = groupInvitationRepository.findByGroupId(groupId).orElseThrow();
+       return groupInvitation.getCode();
+    }
+
+    @Override
+    public Group getGroupByCode(String groupCode) {
+        GroupInvitation groupInvitation = groupInvitationRepository.findByCode(groupCode).orElseThrow();
+        return groupInvitation.getGroup();
     }
 }
