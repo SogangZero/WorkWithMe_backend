@@ -6,8 +6,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long> {
@@ -35,4 +37,32 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
                                           @Param("start_time") LocalDateTime start_time,
                                           @Param("end_time") LocalDateTime end_time,
                                           @Param("is_done") Boolean is_done);
+    @Query("SELECT t FROM Task t WHERE t.endTime >= :startDate AND t.endTime <= :endDate")
+    List<Task> findTasksBetweenDates(
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate);
+
+    @Query("SELECT t FROM Task t " +
+            "LEFT JOIN FETCH t.userTaskList ut " +
+            "WHERE ut.user.id = :userId " +
+            "AND t.endTime = :date")
+    List<Task> findAllByUserAndEndTime(Long userId, LocalDate date);
+
+
+    @Query("SELECT t FROM Task t " +
+            "LEFT JOIN FETCH t.userTaskList ut " +
+            "LEFT JOIN FETCH ut.user u " +
+            "LEFT JOIN FETCH t.tag tg " +
+            "LEFT JOIN FETCH t.group g " +
+            "WHERE t.id = :taskId")
+    Optional<Task> findTaskByIdWithUserTaskList(Long taskId);
+
+    @Query("SELECT t FROM Task t " +
+            "LEFT JOIN FETCH t.userTaskList ut " +
+            "LEFT JOIN FETCH t.group gp " +
+            "LEFT JOIN FETCH t.tag tg " +
+            "WHERE ut.user.id = :userId " +
+            "AND ut.isDone = false " +
+            "ORDER BY t.endTime asc")
+    List<Task> findTasksByUserIdFetchUserTask(@Param("userId") Long userId);
 }

@@ -33,25 +33,23 @@ public class LoginCheckAspect {
 
         String authorization = request.getHeader("access");
         if (authorization == null || authorization.isEmpty()) {
-            throw new NotAuthorizedUserException();
+            throw new NotAuthorizedUserException("Access Token is null");
         }
 
         String userKey = jwtUtil.getUserKey(authorization);
         if (userKey == null || userKey.isEmpty()) {
-            throw new NotAuthorizedUserException();
+            throw new NotAuthorizedUserException("Access Token is Invalid");
         }
 
         User user = userRepository.findByUserKey(userKey)
-                .orElseThrow(() -> new NoSuchUserException());
+                .orElseThrow(() -> new NoSuchUserException("Not Found User"));
 
         if (!loginCheck.checkLevel().equals(user.getRole())) {
-            throw new NotAuthorizedUserException();
+            throw new NotAuthorizedUserException("Too Low Role for Access");
         }
 
         Object[] modifiedArgsWithUser = modifyArgsWithUser(user, proceedingJoinPoint);
-        for (Object o : modifiedArgsWithUser) {
-            System.out.println("o = " + o);
-        }
+
         return proceedingJoinPoint.proceed(modifiedArgsWithUser);
     }
 
@@ -63,9 +61,7 @@ public class LoginCheckAspect {
 
         for (int i = 0; i < method.getParameters().length; i++) {
             String parameterName = method.getParameters()[i].getName();
-            System.out.println("parameterName = " + parameterName);
             if (parameterName.equals(USER_PARAM)) {
-                System.out.println("LoginCheckAspect.modifyArgsWithUser");
                 parameters[i] = user;
             }
         }

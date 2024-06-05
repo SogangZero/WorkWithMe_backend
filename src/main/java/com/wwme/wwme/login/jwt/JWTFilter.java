@@ -27,6 +27,13 @@ public class JWTFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
         String accessToken = request.getHeader("access");
+
+        //For Supervisor
+        String access = (String)request.getAttribute("access");
+        if (access != null) {
+            accessToken = access;
+        }
+
         if (accessToken == null) {
             log.info("AccessToken is null");
             filterChain.doFilter(request, response);
