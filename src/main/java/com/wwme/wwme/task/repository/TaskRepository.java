@@ -1,13 +1,16 @@
 package com.wwme.wwme.task.repository;
 
 import com.wwme.wwme.task.domain.Task;
+import com.wwme.wwme.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long> {
@@ -35,4 +38,16 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
                                           @Param("start_time") LocalDateTime start_time,
                                           @Param("end_time") LocalDateTime end_time,
                                           @Param("is_done") Boolean is_done);
+    @Query("SELECT t FROM Task t WHERE t.endTime >= :startDate AND t.endTime <= :endDate")
+    List<Task> findTasksBetweenDates(
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate);
+
+    List<Task> findAllByUserAndDate(User user, LocalDate date);
+
+    @Query("SELECT t FROM Task t LEFT JOIN FETCH t.userTaskList WHERE t.id = :id")
+    Optional<Task> findByIdWithUserTaskList(Long id);
+
+    @Query("SELECT t FROM Task t LEFT JOIN FETCH t.userTaskList ut WHERE ut.user.id = :userId")
+    List<Task> findTasksByUserIdFetchUserTask(@Param("userId") Long userId);
 }

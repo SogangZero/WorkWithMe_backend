@@ -1,7 +1,6 @@
 package com.wwme.wwme.task.controller;
 
 import com.wwme.wwme.task.domain.DTO.TagDTO;
-import com.wwme.wwme.task.domain.Tag;
 import com.wwme.wwme.task.service.TagCRUDService;
 import com.wwme.wwme.task.service.TaskCRUDService;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
