@@ -39,6 +39,7 @@ public class TaskCRUDController {
     public ResponseEntity<?> createTask(@RequestBody CreateTaskReceiveDTO createTaskReceiveDTO){
         try {
             Task task = taskCRUDService.createTask(createTaskReceiveDTO);
+            logger.info("successfully created and added Task");
             return ResponseEntity.ok(Collections.singletonMap("task_id",task.getId()));
         } catch (Exception e) {
             logger.error(e.getMessage());
