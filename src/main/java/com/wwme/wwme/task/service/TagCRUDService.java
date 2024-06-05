@@ -2,12 +2,16 @@ package com.wwme.wwme.task.service;
 
 import com.wwme.wwme.group.repository.GroupRepository;
 import com.wwme.wwme.task.domain.DTO.TagDTO;
+import com.wwme.wwme.task.domain.DTO.sendDTO.TagListReadSendDTO;
 import com.wwme.wwme.task.domain.Tag;
 import com.wwme.wwme.task.repository.TagRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -62,5 +66,22 @@ public class TagCRUDService {
             entityManager.refresh(tag);
         }
         return entityManager.find(Tag.class,tagId);
+    }
+
+    public List<TagListReadSendDTO> getTagList(TagDTO tagDTO){
+
+        List<Tag> tagList= tagRepository.findAllByGroupId(tagDTO.getGroupId());
+
+        List<TagListReadSendDTO> tagListReadSendDTOList = new ArrayList<>();
+
+        for(Tag tag : tagList){
+            TagListReadSendDTO tagListReadSendDTO = new TagListReadSendDTO();
+            tagListReadSendDTO.setTag_id(tag.getId());
+            tagListReadSendDTO.setTag_name(tag.getTagName());
+
+            tagListReadSendDTOList.add(tagListReadSendDTO);
+        }
+
+        return tagListReadSendDTOList;
     }
 }

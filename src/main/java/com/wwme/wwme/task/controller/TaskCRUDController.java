@@ -35,7 +35,7 @@ public class TaskCRUDController {
         this.userService = userService;
     }
 
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<?> createTask(@RequestBody CreateTaskReceiveDTO createTaskReceiveDTO){
         try {
             Task task = taskCRUDService.createTask(createTaskReceiveDTO);
@@ -46,7 +46,7 @@ public class TaskCRUDController {
         }
     }
 
-    @PostMapping("/update")
+    @PutMapping
     public ResponseEntity<?> updateTask(@RequestBody UpdateTaskReceiveDTO updateTaskReceiveDTO){
         try {
             Task task = taskCRUDService.updateTask(updateTaskReceiveDTO);
