@@ -8,6 +8,5 @@ import lombok.Setter;
 @Setter
 @RequiredArgsConstructor
 public class UpdateTaskSendDTO {
-    private Boolean success;
     private Long task_id;
 }

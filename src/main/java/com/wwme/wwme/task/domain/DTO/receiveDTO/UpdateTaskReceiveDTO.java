@@ -17,5 +17,6 @@ public class UpdateTaskReceiveDTO {
     private String task_type;
     private Long tag_id;
     private Long group_id;
-    private Boolean is_done;
+    private Boolean is_done_total;
+    private Boolean is_done_personal;
 }

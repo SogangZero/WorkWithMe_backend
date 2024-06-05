@@ -1,5 +1,7 @@
 package com.wwme.wwme.task.controller;
 
+import com.wwme.wwme.group.DTO.DataWrapDTO;
+import com.wwme.wwme.group.DTO.ErrorWrapDTO;
 import com.wwme.wwme.login.aop.Login;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.CreateTaskReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.TaskListReadByGroupReceiveDTO;
@@ -9,6 +11,8 @@ import com.wwme.wwme.task.domain.Task;
 import com.wwme.wwme.task.service.TaskCRUDService;
 import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -23,6 +27,7 @@ public class TaskCRUDController {
 
     private final TaskCRUDService taskCRUDService;
     private final UserService userService;
+    private static final Logger logger = LoggerFactory.getLogger(TaskCRUDController.class);
 
     @Autowired
     public TaskCRUDController(TaskCRUDService taskCRUDService, UserService userService) {
@@ -30,37 +35,56 @@ public class TaskCRUDController {
         this.userService = userService;
     }
 
-    @PostMapping("/")
-    public ResponseEntity<Map<String,Long>> createTask(@RequestBody CreateTaskReceiveDTO createTaskReceiveDTO){
-        Task task = taskCRUDService.createTask(createTaskReceiveDTO);
-        return ResponseEntity.ok(Collections.singletonMap("task_id",task.getId()));
+    @PostMapping("/create")
+    public ResponseEntity<?> createTask(@RequestBody CreateTaskReceiveDTO createTaskReceiveDTO){
+        try {
+            Task task = taskCRUDService.createTask(createTaskReceiveDTO);
+            return ResponseEntity.ok(Collections.singletonMap("task_id",task.getId()));
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return ResponseEntity.badRequest().body(Collections.singletonMap("error",e.getMessage()));
+        }
     }
 
-    @PostMapping("/")
-    public ResponseEntity<UpdateTaskSendDTO> updateTask(@RequestBody UpdateTaskReceiveDTO updateTaskReceiveDTO){
-        Task task = taskCRUDService.updateTask(updateTaskReceiveDTO);
+    @PostMapping("/update")
+    public ResponseEntity<?> updateTask(@RequestBody UpdateTaskReceiveDTO updateTaskReceiveDTO){
+        try {
+            Task task = taskCRUDService.updateTask(updateTaskReceiveDTO);
+            UpdateTaskSendDTO updateTaskSendDTO = new UpdateTaskSendDTO();
+            updateTaskSendDTO.setTask_id(task.getId());
 
-        UpdateTaskSendDTO updateTaskSendDTO = new UpdateTaskSendDTO();
-        updateTaskSendDTO.setTask_id(task.getId());
-        updateTaskSendDTO.setSuccess(true);
+            DataWrapDTO dataWrapDTO= new DataWrapDTO(updateTaskSendDTO);
 
-        return ResponseEntity.ok(updateTaskSendDTO);
+            return ResponseEntity.ok(updateTaskSendDTO);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            ErrorWrapDTO errorWrapDTO = new ErrorWrapDTO(e.getMessage());
+            return ResponseEntity.badRequest().body(errorWrapDTO);
+        }
     }
 
     @PostMapping("/done")
-    public ResponseEntity<Map<String,Boolean>> makeTaskDone(@RequestBody Long task_id,@RequestBody Boolean done){
+    public ResponseEntity<?> makeTaskDone(@RequestBody Long task_id,@RequestBody Boolean done){
         try{
             taskCRUDService.makeTaskDone(task_id, done);
-            return ResponseEntity.ok(Collections.singletonMap("success",true));
+            return ResponseEntity.ok(null); //TODO: 데이터가 없을떄 명세서에 의하면 아무것도 보내지 않는다. Is this ok?
         }catch (Exception e){
-            return ResponseEntity.badRequest().body(Collections.singletonMap("success",false));
+            logger.error(e.getMessage());
+            ErrorWrapDTO errorWrapDTO = new ErrorWrapDTO(e.getMessage());
+            return ResponseEntity.badRequest().body(errorWrapDTO);
         }
 
     }
 
     @GetMapping("/list/month")
-    public ResponseEntity<GetTaskCountListforMonthSendDTO> getTaskCountListforMonth(@ModelAttribute LocalDate date){
-        return ResponseEntity.ok(taskCRUDService.getTaskCountListforMonth(date));
+    public ResponseEntity<?> getTaskCountListforMonth(@ModelAttribute LocalDate date){
+        try {
+            return ResponseEntity.ok(new DataWrapDTO(taskCRUDService.getTaskCountListforMonth(date)));
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            ErrorWrapDTO errorWrapDTO = new ErrorWrapDTO(e.getMessage());
+            return ResponseEntity.badRequest().body(errorWrapDTO);
+        }
     }
 
     @GetMapping("list/day")
@@ -72,11 +96,13 @@ public class TaskCRUDController {
 
     }
 
-    @GetMapping("/")
-    public ResponseEntity<ReadOneTaskSendDTO> readOneTask(@ModelAttribute Long task_id){
+    @GetMapping
+    public ResponseEntity<?> readOneTask(@ModelAttribute Long task_id){
         ReadOneTaskSendDTO readOneTaskSendDTO = taskCRUDService.readOneTask(task_id);
 
-        return ResponseEntity.ok(readOneTaskSendDTO);
+        DataWrapDTO dataWrapDTO = new DataWrapDTO(readOneTaskSendDTO);
+
+        return ResponseEntity.ok(dataWrapDTO);
     }
 
     /**
@@ -85,10 +111,17 @@ public class TaskCRUDController {
      * @return
      */
     @GetMapping("/list/user")
-    public ResponseEntity<Map<String, List<ReadTaskListByUserSendDTO>>>
+    public ResponseEntity<?>
     taskListReadByUser(@Login User user,@ModelAttribute Long last_task_id){
-        List<ReadTaskListByUserSendDTO> readTaskListByUserSendDTOList = taskCRUDService.getTaskListForUser(user, last_task_id);
-        return ResponseEntity.ok(Collections.singletonMap("task_list",readTaskListByUserSendDTOList));
+        try {
+            List<ReadTaskListByUserSendDTO> readTaskListByUserSendDTOList = taskCRUDService.getTaskListForUser(user, last_task_id);
+            DataWrapDTO dataWrapDTO = new DataWrapDTO(readTaskListByUserSendDTOList);
+            return ResponseEntity.ok(dataWrapDTO);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            ErrorWrapDTO errorWrapDTO = new ErrorWrapDTO(e.getMessage());
+            return ResponseEntity.badRequest().body(errorWrapDTO);
+        }
     }
 
     @GetMapping("/list/group")
@@ -99,10 +132,16 @@ public class TaskCRUDController {
         return ResponseEntity.ok(Collections.singletonMap("task_list",taskListReadByGroupSendDTOList));
     }
 
-    @DeleteMapping("")
-    public ResponseEntity<Map<String,Boolean>> deleteTask(@ModelAttribute Long task_id){
-        taskCRUDService.deleteTask(task_id);
-        return ResponseEntity.ok(Collections.singletonMap("success",true));
+    @DeleteMapping
+    public ResponseEntity<?> deleteTask(@ModelAttribute Long task_id){
+        try {
+            taskCRUDService.deleteTask(task_id);
+            return ResponseEntity.ok(null); //TODO: 데이터가 없을떄 명세서에 의하면 아무것도 보내지 않는다. Is this ok?
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            ErrorWrapDTO errorWrapDTO = new ErrorWrapDTO(e.getMessage());
+            return ResponseEntity.badRequest().body(errorWrapDTO);
+        }
     }
 
 
