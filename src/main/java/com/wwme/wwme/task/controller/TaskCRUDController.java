@@ -1,5 +1,6 @@
 package com.wwme.wwme.task.controller;
 
+import com.wwme.wwme.login.aop.Login;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.CreateTaskReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.TaskListReadByGroupReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.UpdateTaskReceiveDTO;
@@ -47,9 +48,14 @@ public class TaskCRUDController {
     }
 
     @PostMapping("/done")
-    public ResponseEntity<Map<String,Boolean>> makeTaskDone(@RequestBody Long task_id){
-        taskCRUDService.makeTaskDone(task_id);
-        return ResponseEntity.ok(Collections.singletonMap("success",true));
+    public ResponseEntity<Map<String,Boolean>> makeTaskDone(@RequestBody Long task_id,@RequestBody Boolean done){
+        try{
+            taskCRUDService.makeTaskDone(task_id, done);
+            return ResponseEntity.ok(Collections.singletonMap("success",true));
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(Collections.singletonMap("success",false));
+        }
+
     }
 
     @GetMapping("/list/month")
@@ -76,15 +82,13 @@ public class TaskCRUDController {
 
     /**
      * Read all Incomplete Task of user
-     * @param jwtString
+     *
      * @return
      */
     @GetMapping("/list/user")
     public ResponseEntity<Map<String, List<ReadTaskListByUserSendDTO>>>
-    taskListReadByUser(@CookieValue("Authorization") String jwtString){
-        User loginUser = userService.getUserFromJWTString(jwtString);
-
-        List<ReadTaskListByUserSendDTO> readTaskListByUserSendDTOList = taskCRUDService.getTaskListForUser(loginUser);
+    taskListReadByUser(@Login User user,@ModelAttribute Long last_task_id){
+        List<ReadTaskListByUserSendDTO> readTaskListByUserSendDTOList = taskCRUDService.getTaskListForUser(user, last_task_id);
         return ResponseEntity.ok(Collections.singletonMap("task_list",readTaskListByUserSendDTOList));
     }
 

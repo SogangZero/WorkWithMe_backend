@@ -33,7 +33,7 @@ public interface TaskCRUDService {
      * @param taskId
      * make the task of "taskid" done
      */
-    public void makeTaskDone(Long taskId);
+    public void makeTaskDone(Long taskId, Boolean done);
 
 
     /**
@@ -61,10 +61,12 @@ public interface TaskCRUDService {
 
     /**
      * return incomlpete task of user
+     *
      * @param loginUser
+     * @param last_task_id
      * @return
      */
-    public List<ReadTaskListByUserSendDTO> getTaskListForUser(User loginUser);
+    public List<ReadTaskListByUserSendDTO> getTaskListForUser(User loginUser, Long last_task_id);
 
 
     /**
