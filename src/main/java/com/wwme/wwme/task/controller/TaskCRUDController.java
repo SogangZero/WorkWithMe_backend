@@ -66,8 +66,7 @@ public class TaskCRUDController {
     @GetMapping("list/day")
     public ResponseEntity<List<TaskListForDaySendDTO>> getTaskListForDay
             (@ModelAttribute LocalDate date,
-           @CookieValue("Authorization") String jwtString){
-        User user = userService.getUserFromJWTString(jwtString);
+           @Login User user){
         List<TaskListForDaySendDTO> taskListForDaySendDTO = taskCRUDService.getTaskListForDay(user,date);
         return ResponseEntity.ok(taskListForDaySendDTO);
 

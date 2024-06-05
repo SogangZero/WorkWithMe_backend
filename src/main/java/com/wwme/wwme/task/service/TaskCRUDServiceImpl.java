@@ -222,7 +222,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
 
     @Override
     public List<TaskListReadByGroupSendDTO> readTaskListByGroup(TaskListReadByGroupReceiveDTO taskListReadByGroupReceiveDTO) {
-
+        return null;
     }
 
     @Override
