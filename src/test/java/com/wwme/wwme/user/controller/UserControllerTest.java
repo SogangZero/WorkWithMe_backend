@@ -24,9 +24,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -58,19 +60,19 @@ public class UserControllerTest {
     @DisplayName("user가 존재할 때 - /user [GET]")
     public void requestValidUserInfo() throws Exception {
         //given
-        String accessToken = "testToken";
         String nickname = "testUser";
         User user = new User();
+        user.setId(0L);
         user.setNickname(nickname);
         UserInfoDTO userDTO = new UserInfoDTO(true, nickname, 0);
         String jsonUser = objectMapper.writeValueAsString(userDTO);
 
 
         //when
-        when(request.getHeader("access"))
-                .thenReturn(accessToken);
-        when(userService.getUserFromJWTString(any()))
-                .thenReturn(user);
+        when(jwtUtil.getUserKey(any()))
+                .thenReturn("testUserKey");
+        when(userRepository.findByUserKey(any()))
+                .thenReturn(Optional.of(user));
 
         //then
         mvc.perform(
@@ -85,13 +87,14 @@ public class UserControllerTest {
     public void requestInvalidUser() throws Exception {
         //given
         String accessToken = "testToken";
-
+        User emptyUser = new User();
+        emptyUser.setId(-1L);
 
         //when
-        when(request.getHeader("access"))
-                .thenReturn(accessToken);
-        when(userService.getUserFromJWTString(any()))
-                .thenThrow(NoSuchElementException.class);
+        when(jwtUtil.getUserKey(any()))
+                .thenReturn("testUserKey");
+        when(userRepository.findByUserKey(any()))
+                .thenReturn(Optional.of(emptyUser));
 
         //then
         mvc.perform(
