@@ -8,8 +8,10 @@ import com.wwme.wwme.task.domain.Tag;
 import com.wwme.wwme.task.service.TagCRUDService;
 import com.wwme.wwme.task.service.TaskCRUDService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -17,13 +19,17 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequiredArgsConstructor
 @RequestMapping("/tag")
 public class TagController {
 
     private TaskCRUDService taskCRUDService;
     private TagCRUDService tagCRUDService;
 
+    @Autowired
+    public TagController(TaskCRUDService taskCRUDService, TagCRUDService tagCRUDService) {
+        this.taskCRUDService = taskCRUDService;
+        this.tagCRUDService = tagCRUDService;
+    }
 
     @PostMapping
     public ResponseEntity<?> createTag(@RequestBody TagDTO tagDTO){
@@ -48,9 +54,11 @@ public class TagController {
     }
 
     //TODO: coordinate with Group database
-    @GetMapping("/")
-    public ResponseEntity<?> getTagList(@ModelAttribute TagDTO tagDTO){
+    @GetMapping
+    public ResponseEntity<?> getTagList(@RequestParam Long group_id){
         try {
+            TagDTO tagDTO = new TagDTO();
+            tagDTO.setGroupId(group_id);
             List<TagListReadSendDTO> tagListReadSendDTOList = tagCRUDService.getTagList(tagDTO);
             return ResponseEntity.ok(new DataWrapDTO(tagListReadSendDTOList));
         } catch (Exception e) {
@@ -61,7 +69,7 @@ public class TagController {
     }
 
     @DeleteMapping
-    public ResponseEntity<?> deleteTag(@ModelAttribute Long tag_id){
+    public ResponseEntity<?> deleteTag(@RequestParam Long tag_id){
         try {
             tagCRUDService.deleteTag(tag_id);
             return ResponseEntity.ok(null);

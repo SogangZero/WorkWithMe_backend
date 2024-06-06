@@ -9,11 +9,13 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class TagCRUDService {
     public final TagRepository tagRepository;
@@ -69,9 +71,9 @@ public class TagCRUDService {
     }
 
     public List<TagListReadSendDTO> getTagList(TagDTO tagDTO){
-
+        System.out.println("groupid = " + tagDTO.getGroupId());
         List<Tag> tagList= tagRepository.findAllByGroupId(tagDTO.getGroupId());
-
+        System.out.println(tagList);
         List<TagListReadSendDTO> tagListReadSendDTOList = new ArrayList<>();
 
         for(Tag tag : tagList){

@@ -16,12 +16,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.*;
 
 @Controller
+@Transactional
 @RequestMapping("/task")
 public class TaskCRUDController {
 
@@ -38,6 +40,7 @@ public class TaskCRUDController {
     @PostMapping
     public ResponseEntity<?> createTask(@RequestBody CreateTaskReceiveDTO createTaskReceiveDTO){
         try {
+            System.out.println(createTaskReceiveDTO.getGroup_id());
             Task task = taskCRUDService.createTask(createTaskReceiveDTO);
             logger.info("successfully created and added Task");
             return ResponseEntity.ok(Collections.singletonMap("task_id",task.getId()));

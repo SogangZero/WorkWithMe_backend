@@ -11,8 +11,10 @@ import lombok.Setter;
 @Setter
 public class TagDTO {
     private Long id;
+
     @JsonProperty("group_id")
     private Long groupId;
+
     @JsonProperty("tag_name")
     private String tagName;
 }
