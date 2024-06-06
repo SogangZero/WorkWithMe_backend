@@ -15,6 +15,7 @@ import java.util.List;
 
 public class ReadOneTaskSendDTO {
     private Long task_id;
+    private String tag_name;
     private String task_name;
     private Integer is_done_count;
     private Integer total_user_count;

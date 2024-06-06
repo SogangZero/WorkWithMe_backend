@@ -1,7 +1,6 @@
 package com.wwme.wwme.task.repository;
 
 import com.wwme.wwme.task.domain.Task;
-import com.wwme.wwme.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -43,11 +42,27 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
 
-    List<Task> findAllByUserAndDate(User user, LocalDate date);
+    @Query("SELECT t FROM Task t " +
+            "LEFT JOIN FETCH t.userTaskList ut " +
+            "WHERE ut.user.id = :userId " +
+            "AND t.endTime = :date")
+    List<Task> findAllByUserAndEndTime(Long userId, LocalDate date);
 
-    @Query("SELECT t FROM Task t LEFT JOIN FETCH t.userTaskList WHERE t.id = :id")
-    Optional<Task> findByIdWithUserTaskList(Long id);
 
-    @Query("SELECT t FROM Task t LEFT JOIN FETCH t.userTaskList ut WHERE ut.user.id = :userId")
+    @Query("SELECT t FROM Task t " +
+            "LEFT JOIN FETCH t.userTaskList ut " +
+            "LEFT JOIN FETCH ut.user u " +
+            "LEFT JOIN FETCH t.tag tg " +
+            "LEFT JOIN FETCH t.group g " +
+            "WHERE t.id = :taskId")
+    Optional<Task> findTaskByIdWithUserTaskList(Long taskId);
+
+    @Query("SELECT t FROM Task t " +
+            "LEFT JOIN FETCH t.userTaskList ut " +
+            "LEFT JOIN FETCH t.group gp " +
+            "LEFT JOIN FETCH t.tag tg " +
+            "WHERE ut.user.id = :userId " +
+            "AND ut.isDone = false " +
+            "ORDER BY t.endTime asc")
     List<Task> findTasksByUserIdFetchUserTask(@Param("userId") Long userId);
 }

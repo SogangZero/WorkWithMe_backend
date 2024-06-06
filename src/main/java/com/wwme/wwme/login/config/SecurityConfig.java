@@ -3,6 +3,7 @@ package com.wwme.wwme.login.config;
 import com.wwme.wwme.login.jwt.CustomLogoutFilter;
 import com.wwme.wwme.login.jwt.JWTFilter;
 import com.wwme.wwme.login.jwt.JWTUtil;
+import com.wwme.wwme.login.jwt.SupervisorFilter;
 import com.wwme.wwme.login.oauth2.CustomSuccessHandler;
 import com.wwme.wwme.login.repository.RefreshRepository;
 import com.wwme.wwme.login.service.CustomOAuth2UserService;
@@ -66,9 +67,9 @@ public class SecurityConfig {
                         .requestMatchers("/", "/login", "/favicon.ico").permitAll()
                         .requestMatchers("/reissue").permitAll()
                         .requestMatchers("/login/oauth2/code/**").permitAll()
-                        .anyRequest().authenticated()
-
+                        .anyRequest().hasAnyRole("ADMIN", "USER")
                 );
+
 
         //From login disable
         http
@@ -85,6 +86,11 @@ public class SecurityConfig {
         //add JWTFilter
         http
                 .addFilterAfter(new JWTFilter(jwtUtil), OAuth2LoginAuthenticationFilter.class);
+
+        //add SupervisorFilter
+        http
+                .addFilterBefore(new SupervisorFilter(jwtUtil, userRepository), LogoutFilter.class);
+
         //oauth2
         http
                 .oauth2Login((oauth2) -> oauth2

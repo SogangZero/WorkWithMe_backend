@@ -12,4 +12,6 @@ import java.util.List;
 @Repository
 public interface TagRepository extends JpaRepository<Tag,Long> {
 
+    List<Tag> findAllByGroupId(Long groupId);
+
 }

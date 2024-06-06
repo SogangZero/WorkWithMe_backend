@@ -2,6 +2,9 @@ package com.wwme.wwme.user.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wwme.wwme.login.aop.Login;
+import com.wwme.wwme.login.domain.dto.DataDTO;
+import com.wwme.wwme.login.domain.dto.ErrorDTO;
 import com.wwme.wwme.login.exception.JwtTokenException;
 import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.domain.dto.UserInfoDTO;
@@ -24,23 +27,20 @@ import java.util.NoSuchElementException;
 @RequestMapping("/user")
 public class UserController {
     private final UserService userService;
-    private final ObjectMapper objectMapper;
 
     @GetMapping
-    public ResponseEntity<?> userInfo(HttpServletRequest request,
-                                   HttpServletResponse response) {
-        String accessToken = request.getHeader("access");
-        try {
-            User user = userService.getUserFromJWTString(accessToken);
-            UserInfoDTO userInfoDTO = new UserInfoDTO(true, user.getNickname(), 0);
-
-            response.setContentType("application/json");
-            response.setStatus(HttpServletResponse.SC_OK);
-            String result = objectMapper.writeValueAsString(userInfoDTO);
-
-            return new ResponseEntity<>(result, HttpStatus.OK);
-        } catch (NoSuchElementException | JsonProcessingException | JwtTokenException e) {
+    public ResponseEntity<?> userInfo(@Login User user) {
+        if (user.getId().equals(-1L)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        try {
+            log.info("Request user info ID {}", user.getId());
+            UserInfoDTO userInfo = userService.getUserInfo(user);
+
+            return new ResponseEntity<>(new DataDTO(userInfo), HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            ErrorDTO errorDTO = new ErrorDTO(e.getMessage());
+            return new ResponseEntity<>(errorDTO, HttpStatus.BAD_REQUEST);
         }
     }
 }

@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class NicknameService {
     private final UserRepository userRepository;
 
-    public void saveNicknameAndChangeRole(String nickname, String role, String userKey) {
+    public void saveNickname(String nickname, String userKey) {
         if (nickname == null || nickname.isEmpty()) {
             throw new IllegalArgumentException();
         }
@@ -22,7 +22,6 @@ public class NicknameService {
         User user = userRepository.findByUserKey(userKey).orElseThrow();
 
         user.setNickname(nickname);
-        user.setRole(role);
         user.setRegisterDate(LocalDateTime.now());
 
         log.info("User {} set nickname {}", user.getUserKey(), user.getNickname());

@@ -11,7 +11,6 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
-
 @RequiredArgsConstructor
 public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver {
     private final UserRepository userRepository;
@@ -31,9 +30,18 @@ public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver 
             throws Exception {
         HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
         String accessToken = request.getHeader("access");
+
+        //For Supervisor
+        if (request.getHeader("developer") != null) {
+            return userRepository.findByUserKey("developmentUserKey").get();
+        }
+
         String userKey = jwtUtil.getUserKey(accessToken);
 
-        User user = userRepository.findByUserKey(userKey).orElse(null);
+        User emptyUser = new User();
+        emptyUser.setId(-1L);
+
+        User user = userRepository.findByUserKey(userKey).orElse(emptyUser);
 
         return user;
     }

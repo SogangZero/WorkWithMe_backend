@@ -7,6 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @RequiredArgsConstructor
-public class UpdateTaskSendDTO {
-    private Long task_id;
+public class TagListReadSendDTO {
+    private Long tag_id;
+    private String tag_name;
 }

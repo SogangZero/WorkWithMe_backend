@@ -1,6 +1,10 @@
 package com.wwme.wwme.task.controller;
 
+import com.wwme.wwme.group.DTO.DataWrapDTO;
+import com.wwme.wwme.group.DTO.ErrorWrapDTO;
 import com.wwme.wwme.task.domain.DTO.TagDTO;
+import com.wwme.wwme.task.domain.DTO.sendDTO.TagListReadSendDTO;
+import com.wwme.wwme.task.domain.Tag;
 import com.wwme.wwme.task.service.TagCRUDService;
 import com.wwme.wwme.task.service.TaskCRUDService;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -20,30 +25,50 @@ public class TagController {
     private TagCRUDService tagCRUDService;
 
 
-    @PostMapping("/")
-    public ResponseEntity<Object> createTag(@RequestBody TagDTO tagDTO){
-        tagCRUDService.createUpdateTag(tagDTO);
-
-        return ResponseEntity.ok(Collections.singletonMap("success",true));
+    @PostMapping
+    public ResponseEntity<?> createTag(@RequestBody TagDTO tagDTO){
+        try {
+            Tag tag = tagCRUDService.createUpdateTag(tagDTO);
+            return ResponseEntity.ok(null); //TODO: what to send when data is null?
+        } catch (Exception e) {
+            ErrorWrapDTO errorWrapDTO = new ErrorWrapDTO(e.getMessage());
+            return ResponseEntity.badRequest().body(Collections.singletonMap("error",e.getMessage()));
+        }
     }
 
-    @PutMapping("/")
-    public ResponseEntity<Object> updateTag(@RequestBody TagDTO tagDTO){
-        tagCRUDService.createUpdateTag(tagDTO);
-
-        return ResponseEntity.ok(Collections.singletonMap("success",true));
+    @PutMapping
+    public ResponseEntity<?> updateTag(@RequestBody TagDTO tagDTO){
+        try {
+            tagCRUDService.createUpdateTag(tagDTO);
+            return ResponseEntity.ok(null);
+        } catch (Exception e) {
+            ErrorWrapDTO errorWrapDTO = new ErrorWrapDTO(e.getMessage());
+            return ResponseEntity.badRequest().body(Collections.singletonMap("error",e.getMessage()));
+        }
     }
 
     //TODO: coordinate with Group database
     @GetMapping("/")
-    public ResponseEntity<Object> getTagList(@ModelAttribute TagDTO tagDTO){
-        return null;
+    public ResponseEntity<?> getTagList(@ModelAttribute TagDTO tagDTO){
+        try {
+            List<TagListReadSendDTO> tagListReadSendDTOList = tagCRUDService.getTagList(tagDTO);
+            return ResponseEntity.ok(new DataWrapDTO(tagListReadSendDTOList));
+        } catch (Exception e) {
+            ErrorWrapDTO errorWrapDTO = new ErrorWrapDTO(e.getMessage());
+            return ResponseEntity.badRequest().body(Collections.singletonMap("error",e.getMessage()));
+        }
+
     }
 
-    @DeleteMapping("/")
-    public ResponseEntity<Map<String, Boolean>> deleteTag(@ModelAttribute Long tag_id){
-        tagCRUDService.deleteTag(tag_id);
-        return ResponseEntity.ok(Collections.singletonMap("success",true));
+    @DeleteMapping
+    public ResponseEntity<?> deleteTag(@ModelAttribute Long tag_id){
+        try {
+            tagCRUDService.deleteTag(tag_id);
+            return ResponseEntity.ok(null);
+        } catch (Exception e) {
+            ErrorWrapDTO errorWrapDTO = new ErrorWrapDTO(e.getMessage());
+            return ResponseEntity.badRequest().body(Collections.singletonMap("error",e.getMessage()));
+        }
     }
 
 
