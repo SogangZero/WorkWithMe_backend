@@ -12,6 +12,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -26,15 +27,11 @@ public class SupervisorFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         String supervisorToken = request.getHeader("developer");
 
-        if (supervisorToken == null) {
+        if (!Objects.equals(supervisorToken, "developer")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        if (!supervisorToken.equals("developer")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
         String userKey = "developmentUserKey";
 
         String token = jwtUtil.createJwt("access", userKey, "ROLE_ADMIN", 24 * 60 * 60 * 1000L);
