@@ -5,8 +5,6 @@ import lombok.Data;
 
 @Data
 public class GroupUpdateSuccessResponseDTO {
-    boolean success;
-
     @JsonProperty("group_id")
     long groupId;
 }
