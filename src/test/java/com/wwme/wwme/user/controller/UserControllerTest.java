@@ -3,6 +3,7 @@ package com.wwme.wwme.user.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wwme.wwme.login.config.SecurityTestConfig;
 import com.wwme.wwme.login.config.WebConfig;
+import com.wwme.wwme.login.domain.dto.DataDTO;
 import com.wwme.wwme.login.domain.dto.UserDTO;
 import com.wwme.wwme.login.jwt.JWTUtil;
 import com.wwme.wwme.user.domain.User;
@@ -65,7 +66,8 @@ public class UserControllerTest {
         user.setId(0L);
         user.setNickname(nickname);
         UserInfoDTO userDTO = new UserInfoDTO(true, nickname, 0);
-        String jsonUser = objectMapper.writeValueAsString(userDTO);
+        DataDTO result = new DataDTO(userDTO);
+        String jsonUser = objectMapper.writeValueAsString(result);
 
 
         //when
@@ -73,6 +75,8 @@ public class UserControllerTest {
                 .thenReturn("testUserKey");
         when(userRepository.findByUserKey(any()))
                 .thenReturn(Optional.of(user));
+        when(userService.getUserInfo(any()))
+                .thenReturn(userDTO);
 
         //then
         mvc.perform(
@@ -80,6 +84,7 @@ public class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"))
                 .andExpect(content().string(jsonUser));
+
     }
 
     @Test

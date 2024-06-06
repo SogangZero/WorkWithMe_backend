@@ -128,7 +128,6 @@ class GroupControllerTest {
         requestDTO.setGroupName(groupName);
 
         GroupUpdateSuccessResponseDTO responseDTO = new GroupUpdateSuccessResponseDTO();
-        responseDTO.setSuccess(true);
         responseDTO.setGroupId(groupId);
 
         User mockedUser = new User();
@@ -187,7 +186,7 @@ class GroupControllerTest {
         requestDTO.setGroupColor(groupColor);
         requestDTO.setGroupName(groupName);
 
-        GroupUpdateFailResponseDTO responseDTO = new GroupUpdateFailResponseDTO();
+        GenericResponseFailDTO responseDTO = new GenericResponseFailDTO();
         responseDTO.setSuccess(false);
 
         when(userService.getUserFromJWTString(jwtString))

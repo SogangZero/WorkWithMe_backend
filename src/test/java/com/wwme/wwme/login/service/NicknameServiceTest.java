@@ -41,7 +41,7 @@ public class NicknameServiceTest {
                 .thenReturn(Optional.of(user));
 
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> nicknameService.saveNicknameAndChangeRole(null, "test", "testUser"));
+                () -> nicknameService.saveNickname(null, "testUser"));
     }
 
     @Test
@@ -54,7 +54,7 @@ public class NicknameServiceTest {
                 .thenReturn(Optional.of(user));
 
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> nicknameService.saveNicknameAndChangeRole("", " ","testUser"));
+                () -> nicknameService.saveNickname("","testUser"));
     }
 
     @Test
@@ -65,7 +65,7 @@ public class NicknameServiceTest {
         when(userRepository.findByUserKey(any()))
                 .thenReturn(Optional.of(user));
 
-        nicknameService.saveNicknameAndChangeRole(nickname, "ROLE_USER","testUserKey");
+        nicknameService.saveNickname(nickname, "testUserKey");
 
         assertThat(user.getNickname()).isEqualTo(nickname);
         assertThat(user.getRole()).isEqualTo("ROLE_USER");
@@ -79,7 +79,7 @@ public class NicknameServiceTest {
 //        user.setName("testUser");
         user.setNickname(null);
         user.setUserKey("testUser");
-        user.setRole("ROLE_TEMP");
+        user.setRole("ROLE_USER");
         user.setRegisterDate(null);
         user.setSocialProvider("naver");
         return user;
