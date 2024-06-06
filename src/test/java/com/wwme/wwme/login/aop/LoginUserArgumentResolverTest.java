@@ -1,6 +1,6 @@
 package com.wwme.wwme.login.aop;
 
-import com.wwme.wwme.login.jwt.JWTUtil;
+import com.wwme.wwme.login.service.JWTUtilService;
 import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,7 +25,7 @@ public class LoginUserArgumentResolverTest {
     private UserRepository userRepository;
 
     @Mock
-    private JWTUtil jwtUtil;
+    private JWTUtilService jwtUtilService;
 
     @InjectMocks
     private LoginUserArgumentResolver resolver;
@@ -66,7 +66,7 @@ public class LoginUserArgumentResolverTest {
                 .thenReturn(request);
         when(request.getHeader("access"))
                 .thenReturn(accessToken);
-        when(jwtUtil.getUserKey(accessToken))
+        when(jwtUtilService.getUserKey(accessToken))
                 .thenReturn(userKey);
         when(userRepository.findByUserKey(userKey))
                 .thenReturn(Optional.of(user));
@@ -112,7 +112,7 @@ public class LoginUserArgumentResolverTest {
                 .thenReturn(request);
         when(request.getHeader("access"))
                 .thenReturn(accessToken);
-        when(jwtUtil.getUserKey(accessToken))
+        when(jwtUtilService.getUserKey(accessToken))
                 .thenReturn(userKey);
         when(userRepository.findByUserKey(userKey))
                 .thenReturn(Optional.empty());

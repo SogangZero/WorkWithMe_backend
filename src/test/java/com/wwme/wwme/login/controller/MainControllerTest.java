@@ -1,8 +1,9 @@
 package com.wwme.wwme.login.controller;
 
 import com.wwme.wwme.login.config.SecurityTestConfig;
-import com.wwme.wwme.login.config.WebConfig;
-import com.wwme.wwme.login.jwt.JWTUtil;
+import com.wwme.wwme.login.config.ResolverConfig;
+import com.wwme.wwme.login.service.JWTUtilService;
+import com.wwme.wwme.main.controller.MainController;
 import com.wwme.wwme.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,13 +19,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @WebMvcTest(controllers = MainController.class)
-@Import({SecurityTestConfig.class, WebConfig.class})
+@Import({SecurityTestConfig.class, ResolverConfig.class})
 public class MainControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
-    private JWTUtil jwtUtil;
+    private JWTUtilService jwtUtilService;
 
     @MockBean
     private UserRepository userRepository;

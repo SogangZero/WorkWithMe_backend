@@ -47,20 +47,24 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             log.info("New User {}", oAuth2Response.getName());
             User user = new User();
             user.setUserKey(userKey);
-//            user.setName(oAuth2Response.getName());
             user.setSocialProvider(provider);
             user.setRole("ROLE_USER");
 
             userRepository.save(user);
-            UserDTO userDTO = new UserDTO(oAuth2Response.getName(), userKey, provider, "ROLE_USER");
+            UserDTO userDTO = new UserDTO(oAuth2Response.getName(),
+                    userKey,
+                    provider,
+                    "ROLE_USER");
 
             return new CustomOAuth2User(userDTO);
         }
 
         log.info("Existed User {}", oAuth2Response.getName());
-        //existData.setName(oAuth2Response.getName());
         userRepository.save(existData);
-        UserDTO userDTO = new UserDTO(oAuth2Response.getName(), existData.getUserKey(), existData.getSocialProvider(), existData.getRole());
+        UserDTO userDTO = new UserDTO(oAuth2Response.getName(),
+                existData.getUserKey(),
+                existData.getSocialProvider(),
+                existData.getRole());
 
         return new CustomOAuth2User(userDTO);
     }

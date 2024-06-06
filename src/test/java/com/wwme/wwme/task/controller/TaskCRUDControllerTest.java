@@ -2,8 +2,8 @@ package com.wwme.wwme.task.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wwme.wwme.login.config.SecurityTestConfig;
-import com.wwme.wwme.login.config.WebConfig;
-import com.wwme.wwme.login.jwt.JWTUtil;
+import com.wwme.wwme.login.config.ResolverConfig;
+import com.wwme.wwme.login.service.JWTUtilService;
 import com.wwme.wwme.task.domain.DTO.TaskDTO;
 import com.wwme.wwme.task.domain.Task;
 import com.wwme.wwme.task.service.TaskCRUDService;
@@ -19,9 +19,9 @@ import org.springframework.http.MediaType;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.mockito.Mockito.*;
+
 @WebMvcTest(TaskCRUDController.class)
-@Import({SecurityTestConfig.class, WebConfig.class})
+@Import({SecurityTestConfig.class, ResolverConfig.class})
 @WithMockUser(username = "TEST", roles = "USER")
 public class TaskCRUDControllerTest {
 
@@ -32,7 +32,7 @@ public class TaskCRUDControllerTest {
     private TaskCRUDService taskCRUDService;
 
     @MockBean
-    private JWTUtil jwtUtil;
+    private JWTUtilService jwtUtilService;
 
     @MockBean
     private UserRepository userRepository;
@@ -46,7 +46,7 @@ public class TaskCRUDControllerTest {
         task.setTaskName("newTask1");
         task.setId(1L);
 
-        when(taskCRUDService.createUpdateTask(any(TaskDTO.class))).thenReturn(task);
+//        when(taskCRUDService.createUpdateTask(any(TaskDTO.class))).thenReturn(task);
 
         mockMvc.perform(post("/task")
                         .contentType(MediaType.APPLICATION_JSON)

@@ -4,7 +4,6 @@ import com.wwme.wwme.login.domain.entity.RefreshEntity;
 import com.wwme.wwme.login.exception.InvalidRefreshTokenException;
 import com.wwme.wwme.login.exception.JwtTokenException;
 import com.wwme.wwme.login.exception.NullRefreshTokenException;
-import com.wwme.wwme.login.jwt.JWTUtil;
 import com.wwme.wwme.login.repository.RefreshRepository;
 import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +14,7 @@ import java.util.Date;
 @Service
 @RequiredArgsConstructor
 public class ReissueService {
-    private final JWTUtil jwtUtil;
+    private final JWTUtilService jwtUtilService;
     private final RefreshRepository refreshRepository;
 
     public String validateRefreshToken(Cookie[] cookies) throws NullRefreshTokenException, JwtTokenException, InvalidRefreshTokenException {
@@ -31,13 +30,13 @@ public class ReissueService {
         }
 
         //expired check
-        if (jwtUtil.isExpired(refresh)) {
+        if (jwtUtilService.isExpired(refresh)) {
             throw new InvalidRefreshTokenException("expired refresh token");
         }
 
 
         //check if the token is refresh
-        String category = jwtUtil.getCategory(refresh);
+        String category = jwtUtilService.getCategory(refresh);
         if (!category.equals("refresh")) {
             throw new InvalidRefreshTokenException("invalid refresh token");
         }
@@ -52,12 +51,12 @@ public class ReissueService {
     }
 
     public String generateAccessToken(String userKey, String role) {
-        String newAccess = jwtUtil.createJwt("access", userKey, role, 10 * 60 * 1000L);//10 minutes
+        String newAccess = jwtUtilService.createJwt("access", userKey, role, 10 * 60 * 1000L);//10 minutes
         return newAccess;
     }
 
     public String exchangeRefreshToken(String userKey, String role, String oldRefresh) {
-        String newRefresh = jwtUtil.createJwt("refresh", userKey, role, 24 * 60 * 60 * 1000L);//24 hours
+        String newRefresh = jwtUtilService.createJwt("refresh", userKey, role, 24 * 60 * 60 * 1000L);//24 hours
 
 
         //delete old refresh token and save new refresh token

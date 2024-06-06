@@ -3,7 +3,7 @@ package com.wwme.wwme.login.controller;
 import com.wwme.wwme.login.exception.InvalidRefreshTokenException;
 import com.wwme.wwme.login.exception.JwtTokenException;
 import com.wwme.wwme.login.exception.NullRefreshTokenException;
-import com.wwme.wwme.login.jwt.JWTUtil;
+import com.wwme.wwme.login.service.JWTUtilService;
 import com.wwme.wwme.login.service.ReissueService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 public class ReissueController {
-    private final JWTUtil jwtUtil;
+    private final JWTUtilService jwtUtilService;
     private final ReissueService reissueService;
 
     @PostMapping("/reissue")
@@ -37,8 +37,8 @@ public class ReissueController {
         }
 
 
-        String userKey = jwtUtil.getUserKey(refresh);
-        String role = jwtUtil.getRole(refresh);
+        String userKey = jwtUtilService.getUserKey(refresh);
+        String role = jwtUtilService.getRole(refresh);
 
         //make new JWT
         String newAccess = reissueService.generateAccessToken(userKey, role);
@@ -47,7 +47,7 @@ public class ReissueController {
         log.info("User[{}] re-generate access and refresh token", userKey);
         response.setHeader("access", newAccess);
         response.addCookie(createCookie("refresh", newRefresh));
-        
+
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

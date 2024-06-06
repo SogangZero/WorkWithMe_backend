@@ -1,5 +1,6 @@
-package com.wwme.wwme.login.jwt;
+package com.wwme.wwme.login.filter;
 
+import com.wwme.wwme.login.service.JWTUtilService;
 import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.repository.UserRepository;
 import jakarta.servlet.FilterChain;
@@ -17,7 +18,7 @@ import java.util.Objects;
 @Slf4j
 @RequiredArgsConstructor
 public class SupervisorFilter extends OncePerRequestFilter {
-    private final JWTUtil jwtUtil;
+    private final JWTUtilService jwtUtilService;
     private final UserRepository userRepository;
 
     @Override
@@ -34,7 +35,7 @@ public class SupervisorFilter extends OncePerRequestFilter {
 
         String userKey = "developmentUserKey";
 
-        String token = jwtUtil.createJwt("access", userKey, "ROLE_ADMIN", 24 * 60 * 60 * 1000L);
+        String token = jwtUtilService.createJwt("access", userKey, "ROLE_ADMIN", 24 * 60 * 60 * 1000L);
         request.setAttribute("access", token);
 
 

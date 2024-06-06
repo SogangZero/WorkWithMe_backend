@@ -30,15 +30,12 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<?> userInfo(@Login User user) {
-        if (user.getId().equals(-1L)) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
         try {
             log.info("Request user info ID {}", user.getId());
             UserInfoDTO userInfo = userService.getUserInfo(user);
 
             return new ResponseEntity<>(new DataDTO(userInfo), HttpStatus.OK);
-        } catch (NoSuchElementException e) {
+        } catch (Exception e) {
             ErrorDTO errorDTO = new ErrorDTO(e.getMessage());
             return new ResponseEntity<>(errorDTO, HttpStatus.BAD_REQUEST);
         }

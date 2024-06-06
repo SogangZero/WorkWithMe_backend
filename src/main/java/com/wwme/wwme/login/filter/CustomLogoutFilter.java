@@ -1,6 +1,7 @@
-package com.wwme.wwme.login.jwt;
+package com.wwme.wwme.login.filter;
 
 import com.wwme.wwme.login.exception.JwtTokenException;
+import com.wwme.wwme.login.service.JWTUtilService;
 import com.wwme.wwme.login.repository.RefreshRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -18,7 +19,7 @@ import java.io.IOException;
 @Slf4j
 @RequiredArgsConstructor
 public class CustomLogoutFilter extends GenericFilterBean {
-    private final JWTUtil jwtUtil;
+    private final JWTUtilService jwtUtilService;
     private final RefreshRepository refreshRepository;
 
     @Override
@@ -65,14 +66,14 @@ public class CustomLogoutFilter extends GenericFilterBean {
         }
 
         try {
-            jwtUtil.isExpired(refresh);
+            jwtUtilService.isExpired(refresh);
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
 
         //check token is refresh token
-        String category = jwtUtil.getCategory(refresh);
+        String category = jwtUtilService.getCategory(refresh);
         if (!category.equals("refresh")) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;

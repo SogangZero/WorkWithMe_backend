@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wwme.wwme.login.domain.dto.CustomOAuth2User;
 import com.wwme.wwme.login.domain.dto.JoinStatusDTO;
 import com.wwme.wwme.login.domain.entity.RefreshEntity;
-import com.wwme.wwme.login.jwt.JWTUtil;
+import com.wwme.wwme.login.service.JWTUtilService;
 import com.wwme.wwme.login.repository.RefreshRepository;
 import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.repository.UserRepository;
@@ -30,7 +30,7 @@ import java.util.NoSuchElementException;
 @Slf4j
 @RequiredArgsConstructor
 public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
-    private final JWTUtil jwtUtil;
+    private final JWTUtilService jwtUtilService;
     private final RefreshRepository refreshRepository;
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
@@ -53,8 +53,8 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String role = auth.getAuthority();
 
         //generate token
-        String access = jwtUtil.createJwt("access", userKey, role, accessTokenDurationMS);//10m
-        String refresh = jwtUtil.createJwt("refresh", userKey, role, refreshTokenDurationMS);//24h
+        String access = jwtUtilService.createJwt("access", userKey, role, accessTokenDurationMS);//10m
+        String refresh = jwtUtilService.createJwt("refresh", userKey, role, refreshTokenDurationMS);//24h
 
         //store refresh token
         addRefreshToken(userKey, refresh, refreshTokenDurationMS);

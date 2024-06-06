@@ -1,7 +1,6 @@
 package com.wwme.wwme.group.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nimbusds.common.contenttype.ContentType;
 import com.wwme.wwme.group.DTO.*;
 import com.wwme.wwme.group.domain.Group;
 import com.wwme.wwme.group.domain.UserGroup;
@@ -9,21 +8,19 @@ import com.wwme.wwme.group.service.GroupInvitationService;
 import com.wwme.wwme.group.service.GroupService;
 import com.wwme.wwme.group.service.UserGroupService;
 import com.wwme.wwme.login.config.SecurityTestConfig;
-import com.wwme.wwme.login.config.WebConfig;
+import com.wwme.wwme.login.config.ResolverConfig;
 import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.repository.UserRepository;
 import com.wwme.wwme.user.service.UserService;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.util.MultiValueMap;
 
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
@@ -41,7 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         //excludeAutoConfiguration = SecurityTestConfig.class
 )
 @WithMockUser(username = "test", roles = "USER")
-@Import({SecurityTestConfig.class, WebConfig.class})
+@Import({SecurityTestConfig.class, ResolverConfig.class})
 class GroupControllerTest {
     @Autowired
     private MockMvc mockMvc;

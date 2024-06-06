@@ -1,6 +1,6 @@
 package com.wwme.wwme.login.aop;
 
-import com.wwme.wwme.login.jwt.JWTUtil;
+import com.wwme.wwme.login.service.JWTUtilService;
 import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,7 +22,7 @@ import static org.mockito.Mockito.*;
 
 public class LoginCheckAspectTest {
     @Mock
-    private JWTUtil jwtUtil;
+    private JWTUtilService jwtUtilService;
 
     @Mock
     private UserRepository userRepository;
@@ -58,7 +58,7 @@ public class LoginCheckAspectTest {
         //when
         when(request.getHeader("access"))
                 .thenReturn("testToken");
-        when(jwtUtil.getUserKey("testToken"))
+        when(jwtUtilService.getUserKey("testToken"))
                 .thenReturn("testKey");
         when(userRepository.findByUserKey("testKey"))
                 .thenReturn(Optional.of(user));

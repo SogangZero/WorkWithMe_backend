@@ -2,10 +2,9 @@ package com.wwme.wwme.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wwme.wwme.login.config.SecurityTestConfig;
-import com.wwme.wwme.login.config.WebConfig;
+import com.wwme.wwme.login.config.ResolverConfig;
 import com.wwme.wwme.login.domain.dto.DataDTO;
-import com.wwme.wwme.login.domain.dto.UserDTO;
-import com.wwme.wwme.login.jwt.JWTUtil;
+import com.wwme.wwme.login.service.JWTUtilService;
 import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.domain.dto.UserInfoDTO;
 import com.wwme.wwme.user.repository.UserRepository;
@@ -17,25 +16,20 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.MockBeans;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.MethodParameter;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(UserController.class)
-@Import({SecurityTestConfig.class, WebConfig.class})
+@Import({SecurityTestConfig.class, ResolverConfig.class})
 @WithMockUser(username = "testUser", roles = "USER")
 public class UserControllerTest {
 
@@ -46,7 +40,7 @@ public class UserControllerTest {
     private MockMvc mvc;
 
     @MockBean
-    private JWTUtil jwtUtil;
+    private JWTUtilService jwtUtilService;
 
     @MockBean
     private UserRepository userRepository;
@@ -71,7 +65,7 @@ public class UserControllerTest {
 
 
         //when
-        when(jwtUtil.getUserKey(any()))
+        when(jwtUtilService.getUserKey(any()))
                 .thenReturn("testUserKey");
         when(userRepository.findByUserKey(any()))
                 .thenReturn(Optional.of(user));
@@ -96,7 +90,7 @@ public class UserControllerTest {
         emptyUser.setId(-1L);
 
         //when
-        when(jwtUtil.getUserKey(any()))
+        when(jwtUtilService.getUserKey(any()))
                 .thenReturn("testUserKey");
         when(userRepository.findByUserKey(any()))
                 .thenReturn(Optional.of(emptyUser));

@@ -1,19 +1,15 @@
 package com.wwme.wwme.login.service;
 
-import com.wwme.wwme.login.config.WebConfig;
-import com.wwme.wwme.login.jwt.JWTUtil;
 import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 
 import java.util.Optional;
 
@@ -29,7 +25,7 @@ public class NicknameServiceTest {
     @MockBean
     private UserRepository userRepository;
     @MockBean
-    private JWTUtil jwtUtil;
+    private JWTUtilService jwtUtilService;
 
     @Test
     @DisplayName("닉네임이 null이라면 IllegalArgumentException 발생")

@@ -1,9 +1,10 @@
-package com.wwme.wwme.login.jwt;
+package com.wwme.wwme.login.filter;
 
 import com.wwme.wwme.login.domain.CustomAuthenticationToken;
 import com.wwme.wwme.login.domain.dto.CustomOAuth2User;
 import com.wwme.wwme.login.domain.dto.UserDTO;
 import com.wwme.wwme.login.exception.JwtTokenException;
+import com.wwme.wwme.login.service.JWTUtilService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,8 +19,8 @@ import java.io.IOException;
 
 @Slf4j
 @RequiredArgsConstructor
-public class JWTFilter extends OncePerRequestFilter {
-    private final JWTUtil jwtUtil;
+public class WwmeAuthenticationFilter extends OncePerRequestFilter {
+    private final JWTUtilService jwtUtilService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -46,14 +47,18 @@ public class JWTFilter extends OncePerRequestFilter {
 
 
         try {
-            if (jwtUtil.isExpired(accessToken)) {
+            if (jwtUtilService.isExpired(accessToken)) {
                 log.info("AccessToken is expired");
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                return;
+                throw new JwtTokenException("AccessToken is expired");
             }
-            category = jwtUtil.getCategory(accessToken);
-            userKey = jwtUtil.getUserKey(accessToken);
-            role = jwtUtil.getRole(accessToken);
+
+            category = jwtUtilService.getCategory(accessToken);
+            userKey = jwtUtilService.getUserKey(accessToken);
+            role = jwtUtilService.getRole(accessToken);
+            if (!category.equals("access")) {
+                log.info("AccessToken is invalid");
+                throw new JwtTokenException("AccessToken is invalid");
+            }
 
         } catch (JwtTokenException e) {
             log.info("AccessToken is invalid");
@@ -61,12 +66,6 @@ public class JWTFilter extends OncePerRequestFilter {
             return;
         }
 
-        if (!category.equals("access")) {
-            log.info("AccessToken is invalid");
-
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
-        }
 
         log.info("UserKey {}[{}] has access token {}", userKey, role, accessToken);
         UserDTO userDTO = new UserDTO();

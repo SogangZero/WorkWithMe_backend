@@ -1,9 +1,9 @@
 package com.wwme.wwme.login.config;
 
-import com.wwme.wwme.login.jwt.CustomLogoutFilter;
-import com.wwme.wwme.login.jwt.JWTFilter;
-import com.wwme.wwme.login.jwt.JWTUtil;
-import com.wwme.wwme.login.jwt.SupervisorFilter;
+import com.wwme.wwme.login.filter.CustomLogoutFilter;
+import com.wwme.wwme.login.filter.WwmeAuthenticationFilter;
+import com.wwme.wwme.login.service.JWTUtilService;
+import com.wwme.wwme.login.filter.SupervisorFilter;
 import com.wwme.wwme.login.oauth2.CustomSuccessHandler;
 import com.wwme.wwme.login.repository.RefreshRepository;
 import com.wwme.wwme.login.service.CustomOAuth2UserService;
@@ -30,7 +30,7 @@ import java.util.Collections;
 public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomSuccessHandler customSuccessHandler;
-    private final JWTUtil jwtUtil;
+    private final JWTUtilService jwtUtilService;
     private final RefreshRepository refreshRepository;
     private final UserRepository userRepository;
 
@@ -64,9 +64,7 @@ public class SecurityConfig {
         //authorization for request URI
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/", "/login", "/favicon.ico").permitAll()
-                        .requestMatchers("/reissue").permitAll()
-                        .requestMatchers("/login/oauth2/code/**").permitAll()
+                        .requestMatchers("/", "/login", "/favicon.ico", "/reissue", "/login/oauth2/code/**").permitAll()
                         .anyRequest().hasAnyRole("ADMIN", "USER")
                 );
 
@@ -81,15 +79,15 @@ public class SecurityConfig {
 
         //add LogoutFilter
         http
-                .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshRepository), LogoutFilter.class);
+                .addFilterBefore(new CustomLogoutFilter(jwtUtilService, refreshRepository), LogoutFilter.class);
 
         //add JWTFilter
         http
-                .addFilterAfter(new JWTFilter(jwtUtil), OAuth2LoginAuthenticationFilter.class);
+                .addFilterAfter(new WwmeAuthenticationFilter(jwtUtilService), OAuth2LoginAuthenticationFilter.class);
 
         //add SupervisorFilter
         http
-                .addFilterBefore(new SupervisorFilter(jwtUtil, userRepository), LogoutFilter.class);
+                .addFilterBefore(new SupervisorFilter(jwtUtilService, userRepository), LogoutFilter.class);
 
         //oauth2
         http

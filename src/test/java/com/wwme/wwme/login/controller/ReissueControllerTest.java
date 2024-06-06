@@ -3,14 +3,12 @@ package com.wwme.wwme.login.controller;
 import com.wwme.wwme.login.config.SecurityTestConfig;
 import com.wwme.wwme.login.exception.InvalidRefreshTokenException;
 import com.wwme.wwme.login.exception.NullRefreshTokenException;
-import com.wwme.wwme.login.jwt.JWTUtil;
-import com.wwme.wwme.login.repository.RefreshRepository;
+import com.wwme.wwme.login.service.JWTUtilService;
 import com.wwme.wwme.login.service.ReissueService;
 import com.wwme.wwme.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -34,7 +32,7 @@ public class ReissueControllerTest {
     @MockBean
     private ReissueService reissueService;
     @MockBean
-    private JWTUtil jwtUtil;
+    private JWTUtilService jwtUtilService;
     @MockBean
     private UserRepository userRepository;
 
@@ -71,9 +69,9 @@ public class ReissueControllerTest {
 
         when(reissueService.validateRefreshToken(any()))
                 .thenReturn("test");
-        when(jwtUtil.getUserKey(any()))
+        when(jwtUtilService.getUserKey(any()))
                 .thenReturn("testUserKey");
-        when(jwtUtil.getRole(any()))
+        when(jwtUtilService.getRole(any()))
                 .thenReturn("testRole");
         when(reissueService.generateAccessToken(any(), any()))
                 .thenReturn("testAccessToken");

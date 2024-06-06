@@ -1,6 +1,6 @@
 package com.wwme.wwme.login.aop;
 
-import com.wwme.wwme.login.jwt.JWTUtil;
+import com.wwme.wwme.login.service.JWTUtilService;
 import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,7 +14,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 @RequiredArgsConstructor
 public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver {
     private final UserRepository userRepository;
-    private final JWTUtil jwtUtil;
+    private final JWTUtilService jwtUtilService;
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
@@ -35,8 +35,12 @@ public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver 
         if (request.getHeader("developer") != null) {
             return userRepository.findByUserKey("developmentUserKey").get();
         }
+        /*
+        *  User를 가지고 올 때, 토큰을 재사용하는 것이 아니라 contextHolder에서 꺼내오는 방법
+        * */
 
-        String userKey = jwtUtil.getUserKey(accessToken);
+
+        String userKey = jwtUtilService.getUserKey(accessToken);
 
         User emptyUser = new User();
         emptyUser.setId(-1L);

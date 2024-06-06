@@ -1,7 +1,8 @@
 package com.wwme.wwme.login.jwt;
 
-import com.wwme.wwme.login.config.WebConfig;
+import com.wwme.wwme.login.config.ResolverConfig;
 import com.wwme.wwme.login.exception.JwtTokenException;
+import com.wwme.wwme.login.service.JWTUtilService;
 import com.wwme.wwme.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,11 +15,11 @@ import org.springframework.context.annotation.Import;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@WebMvcTest(JWTUtil.class)
-@Import(WebConfig.class)
+@WebMvcTest(JWTUtilService.class)
+@Import(ResolverConfig.class)
 public class JwtUtilTest {
     @Autowired
-    JWTUtil jwtUtil;
+    JWTUtilService jwtUtilService;
 
     @MockBean
     private UserRepository userRepository;
@@ -31,13 +32,13 @@ public class JwtUtilTest {
 
     @BeforeEach
     public void init() {
-        testToken = jwtUtil.createJwt(category, userKey, role, expiredMs);
+        testToken = jwtUtilService.createJwt(category, userKey, role, expiredMs);
     }
 
     @Test
     @DisplayName("getUserKey from valid Token")
     public void getUserKeyTest() throws Exception {
-        String extractedUserKey = jwtUtil.getUserKey(testToken);
+        String extractedUserKey = jwtUtilService.getUserKey(testToken);
 
         assertThat(extractedUserKey).isEqualTo(userKey);
     }
@@ -49,7 +50,7 @@ public class JwtUtilTest {
 
         assertThrows(
                 JwtTokenException.class,
-                () -> jwtUtil.getUserKey(invalidToken));
+                () -> jwtUtilService.getUserKey(invalidToken));
     }
 
     @Test
@@ -57,13 +58,13 @@ public class JwtUtilTest {
     public void getUserKeyNullTest() throws Exception {
         assertThrows(
                 JwtTokenException.class,
-                () -> jwtUtil.getUserKey(null));
+                () -> jwtUtilService.getUserKey(null));
     }
 
     @Test
     @DisplayName("getRole from valid Token")
     public void getRoleTest() throws Exception {
-        String extractedUserRole = jwtUtil.getRole(testToken);
+        String extractedUserRole = jwtUtilService.getRole(testToken);
 
         assertThat(extractedUserRole).isEqualTo(role);
     }
@@ -75,7 +76,7 @@ public class JwtUtilTest {
 
         assertThrows(
                 JwtTokenException.class,
-                () -> jwtUtil.getRole(invalidToken));
+                () -> jwtUtilService.getRole(invalidToken));
     }
 
     @Test
@@ -83,13 +84,13 @@ public class JwtUtilTest {
     public void getRoleNullTest() throws Exception {
         assertThrows(
                 JwtTokenException.class,
-                () -> jwtUtil.getRole(null));
+                () -> jwtUtilService.getRole(null));
     }
 
     @Test
     @DisplayName("getCategory from valid Token")
     public void getCategoryTest() throws Exception {
-        String extractedCategory = jwtUtil.getCategory(testToken);
+        String extractedCategory = jwtUtilService.getCategory(testToken);
 
         assertThat(extractedCategory).isEqualTo(category);
     }
@@ -101,7 +102,7 @@ public class JwtUtilTest {
 
         assertThrows(
                 JwtTokenException.class,
-                () -> jwtUtil.getCategory(invalidToken));
+                () -> jwtUtilService.getCategory(invalidToken));
     }
 
     @Test
@@ -109,34 +110,34 @@ public class JwtUtilTest {
     public void getCategoryNullTest() throws Exception {
         assertThrows(
                 JwtTokenException.class,
-                () -> jwtUtil.getCategory(null));
+                () -> jwtUtilService.getCategory(null));
     }
 
     @Test
     @DisplayName("isExpired 아직 유효기간이 남음")
     public void notExpiredTokenTest() throws Exception {
-        assertThat(jwtUtil.isExpired(testToken)).isFalse();
+        assertThat(jwtUtilService.isExpired(testToken)).isFalse();
     }
 
     @Test
     @DisplayName("isExpired 유효기간이 지남")
     public void expiredTokenTest() throws Exception {
-        String expiredToken = jwtUtil.createJwt("test", "test", "test", 0L);
+        String expiredToken = jwtUtilService.createJwt("test", "test", "test", 0L);
 
-        assertThat(jwtUtil.isExpired(expiredToken)).isTrue();
+        assertThat(jwtUtilService.isExpired(expiredToken)).isTrue();
     }
 
     @Test
     @DisplayName("isExpired 유효하지 않은 토큰")
     public void expiredInvalidTokenTest() throws Exception {
         assertThrows(JwtTokenException.class,
-                () -> jwtUtil.isExpired("invalidToken"));
+                () -> jwtUtilService.isExpired("invalidToken"));
     }
 
     @Test
     @DisplayName("isExpired null인 토큰")
     public void expiredNullTokenTest() throws Exception {
         assertThrows(JwtTokenException.class,
-                () -> jwtUtil.isExpired(null));
+                () -> jwtUtilService.isExpired(null));
     }
 }

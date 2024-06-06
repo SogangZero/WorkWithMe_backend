@@ -1,15 +1,11 @@
 package com.wwme.wwme.login.config;
 
-import com.wwme.wwme.login.domain.dto.CustomOAuth2User;
-import com.wwme.wwme.login.jwt.CustomLogoutFilter;
-import com.wwme.wwme.login.jwt.JWTFilter;
-import com.wwme.wwme.login.jwt.JWTUtil;
+import com.wwme.wwme.login.filter.CustomLogoutFilter;
+import com.wwme.wwme.login.filter.WwmeAuthenticationFilter;
+import com.wwme.wwme.login.service.JWTUtilService;
 import com.wwme.wwme.login.oauth2.CustomSuccessHandler;
 import com.wwme.wwme.login.repository.RefreshRepository;
 import com.wwme.wwme.login.service.CustomOAuth2UserService;
-import jakarta.servlet.http.HttpServletRequest;
-import org.aspectj.lang.annotation.RequiredTypes;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -22,21 +18,17 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-
-import java.util.Collections;
 
 @TestConfiguration
 @EnableWebSecurity
 @MockBeans({
-        @MockBean(JWTUtil.class),
+        @MockBean(JWTUtilService.class),
         @MockBean(RefreshRepository.class),
         @MockBean(CustomOAuth2UserService.class),
         @MockBean(CustomSuccessHandler.class)
 })
 public class SecurityTestConfig {
-    @Autowired private JWTUtil jwtUtil;
+    @Autowired private JWTUtilService jwtUtilService;
     @Autowired private RefreshRepository refreshRepository;
     @Autowired private CustomOAuth2UserService customOAuth2UserService;
     @Autowired private CustomSuccessHandler customSuccessHandler;
@@ -66,11 +58,11 @@ public class SecurityTestConfig {
 
         //add LogoutFilter
         http
-                .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshRepository), LogoutFilter.class);
+                .addFilterBefore(new CustomLogoutFilter(jwtUtilService, refreshRepository), LogoutFilter.class);
 
         //add JWTFilter
         http
-                .addFilterAfter(new JWTFilter(jwtUtil), OAuth2LoginAuthenticationFilter.class);
+                .addFilterAfter(new WwmeAuthenticationFilter(jwtUtilService), OAuth2LoginAuthenticationFilter.class);
         //oauth2
         http
                 .oauth2Login((oauth2) -> oauth2

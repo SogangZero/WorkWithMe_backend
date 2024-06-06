@@ -1,4 +1,4 @@
-package com.wwme.wwme.login.jwt;
+package com.wwme.wwme.login.service;
 
 import com.wwme.wwme.login.exception.JwtTokenException;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -12,10 +12,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Component
-public class JWTUtil {
+public class JWTUtilService {
     private SecretKey secretKey;
 
-    public JWTUtil(@Value("${spring.jwt.secret}") String secret) {
+    public JWTUtilService(@Value("${spring.jwt.secret}") String secret) {
         secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
     }
 
