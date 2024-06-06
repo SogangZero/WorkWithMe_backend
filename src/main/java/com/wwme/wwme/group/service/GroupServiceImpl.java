@@ -44,12 +44,12 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Group updateGroupNameAndColor(long groupId, String groupName, String color, User user) throws NoSuchElementException {
+    public Group updateGroupNameAndColor(long groupId, String groupName, String color, User user) {
         // Get Group and UserGroup from Database
         Optional<Group> groupOptional = groupRepository.findById(groupId);
-        Group group = groupOptional.orElseThrow(); // NoSuchElementException
+        Group group = groupOptional.orElseThrow();
         Optional<UserGroup> userGroupOptional = userGroupRepository.findByUserAndGroup(user, group);
-        UserGroup userGroup = userGroupOptional.orElseThrow(); // NoSuchElementException
+        UserGroup userGroup = userGroupOptional.orElseThrow();
 
         // Update groupName and Color
         group.setGroupName(groupName);
@@ -79,7 +79,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public String getGroupCode(long groupId) {
-        GroupInvitation groupInvitation = groupInvitationRepository.findByGroupId(groupId).orElseThrow();
+       GroupInvitation groupInvitation = groupInvitationRepository.findByGroupId(groupId).orElseThrow();
        return groupInvitation.getCode();
     }
 

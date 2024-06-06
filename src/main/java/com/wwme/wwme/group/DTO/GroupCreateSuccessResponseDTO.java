@@ -9,8 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GroupCreateSuccessResponseDTO {
-    boolean success;
-
     @JsonProperty("group_id")
     long groupId;
 

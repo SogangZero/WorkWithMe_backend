@@ -7,7 +7,5 @@ import com.wwme.wwme.user.domain.dto.UserInfoDTO;
 import java.util.NoSuchElementException;
 
 public interface UserService {
-    User getUserFromJWTString(String jwtString) throws NoSuchElementException, JwtTokenException;
-
     UserInfoDTO getUserInfo(User user);
 }

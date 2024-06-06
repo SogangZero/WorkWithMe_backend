@@ -14,16 +14,6 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService{
-    private final JWTUtil jwtUtil;
-    private final UserRepository userRepository;
-
-    @Override
-    public User getUserFromJWTString(String jwtString) throws NoSuchElementException, JwtTokenException {
-        String userKey = jwtUtil.getUserKey(jwtString);
-        Optional<User> optionalUserKey = userRepository.findByUserKey(userKey);
-        return optionalUserKey.orElseThrow();
-    }
-
     @Override
     public UserInfoDTO getUserInfo(User user) {
         return new UserInfoDTO(true, user.getNickname(), 0);
