@@ -24,7 +24,7 @@ public class Tag {
 
     private String tagName;
 
-    @ManyToOne()
+    @ManyToOne(fetch = FetchType.LAZY)
     private Group group;
 
     @OneToMany(mappedBy = "tag")
