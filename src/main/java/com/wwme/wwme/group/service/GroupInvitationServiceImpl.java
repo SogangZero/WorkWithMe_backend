@@ -8,19 +8,21 @@ import com.wwme.wwme.group.repository.GroupRepository;
 import com.wwme.wwme.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class GroupInvitationServiceImpl implements GroupInvitationService {
     private final GroupInvitationRepository groupInvitationRepository;
     private final UserGroupService userGroupService;
 
     @Override
     public String createGroupInvitation(Group group) {
-        String candidate = "abcdefghijklmnopqrstuvwxyz1234567890";
-        int codeLength = 10;
+        final String candidate = "abcdefghijklmnopqrstuvwxyz1234567890";
+        final int codeLength = 10;
 
         String randomCode = generateRandomUniqueString(candidate, codeLength);
         GroupInvitation groupInvitation = new GroupInvitation();

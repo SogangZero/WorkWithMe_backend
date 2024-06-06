@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class GroupController {
     private final GroupService groupService;
-    private final UserService userService;
     private final UserGroupService userGroupService;
     private final GroupInvitationService groupInvitationService;
 
@@ -55,11 +54,10 @@ public class GroupController {
             // Formulate response
             GroupCreateSuccessResponseDTO responseDTO = new GroupCreateSuccessResponseDTO();
             responseDTO.setGroupId(createdGroup.getId());
-            responseDTO.setSuccess(true);
             responseDTO.setGroupCode(code);
             return new ResponseEntity<>(new DataWrapDTO(responseDTO), HttpStatus.OK);
         } catch (Exception e) {
-            var responseDTO = new ErrorWrapDTO(e.toString());
+            var responseDTO = new ErrorWrapDTO(e.getMessage());
             return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
         }
     }
@@ -92,7 +90,7 @@ public class GroupController {
 
             return new ResponseEntity<>(new DataWrapDTO(responseDTO), HttpStatus.OK);
         } catch (Exception e) {
-            var responseDTO = new ErrorWrapDTO(e.toString());
+            var responseDTO = new ErrorWrapDTO(e.getMessage());
             return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
         }
     }
@@ -127,7 +125,7 @@ public class GroupController {
 
             return new ResponseEntity<>(new DataWrapDTO(responseDTO), HttpStatus.OK);
         } catch (Exception e) {
-            var responseDTO = new ErrorWrapDTO(e.toString());
+            var responseDTO = new ErrorWrapDTO(e.getMessage());
             return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
         }
     }
@@ -153,8 +151,8 @@ public class GroupController {
 
             return new ResponseEntity<>(new DataWrapDTO(responseDTO), HttpStatus.OK);
         } catch (Exception e) {
-            var responseDTO = new ErrorWrapDTO(e.toString());
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            var responseDTO = new ErrorWrapDTO(e.getMessage());
+            return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -190,7 +188,7 @@ public class GroupController {
 
             return new ResponseEntity<>(new DataWrapDTO(responseDTO), HttpStatus.OK);
         } catch (Exception e) {
-            var responseDTO = new ErrorWrapDTO(e.toString());
+            var responseDTO = new ErrorWrapDTO(e.getMessage());
             return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
         }
     }
@@ -220,7 +218,7 @@ public class GroupController {
             responseDTO.setUser(responseUsers);
             return new ResponseEntity<>(new DataWrapDTO(responseDTO), HttpStatus.OK);
         } catch (Exception e) {
-            var responseDTO = new ErrorWrapDTO(e.toString());
+            var responseDTO = new ErrorWrapDTO(e.getMessage());
             return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
         }
     }
@@ -241,7 +239,7 @@ public class GroupController {
             responseDTO.setGroupId(group.getId());
             return new ResponseEntity<>(new DataWrapDTO(responseDTO), HttpStatus.OK);
         } catch (Exception e) {
-            var responseDTO = new ErrorWrapDTO(e.toString());
+            var responseDTO = new ErrorWrapDTO(e.getMessage());
             return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
         }
     }
@@ -255,7 +253,7 @@ public class GroupController {
             userGroupService.removeUserFromGroup(groupId, user);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
-            var responseDTO = new ErrorWrapDTO(e.toString());
+            var responseDTO = new ErrorWrapDTO(e.getMessage());
             return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
         }
     }

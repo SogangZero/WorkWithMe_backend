@@ -100,6 +100,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
     }
 
     @Override
+    //TODO: UserTaskList 내부 확인
     public void makeTaskDone(Long taskId, Boolean done) {
         Task task = taskRepository.findById(taskId).orElseThrow(() -> new EntityNotFoundException(
         "Could not find task with ID: " + taskId));
@@ -121,6 +122,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         List<Task> taskList = taskRepository.findTasksBetweenDates(startTime,endTime);
 
         Integer[] countList = new Integer[32];
+        Arrays.fill(countList,0);
 
         for(Task t : taskList){
             int dayOfMonth = t.getEndTime().getDayOfMonth();

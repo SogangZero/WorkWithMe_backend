@@ -7,18 +7,20 @@ import com.wwme.wwme.group.repository.UserGroupRepository;
 import com.wwme.wwme.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserGroupServiceImpl implements UserGroupService{
     private final GroupRepository groupRepository;
     private final UserGroupRepository userGroupRepository;
 
     @Override
-    public UserGroup getUserGroupByIdAndUser(long groupId, User user) throws NoSuchElementException {
+    public UserGroup getUserGroupByIdAndUser(long groupId, User user) {
         Group group = groupRepository.findById(groupId).orElseThrow();
 
         // if matching user is inside found group return userGroup
