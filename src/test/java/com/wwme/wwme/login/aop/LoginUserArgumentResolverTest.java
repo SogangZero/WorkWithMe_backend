@@ -97,8 +97,9 @@ public class LoginUserArgumentResolverTest {
                 new ModelAndViewContainer(),
                 webRequest,
                 null);
-        assertThat(resolvedArgument).isNull();
-
+        assertThat(resolvedArgument).isInstanceOf(User.class);
+        User user = (User) resolvedArgument;
+        assertThat(user.getId()).isEqualTo(-1L);
     }
 
     @Test
@@ -124,7 +125,9 @@ public class LoginUserArgumentResolverTest {
                 webRequest,
                 null);
 
-        assertThat(resolvedArgument).isNull();
+        assertThat(resolvedArgument).isInstanceOf(User.class);
+        User user = (User) resolvedArgument;
+        assertThat(user.getId()).isEqualTo(-1L);
     }
 
     static class TestController {
