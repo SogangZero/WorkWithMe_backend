@@ -8,7 +8,6 @@ import java.util.List;
 
 @Data
 public class GroupReadAllSuccessResponseDTO {
-    boolean success;
     @JsonProperty("group_list")
     List<GroupDTO> groupDTOList = new ArrayList<>();
 
@@ -22,5 +21,8 @@ public class GroupReadAllSuccessResponseDTO {
 
         @JsonProperty("group_color")
         String groupColor;
+
+        @JsonProperty("num_people")
+        int numPeople;
     }
 }

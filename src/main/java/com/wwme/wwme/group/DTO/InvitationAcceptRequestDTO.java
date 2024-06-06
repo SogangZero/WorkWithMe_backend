@@ -5,7 +5,8 @@ import lombok.Data;
 
 @Data
 public class InvitationAcceptRequestDTO {
-    String code;
+    @JsonProperty("group_code")
+    String groupCode;
 
     @JsonProperty("group_color")
     String groupColor;

@@ -8,8 +8,6 @@ import java.util.List;
 
 @Data
 public class GroupReadSuccessResponseDTO {
-    boolean success;
-
     @JsonProperty("group_name")
     String groupName;
 

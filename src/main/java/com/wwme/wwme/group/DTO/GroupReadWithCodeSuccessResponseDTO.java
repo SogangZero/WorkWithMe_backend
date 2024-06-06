@@ -7,7 +7,6 @@ import java.util.List;
 
 @Data
 public class GroupReadWithCodeSuccessResponseDTO {
-    boolean success;
     @JsonProperty("group_name")
     String groupName;
     @JsonProperty("user")
