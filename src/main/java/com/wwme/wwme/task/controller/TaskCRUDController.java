@@ -3,17 +3,16 @@ package com.wwme.wwme.task.controller;
 import com.wwme.wwme.group.DTO.DataWrapDTO;
 import com.wwme.wwme.group.DTO.ErrorWrapDTO;
 import com.wwme.wwme.login.aop.Login;
-import com.wwme.wwme.task.domain.DTO.receiveDTO.CreateTaskReceiveDTO;
-import com.wwme.wwme.task.domain.DTO.receiveDTO.TaskListReadByGroupReceiveDTO;
-import com.wwme.wwme.task.domain.DTO.receiveDTO.UpdateTaskReceiveDTO;
-import com.wwme.wwme.task.domain.DTO.sendDTO.*;
+import com.wwme.wwme.task.domain.DTO.taskReceiveDTO.CreateTaskReceiveDTO;
+import com.wwme.wwme.task.domain.DTO.taskReceiveDTO.TaskListReadByGroupReceiveDTO;
+import com.wwme.wwme.task.domain.DTO.taskReceiveDTO.UpdateTaskReceiveDTO;
+import com.wwme.wwme.task.domain.DTO.taskSendDTO.*;
 import com.wwme.wwme.task.domain.Task;
 import com.wwme.wwme.task.service.TaskCRUDService;
 import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.service.UserService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,27 +24,23 @@ import java.util.*;
 @Controller
 @Transactional
 @RequestMapping("/task")
+@Slf4j
+@RequiredArgsConstructor
 public class TaskCRUDController {
 
     private final TaskCRUDService taskCRUDService;
     private final UserService userService;
-    private static final Logger logger = LoggerFactory.getLogger(TaskCRUDController.class);
 
-    @Autowired
-    public TaskCRUDController(TaskCRUDService taskCRUDService, UserService userService) {
-        this.taskCRUDService = taskCRUDService;
-        this.userService = userService;
-    }
 
     @PostMapping
     public ResponseEntity<?> createTask(@RequestBody CreateTaskReceiveDTO createTaskReceiveDTO){
         try {
             System.out.println(createTaskReceiveDTO.getGroup_id());
             Task task = taskCRUDService.createTask(createTaskReceiveDTO);
-            logger.info("successfully created and added Task");
+            log.info("successfully created and added Task");
             return ResponseEntity.ok(Collections.singletonMap("task_id",task.getId()));
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
             return ResponseEntity.badRequest().body(Collections.singletonMap("error",e.getMessage()));
         }
     }
@@ -61,7 +56,7 @@ public class TaskCRUDController {
 
             return ResponseEntity.ok(updateTaskSendDTO);
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
             ErrorWrapDTO errorWrapDTO = new ErrorWrapDTO(e.getMessage());
             return ResponseEntity.badRequest().body(errorWrapDTO);
         }
@@ -71,9 +66,9 @@ public class TaskCRUDController {
     public ResponseEntity<?> makeTaskDone(@RequestBody Long task_id,@RequestBody Boolean done){
         try{
             taskCRUDService.makeTaskDone(task_id, done);
-            return ResponseEntity.ok(null); //TODO: 데이터가 없을떄 명세서에 의하면 아무것도 보내지 않는다. Is this ok?
+            return ResponseEntity.ok().build();
         }catch (Exception e){
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
             ErrorWrapDTO errorWrapDTO = new ErrorWrapDTO(e.getMessage());
             return ResponseEntity.badRequest().body(errorWrapDTO);
         }
@@ -85,7 +80,7 @@ public class TaskCRUDController {
         try {
             return ResponseEntity.ok(new DataWrapDTO(taskCRUDService.getTaskCountListforMonth(date)));
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
             ErrorWrapDTO errorWrapDTO = new ErrorWrapDTO(e.getMessage());
             return ResponseEntity.badRequest().body(errorWrapDTO);
         }
@@ -122,7 +117,7 @@ public class TaskCRUDController {
             DataWrapDTO dataWrapDTO = new DataWrapDTO(readTaskListByUserSendDTOList);
             return ResponseEntity.ok(dataWrapDTO);
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
             ErrorWrapDTO errorWrapDTO = new ErrorWrapDTO(e.getMessage());
             return ResponseEntity.badRequest().body(errorWrapDTO);
         }
@@ -140,9 +135,9 @@ public class TaskCRUDController {
     public ResponseEntity<?> deleteTask(@ModelAttribute Long task_id){
         try {
             taskCRUDService.deleteTask(task_id);
-            return ResponseEntity.ok(null); //TODO: 데이터가 없을떄 명세서에 의하면 아무것도 보내지 않는다. Is this ok?
+            return ResponseEntity.ok().build();
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
             ErrorWrapDTO errorWrapDTO = new ErrorWrapDTO(e.getMessage());
             return ResponseEntity.badRequest().body(errorWrapDTO);
         }
