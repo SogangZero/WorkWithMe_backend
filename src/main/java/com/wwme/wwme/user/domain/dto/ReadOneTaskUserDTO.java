@@ -1,12 +1,12 @@
 package com.wwme.wwme.user.domain.DTO;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
-@RequiredArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class ReadOneTaskUserDTO {
     private Long user_id;
     private String nickname;

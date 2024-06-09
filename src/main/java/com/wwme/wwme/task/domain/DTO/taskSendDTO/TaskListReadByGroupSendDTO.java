@@ -1,11 +1,10 @@
-package com.wwme.wwme.task.domain.DTO.sendDTO;
+package com.wwme.wwme.task.domain.DTO.taskSendDTO;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Getter
 @Setter

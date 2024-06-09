@@ -1,18 +1,16 @@
-package com.wwme.wwme.task.domain.DTO.sendDTO;
+package com.wwme.wwme.task.domain.DTO.taskSendDTO;
 
 import com.wwme.wwme.user.domain.DTO.ReadOneTaskUserDTO;
-import com.wwme.wwme.user.domain.User;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Getter
 @Setter
-@RequiredArgsConstructor
-
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ReadOneTaskSendDTO {
     private Long task_id;
     private String tag_name;

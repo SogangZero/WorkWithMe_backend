@@ -1,4 +1,4 @@
-package com.wwme.wwme.task.domain.DTO.sendDTO;
+package com.wwme.wwme.task.domain.DTO.taskSendDTO;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

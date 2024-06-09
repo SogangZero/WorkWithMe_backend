@@ -1,14 +1,14 @@
-package com.wwme.wwme.task.domain.DTO.sendDTO;
+package com.wwme.wwme.task.domain.DTO.taskSendDTO;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 
 @Getter
 @Setter
-@RequiredArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class TaskListForDaySendDTO {
     private Boolean isComplete;
     private Long taskId;
