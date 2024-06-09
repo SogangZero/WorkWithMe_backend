@@ -15,13 +15,16 @@ public class UserGroup {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Embedded
-    Color color;
+    String color;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     Group group;
 
+    public void setGroup(Group group) {
+        group.addUserGroup(this);
+        this.group = group;
+    }
 }

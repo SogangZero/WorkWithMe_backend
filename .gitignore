@@ -36,6 +36,7 @@ out/
 ### VS Code ###
 .vscode/
 
-### application.properties
-src/main/resources/application.properties
-src/test/resources/application.yaml
+### application.properties ###
+/src/main/resources/application.properties
+/src/test/resources/application.yaml
+/src/main/resources/application.yaml
