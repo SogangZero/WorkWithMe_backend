@@ -64,7 +64,8 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public List<User> getAllUserFromGroupId(long groupId) {
-        Group group = groupRepository.findById(groupId).orElseThrow();
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new NoSuchElementException("Couldn't find Group with given groupId"));
         return getAllUserFromGroup(group);
     }
 
@@ -79,13 +80,15 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public String getGroupCode(long groupId) {
-       GroupInvitation groupInvitation = groupInvitationRepository.findByGroupId(groupId).orElseThrow();
-       return groupInvitation.getCode();
+        GroupInvitation groupInvitation = groupInvitationRepository.findByGroupId(groupId)
+                .orElseThrow(() -> new NoSuchElementException("Couldn't find GroupInvitation associated with given groupId"));
+        return groupInvitation.getCode();
     }
 
     @Override
     public Group getGroupByCode(String groupCode) {
-        GroupInvitation groupInvitation = groupInvitationRepository.findByCode(groupCode).orElseThrow();
+        GroupInvitation groupInvitation = groupInvitationRepository.findByCode(groupCode)
+                .orElseThrow(() -> new NoSuchElementException("Couldn't find GroupInvitation with given GroupCode"));
         return groupInvitation.getGroup();
     }
 }
