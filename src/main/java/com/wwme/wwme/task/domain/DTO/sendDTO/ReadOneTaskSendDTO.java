@@ -1,6 +1,6 @@
 package com.wwme.wwme.task.domain.DTO.sendDTO;
 
-import com.wwme.wwme.user.domain.DTO.ReadOneTaskUserDTO;
+import com.wwme.wwme.user.domain.dto.ReadOneTaskUserDTO;
 import com.wwme.wwme.user.domain.User;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
