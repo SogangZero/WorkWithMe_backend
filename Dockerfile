@@ -1,10 +1,11 @@
-FROM openjdk:17
+FROM amazoncorretto:17
 
-WORKDIR /server
 
 COPY gradlew build.gradle settings.gradle /server/
 COPY gradle /server/gradle
 COPY src /server/src
+
+WORKDIR /server
 
 RUN chmod +x gradlew
 RUN ./gradlew build -x test --parallel
