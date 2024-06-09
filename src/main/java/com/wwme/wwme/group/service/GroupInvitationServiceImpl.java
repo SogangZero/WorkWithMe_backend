@@ -2,9 +2,7 @@ package com.wwme.wwme.group.service;
 
 import com.wwme.wwme.group.domain.Group;
 import com.wwme.wwme.group.domain.GroupInvitation;
-import com.wwme.wwme.group.domain.UserGroup;
 import com.wwme.wwme.group.repository.GroupInvitationRepository;
-import com.wwme.wwme.group.repository.GroupRepository;
 import com.wwme.wwme.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

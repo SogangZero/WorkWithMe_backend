@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 public class GroupReadAllSuccessResponseDTO {
     @JsonProperty("group_list")
-    List<GroupDTO> groupDTOList = new ArrayList<>();
+    List<GroupDTO> groupDTOList;
 
     @Data
     public static class GroupDTO {
