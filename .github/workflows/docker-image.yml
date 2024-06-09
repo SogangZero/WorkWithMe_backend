@@ -11,8 +11,7 @@ jobs:
     - uses: actions/checkout@v4
     - name: Extract version from build.gradle
       run: | 
-        export VERSION=$(sed -n "s/^version = '\(.*\)'/\1/p" build.gradle)
-        echo "Version: $VERSION"
+        echo "VERSION=$(sed -n "s/^version = '\(.*\)'/\1/p" build.gradle)" >> "$GITHUB_ENV"
     
     - name: Build the Docker image
       run: docker build . --file Dockerfile --build-arg VERSION=${VERSION} --tag workwithme:${VERSION}
