@@ -15,6 +15,7 @@ import com.wwme.wwme.user.domain.DTO.ReadOneTaskUserDTO;
 import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.Locked;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,7 +72,9 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
     }
 
     @Override
-    //TODO: needs fixing (논의 필요)
+    //TODO: (논의 필요) 현재는 is done personal 과 is done total 을 받는데, 이 사람이 과제의 주인이 아니라면
+    //1. is done을 바꿀 수 없어야함.
+    //2. 그렇다면 is done 을 어떻게 처리할 것인가?
     public Task updateTask(UpdateTaskReceiveDTO updateTaskReceiveDTO) {
         Task task = taskRepository.findTaskByIdWithUserTaskList(updateTaskReceiveDTO.getTask_id()).orElseThrow(() -> new EntityNotFoundException(
                 "Could not find task with ID: " + updateTaskReceiveDTO.getTask_id() +
@@ -181,15 +184,24 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
 
 
         //convert task into readOneTaskSedDTO
+        ReadOneTaskSendDTO readOneTaskSendDTO = ReadOneTaskSendDTO.builder()
+                .task_id(task.getId())
+                .task_name(task.getTaskName())
+                .task_type(task.getTaskType())
+                .group_name(task.getGroup().getGroupName())
+                .tag_name(task.getTag().getTagName())
+                .start_time(task.getStartTime().toLocalDate())
+                .end_time(task.getEndTime().toLocalDate())
+                .build();
 
-        ReadOneTaskSendDTO readOneTaskSendDTO= new ReadOneTaskSendDTO();
-        readOneTaskSendDTO.setTask_id(task.getId());
-        readOneTaskSendDTO.setTag_name(task.getTag().getTagName());
-        readOneTaskSendDTO.setTask_name(task.getTaskName());
-        readOneTaskSendDTO.setTask_type(task.getTaskType());
-        readOneTaskSendDTO.setGroup_name(task.getGroup().getGroupName());
-        readOneTaskSendDTO.setStart_time(task.getStartTime().toLocalDate());
-        readOneTaskSendDTO.setEnd_time(task.getEndTime().toLocalDate());
+//        ReadOneTaskSendDTO readOneTaskSendDTO= new ReadOneTaskSendDTO();
+//        readOneTaskSendDTO.setTask_id(task.getId());
+//        readOneTaskSendDTO.setTag_name(task.getTag().getTagName());
+//        readOneTaskSendDTO.setTask_name(task.getTaskName());
+//        readOneTaskSendDTO.setTask_type(task.getTaskType());
+//        readOneTaskSendDTO.setGroup_name(task.getGroup().getGroupName());
+//        readOneTaskSendDTO.setStart_time(task.getStartTime().toLocalDate());
+//        readOneTaskSendDTO.setEnd_time(task.getEndTime().toLocalDate());
 
         fillUserListForReadOneTaskSendDTO(readOneTaskSendDTO,task);
 
