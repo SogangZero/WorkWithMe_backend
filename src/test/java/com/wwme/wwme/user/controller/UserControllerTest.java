@@ -3,7 +3,7 @@ package com.wwme.wwme.user.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wwme.wwme.login.config.SecurityTestConfig;
 import com.wwme.wwme.login.config.ResolverConfig;
-import com.wwme.wwme.login.domain.dto.DataDTO;
+import com.wwme.wwme.login.domain.dto.response.DataDTO;
 import com.wwme.wwme.login.service.JWTUtilService;
 import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.domain.dto.UserInfoDTO;
@@ -59,7 +59,7 @@ public class UserControllerTest {
         User user = new User();
         user.setId(0L);
         user.setNickname(nickname);
-        UserInfoDTO userDTO = new UserInfoDTO(true, nickname, 0);
+        UserInfoDTO userDTO = new UserInfoDTO(true, nickname, 0L);
         DataDTO result = new DataDTO(userDTO);
         String jsonUser = objectMapper.writeValueAsString(result);
 

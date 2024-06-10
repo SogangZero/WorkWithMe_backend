@@ -2,13 +2,13 @@ package com.wwme.wwme.login.oauth2;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wwme.wwme.login.domain.dto.CustomOAuth2User;
+import com.wwme.wwme.login.domain.dto.response.DataDTO;
 import com.wwme.wwme.login.domain.dto.JoinStatusDTO;
 import com.wwme.wwme.login.domain.entity.RefreshEntity;
 import com.wwme.wwme.login.service.JWTUtilService;
 import com.wwme.wwme.login.repository.RefreshRepository;
 import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.repository.UserRepository;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -42,7 +42,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,
                                         Authentication authentication)
-            throws IOException, ServletException {
+            throws IOException {
         //get user info
         CustomOAuth2User customUserDetails = (CustomOAuth2User) authentication.getPrincipal();
         String userKey = customUserDetails.getUserKey();
@@ -73,27 +73,33 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             response.setStatus(HttpServletResponse.SC_OK);
             response.setContentType("application/json");
             response.setCharacterEncoding("utf-8");
-            JoinStatusDTO joinStatusDTO = new JoinStatusDTO();
-
-            if (user.getNickname() == null) {
-                joinStatusDTO.setAlready_joined(false);
-            } else {
-                joinStatusDTO.setAlready_joined(true);
-            }
-            String jsonBody = objectMapper.writeValueAsString(joinStatusDTO);
+            JoinStatusDTO joinStatusDTO = checkJoinStatus(user);
+            DataDTO data = new DataDTO(joinStatusDTO);
+            String jsonBody = objectMapper.writeValueAsString(data);
             response.getWriter().write(jsonBody);
         } catch (NoSuchElementException e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
     }
 
+    private static JoinStatusDTO checkJoinStatus(User user) {
+        JoinStatusDTO joinStatusDTO = new JoinStatusDTO();
+        if (user.getNickname() == null) {
+            joinStatusDTO.setAlready_joined(false);
+        } else {
+            joinStatusDTO.setAlready_joined(true);
+        }
+        return joinStatusDTO;
+    }
+
     private void addRefreshToken(String userKey, String refresh, Long expiredMs) {
         Date date = new Date(System.currentTimeMillis() + expiredMs);
 
-        RefreshEntity refreshEntity = new RefreshEntity();
-        refreshEntity.setUserKey(userKey);
-        refreshEntity.setRefresh(refresh);
-        refreshEntity.setExpiration(date.toString());
+        RefreshEntity refreshEntity = RefreshEntity.builder()
+                .userKey(userKey)
+                .refresh(refresh)
+                .expiration(date.toString())
+                .build();
 
         refreshRepository.save(refreshEntity);
     }

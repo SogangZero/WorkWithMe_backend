@@ -23,7 +23,7 @@ public class JWTUtilService {
         try {
             return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("userKey", String.class);
         } catch (Exception e) {
-            throw new JwtTokenException("getUserKey fail");
+            throw new JwtTokenException("Cannot Find UserKey In the Token");
         }
     }
 
@@ -31,7 +31,7 @@ public class JWTUtilService {
         try {
             return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("role", String.class);
         } catch (Exception e) {
-            throw new JwtTokenException("getRole fail");
+            throw new JwtTokenException("Cannot Find Role In the Token");
         }
     }
 
@@ -39,7 +39,7 @@ public class JWTUtilService {
         try {
             return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("category", String.class);
         } catch (Exception e) {
-            throw new JwtTokenException("getCategory fail");
+            throw new JwtTokenException("Cannot Find Category In the Token");
         }
     }
 
@@ -49,7 +49,7 @@ public class JWTUtilService {
         } catch (ExpiredJwtException e) {
             return true;
         } catch (Exception e) {
-            throw new JwtTokenException("isExpired fail");
+            throw new JwtTokenException("Token Is Expired");
         }
     }
 

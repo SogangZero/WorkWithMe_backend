@@ -17,7 +17,8 @@ public class ReissueService {
     private final JWTUtilService jwtUtilService;
     private final RefreshRepository refreshRepository;
 
-    public String validateRefreshToken(Cookie[] cookies) throws NullRefreshTokenException, JwtTokenException, InvalidRefreshTokenException {
+    public String validateRefreshToken(Cookie[] cookies)
+            throws NullRefreshTokenException, JwtTokenException, InvalidRefreshTokenException {
         String refresh = null;
         for (Cookie cookie : cookies) {
             if (cookie.getName().equals("refresh")) {
@@ -26,25 +27,25 @@ public class ReissueService {
         }
 
         if (refresh == null) {
-            throw new NullRefreshTokenException("refresh token null");
+            throw new NullRefreshTokenException("Cannot Find Refresh Token At Request Header");
         }
 
         //expired check
         if (jwtUtilService.isExpired(refresh)) {
-            throw new InvalidRefreshTokenException("expired refresh token");
+            throw new InvalidRefreshTokenException("Refresh Token Has Expired");
         }
 
 
         //check if the token is refresh
         String category = jwtUtilService.getCategory(refresh);
         if (!category.equals("refresh")) {
-            throw new InvalidRefreshTokenException("invalid refresh token");
+            throw new InvalidRefreshTokenException("Refresh Token Has Invalid Content [Category]");
         }
 
         //check if the refresh token is in DB
         Boolean isExist = refreshRepository.existsByRefresh(refresh);
         if (!isExist) {
-            throw new InvalidRefreshTokenException("invalid refresh token");
+            throw new InvalidRefreshTokenException("Refresh Token Has Invalid Content [Not Exist in DB]");
         }
 
         return refresh;
@@ -68,11 +69,11 @@ public class ReissueService {
 
     private void addRefreshToken(String userKey, String refresh, Long expiredMs) {
         Date date = new Date(System.currentTimeMillis() + expiredMs);
-        RefreshEntity refreshEntity = new RefreshEntity();
-
-        refreshEntity.setUserKey(userKey);
-        refreshEntity.setRefresh(refresh);
-        refreshEntity.setExpiration(date.toString());
+        RefreshEntity refreshEntity = RefreshEntity.builder()
+                .userKey(userKey)
+                .refresh(refresh)
+                .expiration(date.toString())
+                .build();
 
         refreshRepository.save(refreshEntity);
     }
