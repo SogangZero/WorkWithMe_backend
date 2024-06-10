@@ -50,7 +50,7 @@ public class GroupDtoConverter {
                     groupDTO.setGroupId(group.getId());
                     groupDTO.setGroupName(group.getGroupName());
                     groupDTO.setGroupColor(userGroup.getColor());
-                    groupDTO.setNumPeople(2);
+                    groupDTO.setNumPeople(userGroup.getGroup().getUserGroupList().size());
                     return groupDTO;
                 })
                 .toList();
