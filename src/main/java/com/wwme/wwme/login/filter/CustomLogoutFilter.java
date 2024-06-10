@@ -30,7 +30,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
         try {
             customDoFilter((HttpServletRequest) request, (HttpServletResponse) response, chain);
         } catch (JwtTokenException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Logout Fail");
         }
     }
 
@@ -53,7 +53,6 @@ public class CustomLogoutFilter extends GenericFilterBean {
         //get refresh token
         String refresh = null;
         Cookie[] cookies = request.getCookies();
-        System.out.println("cookies = " + cookies);
         for (Cookie cookie : cookies) {
             if (cookie.getName().equals("refresh")) {
                 refresh = cookie.getValue();

@@ -67,6 +67,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             "LEFT JOIN FETCH t.tag tg " +
             "WHERE ut.user.id = :userId " +
             "AND ut.isDone = false " +
+            "AND t.endTime <= CURRENT_TIMESTAMP " +
             "ORDER BY t.endTime asc")
     List<Task> findTasksByUserIdFetchUserTask(@Param("userId") Long userId);
 
@@ -80,8 +81,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             "AND t.endTime >= :startDate " +
             "AND t.endTime <= :endDate " +
             "AND tg.id in :tagList " +
-            "AND t.id > :lastId " +
-            "AND t.endTime >= :lastEndTime " +
+            "AND (:lastId IS NULL OR (t.endTime > :lastEndTime) OR (t.endTime = :lastEndTime AND t.id > :lastId)) " +
             "ORDER BY t.endTime asc, t.id asc"
     )
     List<Task> findAllByGroupWithArguments(

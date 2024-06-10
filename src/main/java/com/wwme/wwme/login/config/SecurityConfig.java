@@ -1,5 +1,6 @@
 package com.wwme.wwme.login.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wwme.wwme.login.filter.CustomLogoutFilter;
 import com.wwme.wwme.login.filter.WwmeAuthenticationFilter;
 import com.wwme.wwme.login.service.JWTUtilService;
@@ -33,6 +34,7 @@ public class SecurityConfig {
     private final JWTUtilService jwtUtilService;
     private final RefreshRepository refreshRepository;
     private final UserRepository userRepository;
+    private final ObjectMapper objectMapper;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -83,7 +85,7 @@ public class SecurityConfig {
 
         //add JWTFilter
         http
-                .addFilterAfter(new WwmeAuthenticationFilter(jwtUtilService), OAuth2LoginAuthenticationFilter.class);
+                .addFilterAfter(new WwmeAuthenticationFilter(jwtUtilService, objectMapper), OAuth2LoginAuthenticationFilter.class);
 
         //add SupervisorFilter
         http

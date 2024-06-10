@@ -11,6 +11,8 @@ import com.wwme.wwme.task.domain.Task;
 import com.wwme.wwme.task.service.TaskCRUDService;
 import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.service.UserService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,28 +30,23 @@ import java.util.*;
 @Transactional
 @Slf4j
 @RequestMapping("/task")
+@RequiredArgsConstructor
 public class TaskCRUDController {
 
     private final TaskCRUDService taskCRUDService;
     private final UserService userService;
-    private static final Logger logger = LoggerFactory.getLogger(TaskCRUDController.class);
 
-    @Autowired
-    public TaskCRUDController(TaskCRUDService taskCRUDService, UserService userService) {
-        this.taskCRUDService = taskCRUDService;
-        this.userService = userService;
-    }
 
     @PostMapping
     public ResponseEntity<?> createTask(@RequestBody CreateTaskReceiveDTO createTaskReceiveDTO) {
         try {
             System.out.println(createTaskReceiveDTO.getGroup_id());
             Task task = taskCRUDService.createTask(createTaskReceiveDTO);
-            logger.info("successfully created and added Task");
-            return ResponseEntity.ok(Collections.singletonMap("task_id", task.getId()));
+            log.info("successfully created and added Task");
+            return ResponseEntity.ok(Collections.singletonMap("task_id",task.getId()));
         } catch (Exception e) {
-            logger.error(e.getMessage());
-            return ResponseEntity.badRequest().body(Collections.singletonMap("error", e.getMessage()));
+            log.error(e.getMessage());
+            return ResponseEntity.badRequest().body(Collections.singletonMap("error",e.getMessage()));
         }
     }
 
@@ -64,7 +61,7 @@ public class TaskCRUDController {
 
             return ResponseEntity.ok(updateTaskSendDTO);
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
             ErrorWrapDTO errorWrapDTO = new ErrorWrapDTO(e.getMessage());
             return ResponseEntity.badRequest().body(errorWrapDTO);
         }
@@ -74,9 +71,9 @@ public class TaskCRUDController {
     public ResponseEntity<?> makeTaskDone(@RequestBody Long task_id, @RequestBody Boolean done) {
         try {
             taskCRUDService.makeTaskDone(task_id, done);
-            return ResponseEntity.ok(null); //TODO: 데이터가 없을떄 명세서에 의하면 아무것도 보내지 않는다. Is this ok?
-        } catch (Exception e) {
-            logger.error(e.getMessage());
+            return ResponseEntity.ok().build();
+        }catch (Exception e){
+            log.error(e.getMessage());
             ErrorWrapDTO errorWrapDTO = new ErrorWrapDTO(e.getMessage());
             return ResponseEntity.badRequest().body(errorWrapDTO);
         }
@@ -88,7 +85,7 @@ public class TaskCRUDController {
         try {
             return ResponseEntity.ok(new DataWrapDTO(taskCRUDService.getTaskCountListforMonth(date)));
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
             ErrorWrapDTO errorWrapDTO = new ErrorWrapDTO(e.getMessage());
             return ResponseEntity.badRequest().body(errorWrapDTO);
         }
@@ -125,7 +122,7 @@ public class TaskCRUDController {
             DataWrapDTO dataWrapDTO = new DataWrapDTO(readTaskListByUserSendDTOList);
             return ResponseEntity.ok(dataWrapDTO);
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
             ErrorWrapDTO errorWrapDTO = new ErrorWrapDTO(e.getMessage());
             return ResponseEntity.badRequest().body(errorWrapDTO);
         }
@@ -133,7 +130,7 @@ public class TaskCRUDController {
 
     @GetMapping("/list/group")
     public ResponseEntity<?> taskListReadByGroup(
-            @RequestParam(name = "last_id", required = false) long lastId,
+            @RequestParam(name = "last_id", required = false) Long lastId,
             @RequestParam("group_id") long groupId,
             @RequestParam("is_my_task") boolean isMyTask,
             @RequestParam("complete_status") String completeStatus,
@@ -157,9 +154,24 @@ public class TaskCRUDController {
                             tagList
                     );
 
+            var taskDTOList = taskList.stream().map((task) ->
+                new TaskListReadByGroupSendDTO.Task(
+                        task.getId(),
+                        task.getTaskName(),
+                        task.getEndTime(),
+                        task.getTaskType(),
+                        task.getTag().getId(),
+                        task.getTotalIsDone(),
+                        taskCRUDService.getIsDoneMe(user, task),
+                        taskCRUDService.getDoneUserCount(task),
+                        taskCRUDService.getDoingNickname(task)
+                )
+
+            ).toList();
+            var responseDTO = new TaskListReadByGroupSendDTO(taskDTOList);
             return ResponseEntity
                     .ok()
-                    .body(new DataWrapDTO(taskList));
+                    .body(new DataWrapDTO(responseDTO));
         } catch (Exception e) {
             log.error("input: last_id:{} group_id{} isMyTask:{} completeStatus:{} startDate:{} endDate:{} withDueDate:{} tagList:{} ",
                     lastId, groupId, isMyTask, completeStatus, startDate, endDate, withDueDate, tagList, e);
@@ -173,9 +185,9 @@ public class TaskCRUDController {
     public ResponseEntity<?> deleteTask(@ModelAttribute Long task_id) {
         try {
             taskCRUDService.deleteTask(task_id);
-            return ResponseEntity.ok(null); //TODO: 데이터가 없을떄 명세서에 의하면 아무것도 보내지 않는다. Is this ok?
+            return ResponseEntity.ok().build();
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
             ErrorWrapDTO errorWrapDTO = new ErrorWrapDTO(e.getMessage());
             return ResponseEntity.badRequest().body(errorWrapDTO);
         }

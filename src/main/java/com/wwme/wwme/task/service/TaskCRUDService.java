@@ -77,7 +77,7 @@ public interface TaskCRUDService {
      * @param user
      * @return
      */
-    Collection<Task> readTaskListByGroup(long lastId, long groupId, User user, boolean isMyTask, String completeStatus, LocalDateTime startDate, LocalDateTime endDate, boolean withDueDate, List<Long> tagList);
+    Collection<Task> readTaskListByGroup(Long lastId, long groupId, User user, boolean isMyTask, String completeStatus, LocalDateTime startDate, LocalDateTime endDate, boolean withDueDate, List<Long> tagList);
 
     /**
      * delete task identified by "task_id"
@@ -85,7 +85,9 @@ public interface TaskCRUDService {
      */
     void deleteTask(Long taskId);
 
+    boolean getIsDoneMe(User user, Task task);
 
+    int getDoneUserCount(Task task);
 
-
+    String getDoingNickname(Task task);
 }

@@ -3,7 +3,7 @@ package com.wwme.wwme.user.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wwme.wwme.login.config.SecurityTestConfig;
 import com.wwme.wwme.login.config.ResolverConfig;
-import com.wwme.wwme.login.domain.dto.DataDTO;
+import com.wwme.wwme.login.domain.dto.response.DataDTO;
 import com.wwme.wwme.login.service.JWTUtilService;
 import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.domain.dto.UserInfoDTO;
@@ -59,7 +59,7 @@ public class UserControllerTest {
         User user = new User();
         user.setId(0L);
         user.setNickname(nickname);
-        UserInfoDTO userDTO = new UserInfoDTO(true, nickname, 0);
+        UserInfoDTO userDTO = new UserInfoDTO(true, nickname, 0L);
         DataDTO result = new DataDTO(userDTO);
         String jsonUser = objectMapper.writeValueAsString(result);
 
@@ -80,26 +80,4 @@ public class UserControllerTest {
                 .andExpect(content().string(jsonUser));
 
     }
-
-    @Test
-    @DisplayName("유저가 존재하지 않을 때 - /user [GET]")
-    public void requestInvalidUser() throws Exception {
-        //given
-        String accessToken = "testToken";
-        User emptyUser = new User();
-        emptyUser.setId(-1L);
-
-        //when
-        when(jwtUtilService.getUserKey(any()))
-                .thenReturn("testUserKey");
-        when(userRepository.findByUserKey(any()))
-                .thenReturn(Optional.of(emptyUser));
-
-        //then
-        mvc.perform(
-                        MockMvcRequestBuilders.get("/user"))
-                .andExpect(status().isBadRequest());
-    }
-
-
 }

@@ -1,10 +1,10 @@
 package com.wwme.wwme.login.controller;
 
 import com.wwme.wwme.login.aop.Login;
-import com.wwme.wwme.login.domain.dto.DataDTO;
-import com.wwme.wwme.login.domain.dto.ErrorDTO;
+import com.wwme.wwme.login.domain.dto.response.DataDTO;
+import com.wwme.wwme.login.domain.dto.response.ErrorDTO;
 import com.wwme.wwme.login.domain.dto.NicknameDTO;
-import com.wwme.wwme.login.domain.dto.SuccessDTO;
+import com.wwme.wwme.login.domain.dto.response.SuccessDTO;
 import com.wwme.wwme.login.service.NicknameService;
 import com.wwme.wwme.user.domain.User;
 import lombok.RequiredArgsConstructor;
@@ -30,10 +30,9 @@ public class NicknameController {
 
             SuccessDTO successDTO = new SuccessDTO(true);
             return new ResponseEntity<>(new DataDTO(successDTO), HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
+        } catch (Exception e) {
             ErrorDTO errorDTO = new ErrorDTO(e.getMessage());
             return new ResponseEntity<>(errorDTO, HttpStatus.BAD_REQUEST);
         }
-
     }
 }
