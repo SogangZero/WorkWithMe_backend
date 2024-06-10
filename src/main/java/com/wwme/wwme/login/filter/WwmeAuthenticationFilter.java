@@ -1,7 +1,9 @@
 package com.wwme.wwme.login.filter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wwme.wwme.login.domain.CustomAuthenticationToken;
 import com.wwme.wwme.login.domain.dto.CustomOAuth2User;
+import com.wwme.wwme.login.domain.dto.response.ErrorDTO;
 import com.wwme.wwme.login.domain.dto.UserDTO;
 import com.wwme.wwme.login.exception.JwtTokenException;
 import com.wwme.wwme.login.service.JWTUtilService;
@@ -21,6 +23,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class WwmeAuthenticationFilter extends OncePerRequestFilter {
     private final JWTUtilService jwtUtilService;
+    private final ObjectMapper objectMapper;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -36,7 +39,6 @@ public class WwmeAuthenticationFilter extends OncePerRequestFilter {
         }
 
         if (accessToken == null) {
-            log.info("AccessToken is null");
             filterChain.doFilter(request, response);
             return;
         }
@@ -47,10 +49,7 @@ public class WwmeAuthenticationFilter extends OncePerRequestFilter {
 
 
         try {
-            if (jwtUtilService.isExpired(accessToken)) {
-                log.info("AccessToken is expired");
-                throw new JwtTokenException("AccessToken is expired");
-            }
+            checkTokenExpiredDate(accessToken);
 
             category = jwtUtilService.getCategory(accessToken);
             userKey = jwtUtilService.getUserKey(accessToken);
@@ -62,15 +61,20 @@ public class WwmeAuthenticationFilter extends OncePerRequestFilter {
 
         } catch (JwtTokenException e) {
             log.info("AccessToken is invalid");
+
+            ErrorDTO errorDTO = new ErrorDTO("Access Token Is Invalid. Unauthorized Access.");
+            String result = objectMapper.writeValueAsString(errorDTO);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write(result);
             return;
         }
 
 
         log.info("UserKey {}[{}] has access token {}", userKey, role, accessToken);
-        UserDTO userDTO = new UserDTO();
-        userDTO.setUserKey(userKey);
-        userDTO.setRole(role);
+        UserDTO userDTO = UserDTO.builder()
+                .userKey(userKey)
+                .role(role)
+                .build();
 
         CustomOAuth2User customOAuth2User = new CustomOAuth2User(userDTO);
 
@@ -78,5 +82,12 @@ public class WwmeAuthenticationFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authToken);
 
         filterChain.doFilter(request, response);
+    }
+
+    private void checkTokenExpiredDate(String accessToken) throws JwtTokenException {
+        if (jwtUtilService.isExpired(accessToken)) {
+            log.info("AccessToken is expired");
+            throw new JwtTokenException("AccessToken is expired");
+        }
     }
 }

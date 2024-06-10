@@ -3,7 +3,7 @@ package com.wwme.wwme.user.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wwme.wwme.login.config.SecurityTestConfig;
 import com.wwme.wwme.login.config.ResolverConfig;
-import com.wwme.wwme.login.domain.dto.DataDTO;
+import com.wwme.wwme.login.domain.dto.response.DataDTO;
 import com.wwme.wwme.login.service.JWTUtilService;
 import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.domain.dto.UserInfoDTO;

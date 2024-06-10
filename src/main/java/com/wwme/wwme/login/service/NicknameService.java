@@ -16,13 +16,13 @@ public class NicknameService {
 
     public void saveNickname(String nickname, String userKey) {
         if (nickname == null || nickname.isEmpty()) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Nickname Must Have Contents");
         }
 
         User user = userRepository.findByUserKey(userKey).orElseThrow();
 
-        user.setNickname(nickname);
-        user.setRegisterDate(LocalDateTime.now());
+        user.ChangeNickname(nickname);
+        user.registerComplete();
 
         log.info("User {} set nickname {}", user.getUserKey(), user.getNickname());
     }

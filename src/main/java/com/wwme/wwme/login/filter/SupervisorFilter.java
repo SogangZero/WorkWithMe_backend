@@ -34,22 +34,23 @@ public class SupervisorFilter extends OncePerRequestFilter {
         }
 
         String userKey = "developmentUserKey";
-
         String token = jwtUtilService.createJwt("access", userKey, "ROLE_ADMIN", 24 * 60 * 60 * 1000L);
         request.setAttribute("access", token);
+        
+        createSuperUserIfNotExist(userKey);
+        filterChain.doFilter(request, response);
+    }
 
-
+    private void createSuperUserIfNotExist(String userKey) {
         if (!userRepository.existsByUserKey(userKey)) {
-            User user = new User();
-            user.setRole("ROLE_ADMIN");
-            user.setNickname("developer");
-            user.setUserKey(userKey);
-            user.setRegisterDate(LocalDateTime.now());
+            User user = User.builder()
+                    .role("ROLE_ADMIN")
+                    .nickname("developer")
+                    .userKey(userKey)
+                    .registerDate(LocalDateTime.now())
+                    .build();
 
             userRepository.save(user);
         }
-        log.info("supervisor is in");
-        filterChain.doFilter(request, response);
-
     }
 }
