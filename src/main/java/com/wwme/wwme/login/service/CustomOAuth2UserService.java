@@ -1,6 +1,10 @@
 package com.wwme.wwme.login.service;
 
 import com.wwme.wwme.login.domain.dto.*;
+import com.wwme.wwme.login.domain.dto.provider.GoogleResponse;
+import com.wwme.wwme.login.domain.dto.provider.KakaoResponse;
+import com.wwme.wwme.login.domain.dto.provider.NaverResponse;
+import com.wwme.wwme.login.domain.dto.provider.OAuth2Response;
 import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +28,50 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
+        OAuth2Response oAuth2Response = getoAuth2Response(registrationId, oAuth2User);
+        if (oAuth2Response == null) return null;
+
+        log.info("User login {}", oAuth2Response);
+
+        //create user-specific ID value by info from resource server
+        String provider = oAuth2Response.getProvider();
+        String userKey = oAuth2Response.getProviderId();
+        User existData = null;
+
+        try {
+            existData = userRepository.findByUserKey(userKey).orElseThrow();
+            log.info("Existed User {}", oAuth2Response.getName());
+            userRepository.save(existData);
+            UserDTO userDTO = UserDTO.builder()
+                    .name(oAuth2Response.getName())
+                    .userKey(existData.getUserKey())
+                    .socialProvider(existData.getSocialProvider())
+                    .role(existData.getRole())
+                    .build();
+
+            return new CustomOAuth2User(userDTO);
+        } catch (NoSuchElementException e) {
+            log.info("New User {}", oAuth2Response.getName());
+
+            User user = User.builder()
+                    .userKey(userKey)
+                    .socialProvider(provider)
+                    .role("ROLE_USER")
+                    .build();
+
+            UserDTO userDTO = UserDTO.builder()
+                    .name(oAuth2Response.getName())
+                    .userKey(userKey)
+                    .socialProvider(provider)
+                    .role("ROLE_USER")
+                    .build();
+
+            userRepository.save(user);
+            return new CustomOAuth2User(userDTO);
+        }
+    }
+
+    private static OAuth2Response getoAuth2Response(String registrationId, OAuth2User oAuth2User) {
         OAuth2Response oAuth2Response = null;
         if (registrationId.equals("naver")) {
             oAuth2Response = new NaverResponse(oAuth2User.getAttributes());
@@ -34,38 +82,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         } else {
             return null;
         }
-
-        log.info("User login {}", oAuth2Response);
-
-        //create user-specific ID value by info from resource server
-        String provider = oAuth2Response.getProvider();
-        String userKey = oAuth2Response.getProviderId();
-        User existData = null;
-        try {
-            existData = userRepository.findByUserKey(userKey).orElseThrow();
-        } catch (NoSuchElementException e) {
-            log.info("New User {}", oAuth2Response.getName());
-            User user = new User();
-            user.setUserKey(userKey);
-            user.setSocialProvider(provider);
-            user.setRole("ROLE_USER");
-
-            userRepository.save(user);
-            UserDTO userDTO = new UserDTO(oAuth2Response.getName(),
-                    userKey,
-                    provider,
-                    "ROLE_USER");
-
-            return new CustomOAuth2User(userDTO);
-        }
-
-        log.info("Existed User {}", oAuth2Response.getName());
-        userRepository.save(existData);
-        UserDTO userDTO = new UserDTO(oAuth2Response.getName(),
-                existData.getUserKey(),
-                existData.getSocialProvider(),
-                existData.getRole());
-
-        return new CustomOAuth2User(userDTO);
+        return oAuth2Response;
     }
 }

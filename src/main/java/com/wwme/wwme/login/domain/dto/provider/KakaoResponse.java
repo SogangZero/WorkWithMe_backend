@@ -1,4 +1,4 @@
-package com.wwme.wwme.login.domain.dto;
+package com.wwme.wwme.login.domain.dto.provider;
 
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;

@@ -3,19 +3,18 @@ package com.wwme.wwme.user.domain;
 import com.wwme.wwme.group.domain.UserGroup;
 import com.wwme.wwme.task.domain.UserTask;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-@Getter
-@Setter
+@Data
+@Builder
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "user_table")
 public class User {
     @Id
@@ -54,4 +53,13 @@ public class User {
                 ", profileImageId=" + profileImageId +
                 '}';
     }
+
+    public void ChangeNickname(String changedName) {
+        this.nickname = changedName;
+    }
+
+    public void registerComplete() {
+        this.registerDate = LocalDateTime.now();
+    }
+
 }

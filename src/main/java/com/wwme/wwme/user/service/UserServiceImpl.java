@@ -11,6 +11,10 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService{
     @Override
     public UserInfoDTO getUserInfo(User user) {
-        return new UserInfoDTO(true, user.getNickname(), 0);
+        return UserInfoDTO.builder()
+                .success(true)
+                .nickname(user.getNickname())
+                .profile_image_id(user.getProfileImageId())
+                .build();
     }
 }

@@ -1,16 +1,11 @@
 package com.wwme.wwme.user.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wwme.wwme.login.aop.Login;
-import com.wwme.wwme.login.domain.dto.DataDTO;
-import com.wwme.wwme.login.domain.dto.ErrorDTO;
-import com.wwme.wwme.login.exception.JwtTokenException;
+import com.wwme.wwme.login.domain.dto.response.DataDTO;
+import com.wwme.wwme.login.domain.dto.response.ErrorDTO;
 import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.domain.dto.UserInfoDTO;
 import com.wwme.wwme.user.service.UserService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -18,8 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.NoSuchElementException;
 
 @RestController
 @RequiredArgsConstructor

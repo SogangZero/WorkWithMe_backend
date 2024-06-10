@@ -1,4 +1,4 @@
-package com.wwme.wwme.login.domain.dto;
+package com.wwme.wwme.login.domain.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
