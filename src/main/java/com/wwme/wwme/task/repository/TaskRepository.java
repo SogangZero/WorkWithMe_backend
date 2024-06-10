@@ -63,6 +63,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             "LEFT JOIN FETCH t.tag tg " +
             "WHERE ut.user.id = :userId " +
             "AND ut.isDone = false " +
+            "AND t.endTime <= CURRENT_TIMESTAMP " +
             "ORDER BY t.endTime asc")
     List<Task> findTasksByUserIdFetchUserTask(@Param("userId") Long userId);
 }
