@@ -1,6 +1,6 @@
 package com.wwme.wwme.task.domain.DTO.taskSendDTO;
 
-import com.wwme.wwme.user.domain.DTO.ReadOneTaskUserDTO;
+import com.wwme.wwme.user.domain.dto.ReadOneTaskUserDTO;
 import lombok.*;
 
 import java.time.LocalDate;
