@@ -44,12 +44,15 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         User user = userRepository.findById(createTaskReceiveDTO.getTodo_user_id()).orElseThrow(() -> new EntityNotFoundException(
                 "Could not find user with ID: " + createTaskReceiveDTO.getTodo_user_id() +
                 " in method createTask. Details: " + createTaskReceiveDTO.toString()));
+        if(createTaskReceiveDTO.getTag_id() != null){
+            Tag tag = tagRepository.findById(createTaskReceiveDTO.getTag_id()).orElseThrow(() -> new EntityNotFoundException(
+                    "Could not find tag with ID: " + createTaskReceiveDTO.getTodo_user_id() +
+                            " in method createTask. Details: " + createTaskReceiveDTO.toString()));
+            task.setTag(tag);
+        }
 
-        Tag tag = tagRepository.findById(createTaskReceiveDTO.getTag_id()).orElseThrow(() -> new EntityNotFoundException(
-                "Could not find tag with ID: " + createTaskReceiveDTO.getTodo_user_id() +
-                " in method createTask. Details: " + createTaskReceiveDTO.toString()));
 
-        task.setTag(tag);
+
 
         Group group = groupRepository.findById(createTaskReceiveDTO.getGroup_id()).orElseThrow(() -> new EntityNotFoundException(
                 "Could not find group with ID: " + createTaskReceiveDTO.getTodo_user_id() +
