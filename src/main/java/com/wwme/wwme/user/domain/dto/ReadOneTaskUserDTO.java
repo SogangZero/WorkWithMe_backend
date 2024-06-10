@@ -1,4 +1,4 @@
-package com.wwme.wwme.user.domain.DTO;
+package com.wwme.wwme.user.domain.dto;
 
 import lombok.*;
 
