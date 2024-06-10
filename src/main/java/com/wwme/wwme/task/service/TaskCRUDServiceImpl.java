@@ -11,7 +11,7 @@ import com.wwme.wwme.task.domain.Task;
 import com.wwme.wwme.task.domain.UserTask;
 import com.wwme.wwme.task.repository.TagRepository;
 import com.wwme.wwme.task.repository.TaskRepository;
-import com.wwme.wwme.user.domain.DTO.ReadOneTaskUserDTO;
+import com.wwme.wwme.user.domain.dto.ReadOneTaskUserDTO;
 import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
