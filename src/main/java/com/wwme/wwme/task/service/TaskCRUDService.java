@@ -1,13 +1,14 @@
 package com.wwme.wwme.task.service;
 
 import com.wwme.wwme.task.domain.DTO.receiveDTO.CreateTaskReceiveDTO;
-import com.wwme.wwme.task.domain.DTO.receiveDTO.TaskListReadByGroupReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.UpdateTaskReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.sendDTO.*;
 import com.wwme.wwme.task.domain.Task;
 import com.wwme.wwme.user.domain.User;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 public interface TaskCRUDService {
@@ -71,14 +72,20 @@ public interface TaskCRUDService {
 
     /**
      * read task list by group
-     * @param taskListReadByGroupReceiveDTO
+     *
+     * @param
+     * @param user
      * @return
      */
-    public List<TaskListReadByGroupSendDTO> readTaskListByGroup(TaskListReadByGroupReceiveDTO taskListReadByGroupReceiveDTO);
+    Collection<Task> readTaskListByGroup(long lastId, long groupId, User user, boolean isMyTask, String completeStatus, LocalDateTime startDate, LocalDateTime endDate, boolean withDueDate, List<Long> tagList);
 
     /**
      * delete task identified by "task_id"
      * @param taskId
      */
     void deleteTask(Long taskId);
+
+
+
+
 }

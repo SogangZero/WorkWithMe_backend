@@ -20,13 +20,13 @@ spring:
             authorization-grant-type: authorization_code
             scope: profile_nickname
 
-        google:
-          client-name: google
-          client-id: 678206844749-valeev05unb0m70vnlh1dbe7lr4fvj94.apps.googleusercontent.com
-          client-secret: ${GOOGLE_CLIENT_SECRET}
-          redirect-uri: https://${DOMAIN_NAME}/login/oauth2/code/google
-          authorization-grant-type: authorization_code
-          scope: profile
+          google:
+            client-name: google
+            client-id: 678206844749-valeev05unb0m70vnlh1dbe7lr4fvj94.apps.googleusercontent.com
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            redirect-uri: https://${DOMAIN_NAME}/login/oauth2/code/google
+            authorization-grant-type: authorization_code
+            scope: profile
 
         provider:
           naver:

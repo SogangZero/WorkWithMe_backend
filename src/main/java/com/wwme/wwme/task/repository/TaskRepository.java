@@ -1,6 +1,9 @@
 package com.wwme.wwme.task.repository;
 
+import com.wwme.wwme.task.domain.Tag;
 import com.wwme.wwme.task.domain.Task;
+import com.wwme.wwme.user.domain.User;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -8,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -65,4 +69,30 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             "AND ut.isDone = false " +
             "ORDER BY t.endTime asc")
     List<Task> findTasksByUserIdFetchUserTask(@Param("userId") Long userId);
+
+    @Query("SELECT t FROM Task t " +
+            "LEFT JOIN FETCH t.userTaskList ut " +
+            "LEFT JOIN FETCH t.group gp " +
+            "LEFT JOIN FETCH t.tag tg " +
+            "WHERE gp.id = :groupId " +
+            "AND (:user is NULL or ut = :user) " +
+            "AND (:totalIsDone is NULL or t.totalIsDone = :totalIsDone) " +
+            "AND t.endTime >= :startDate " +
+            "AND t.endTime <= :endDate " +
+            "AND tg.id in :tagList " +
+            "AND t.id > :lastId " +
+            "AND t.endTime >= :lastEndTime " +
+            "ORDER BY t.endTime asc, t.id asc"
+    )
+    List<Task> findAllByGroupWithArguments(
+            @Param("lastId") Long lastId,
+            @Param("lastEndTime") LocalDateTime lastEndTime,
+            @Param("groupId") Long groupId,
+            @Param("user") User user,
+            @Param("totalIsDone") Boolean totalIsDone,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate,
+            @Param("tagList") List<Long> tagList,
+            Pageable pageable
+    );
 }
