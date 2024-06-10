@@ -30,7 +30,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
         try {
             customDoFilter((HttpServletRequest) request, (HttpServletResponse) response, chain);
         } catch (JwtTokenException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Logout Fail");
         }
     }
 
