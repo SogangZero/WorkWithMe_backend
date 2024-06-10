@@ -59,7 +59,7 @@ public class UserControllerTest {
         User user = new User();
         user.setId(0L);
         user.setNickname(nickname);
-        UserInfoDTO userDTO = new UserInfoDTO(true, nickname, 0);
+        UserInfoDTO userDTO = new UserInfoDTO(true, nickname, 0L);
         DataDTO result = new DataDTO(userDTO);
         String jsonUser = objectMapper.writeValueAsString(result);
 
