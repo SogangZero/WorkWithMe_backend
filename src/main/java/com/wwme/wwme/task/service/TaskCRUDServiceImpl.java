@@ -3,7 +3,6 @@ package com.wwme.wwme.task.service;
 import com.wwme.wwme.group.domain.Group;
 import com.wwme.wwme.group.repository.GroupRepository;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.CreateTaskReceiveDTO;
-import com.wwme.wwme.task.domain.DTO.receiveDTO.TaskListReadByGroupReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.UpdateTaskReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.sendDTO.*;
 import com.wwme.wwme.task.domain.Tag;
@@ -20,9 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -247,9 +244,41 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
     }
 
     @Override
-    public List<TaskListReadByGroupSendDTO> readTaskListByGroup(TaskListReadByGroupReceiveDTO taskListReadByGroupReceiveDTO) {
-        return null;
+    public Collection<Task> readTaskListByGroup(
+            long lastId,
+            long groupId,
+            User user,
+            boolean isMyTask,
+            String completeStatus,
+            LocalDateTime startDate,
+            LocalDateTime endDate,
+            boolean withDueDate,
+            List<Long> tagList
+    ) {
+        // prepare for query
+        Boolean totalIsDone = false;
+        if (!isMyTask) {
+            user = null; // null means don't specify user
+        }
+
+        if (Objects.equals(completeStatus, "complete")) {
+            totalIsDone = true;
+        } else if (Objects.equals(completeStatus, "incomplete")) {
+            totalIsDone = false;
+        } else if (Objects.equals(completeStatus, "all")) {
+            totalIsDone = null;
+        }
+
+        return taskRepository.findAllByGroupWithArguments(
+                groupId,
+                user,
+                totalIsDone,
+                startDate,
+                endDate,
+                tagList
+        );
     }
+
 
     @Override
     public void deleteTask(Long taskId) {
