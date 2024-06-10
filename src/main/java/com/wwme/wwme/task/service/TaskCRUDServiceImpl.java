@@ -2,10 +2,10 @@ package com.wwme.wwme.task.service;
 
 import com.wwme.wwme.group.domain.Group;
 import com.wwme.wwme.group.repository.GroupRepository;
-import com.wwme.wwme.task.domain.DTO.taskReceiveDTO.CreateTaskReceiveDTO;
-import com.wwme.wwme.task.domain.DTO.taskReceiveDTO.TaskListReadByGroupReceiveDTO;
-import com.wwme.wwme.task.domain.DTO.taskReceiveDTO.UpdateTaskReceiveDTO;
-import com.wwme.wwme.task.domain.DTO.taskSendDTO.*;
+import com.wwme.wwme.task.domain.DTO.receiveDTO.CreateTaskReceiveDTO;
+import com.wwme.wwme.task.domain.DTO.receiveDTO.TaskListReadByGroupReceiveDTO;
+import com.wwme.wwme.task.domain.DTO.receiveDTO.UpdateTaskReceiveDTO;
+import com.wwme.wwme.task.domain.DTO.sendDTO.*;
 import com.wwme.wwme.task.domain.Tag;
 import com.wwme.wwme.task.domain.Task;
 import com.wwme.wwme.task.domain.UserTask;

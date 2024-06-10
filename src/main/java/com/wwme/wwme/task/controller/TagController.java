@@ -2,9 +2,9 @@ package com.wwme.wwme.task.controller;
 
 import com.wwme.wwme.group.DTO.DataWrapDTO;
 import com.wwme.wwme.group.DTO.ErrorWrapDTO;
-import com.wwme.wwme.task.domain.DTO.tagReceiveDTO.CreateTagReceiveDTO;
-import com.wwme.wwme.task.domain.DTO.tagReceiveDTO.UpdateTagReceiveDTO;
-import com.wwme.wwme.task.domain.DTO.taskSendDTO.TagListReadSendDTO;
+import com.wwme.wwme.task.domain.DTO.receiveDTO.CreateTagReceiveDTO;
+import com.wwme.wwme.task.domain.DTO.receiveDTO.UpdateTagReceiveDTO;
+import com.wwme.wwme.task.domain.DTO.sendDTO.TagListReadSendDTO;
 import com.wwme.wwme.task.domain.Tag;
 import com.wwme.wwme.task.service.TagCRUDServiceImpl;
 import com.wwme.wwme.task.service.TaskCRUDService;

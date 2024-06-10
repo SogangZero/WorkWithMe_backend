@@ -1,9 +1,8 @@
 package com.wwme.wwme.task.service;
 
-import com.wwme.wwme.task.domain.DTO.TagDTO;
-import com.wwme.wwme.task.domain.DTO.tagReceiveDTO.CreateTagReceiveDTO;
-import com.wwme.wwme.task.domain.DTO.tagReceiveDTO.UpdateTagReceiveDTO;
-import com.wwme.wwme.task.domain.DTO.taskSendDTO.TagListReadSendDTO;
+import com.wwme.wwme.task.domain.DTO.receiveDTO.CreateTagReceiveDTO;
+import com.wwme.wwme.task.domain.DTO.receiveDTO.UpdateTagReceiveDTO;
+import com.wwme.wwme.task.domain.DTO.sendDTO.TagListReadSendDTO;
 import com.wwme.wwme.task.domain.Tag;
 
 import java.util.List;

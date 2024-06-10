@@ -1,4 +1,4 @@
-package com.wwme.wwme.task.domain.DTO.taskSendDTO;
+package com.wwme.wwme.task.domain.DTO.sendDTO;
 
 import com.wwme.wwme.user.domain.dto.ReadOneTaskUserDTO;
 import lombok.*;
