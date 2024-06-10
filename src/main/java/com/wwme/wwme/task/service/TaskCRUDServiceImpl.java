@@ -270,14 +270,15 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
             totalIsDone = null;
         }
 
-
-        var lastTask = taskRepository.findById(lastId).orElseThrow(
-                () -> new NoSuchElementException("Couldn't find task using lastId")
-        );
-        var lastEndTime = lastTask.getEndTime();
-
+        Task lastTask = null;
+        LocalDateTime lastEndTime = null;
+        if (lastId != null) {
+            lastTask = taskRepository.findById(lastId).orElseThrow(
+                    () -> new NoSuchElementException("Couldn't find task using lastId")
+            );
+            lastEndTime = lastTask.getEndTime();
+        }
         var pageable = PageRequest.of(0, 20);
-
         return taskRepository.findAllByGroupWithArguments(
                 lastId,
                 lastEndTime,
