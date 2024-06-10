@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -41,5 +40,18 @@ public class User {
 
     public User(String nickname) {
         this.nickname = nickname;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", nickname='" + nickname + '\'' +
+                ", registerDate=" + registerDate +
+                ", userKey='" + userKey + '\'' +
+                ", socialProvider='" + socialProvider + '\'' +
+                ", role='" + role + '\'' +
+                ", profileImageId=" + profileImageId +
+                '}';
     }
 }

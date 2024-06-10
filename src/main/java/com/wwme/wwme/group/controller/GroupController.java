@@ -3,12 +3,12 @@ package com.wwme.wwme.group.controller;
 import com.wwme.wwme.group.DTO.*;
 import com.wwme.wwme.group.domain.Group;
 import com.wwme.wwme.group.domain.UserGroup;
+import com.wwme.wwme.group.service.GroupDtoConverter;
 import com.wwme.wwme.group.service.GroupInvitationService;
 import com.wwme.wwme.group.service.GroupService;
 import com.wwme.wwme.group.service.UserGroupService;
 import com.wwme.wwme.login.aop.Login;
 import com.wwme.wwme.user.domain.User;
-import com.wwme.wwme.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/group")
@@ -27,6 +26,7 @@ public class GroupController {
     private final GroupService groupService;
     private final UserGroupService userGroupService;
     private final GroupInvitationService groupInvitationService;
+    private final GroupDtoConverter converter;
 
     /**
      * POST /group <br>
@@ -52,11 +52,10 @@ public class GroupController {
             String code = groupInvitationService.createGroupInvitation(createdGroup);
 
             // Formulate response
-            GroupCreateSuccessResponseDTO responseDTO = new GroupCreateSuccessResponseDTO();
-            responseDTO.setGroupId(createdGroup.getId());
-            responseDTO.setGroupCode(code);
+            var responseDTO = new GroupCreateSuccessResponseDTO(createdGroup.getId(), code);
             return new ResponseEntity<>(new DataWrapDTO(responseDTO), HttpStatus.OK);
         } catch (Exception e) {
+            log.error("Input: {}", requestDTO, e);
             var responseDTO = new ErrorWrapDTO(e.getMessage());
             return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
         }
@@ -90,6 +89,7 @@ public class GroupController {
 
             return new ResponseEntity<>(new DataWrapDTO(responseDTO), HttpStatus.OK);
         } catch (Exception e) {
+            log.error("Input: {}", requestDTO, e);
             var responseDTO = new ErrorWrapDTO(e.getMessage());
             return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
         }
@@ -111,20 +111,12 @@ public class GroupController {
         try {
             // Get UserGroup and Group from group id and user
             UserGroup userGroup = userGroupService.getUserGroupByIdAndUser(groupId, user);
-            Group group = userGroup.getGroup();
 
             // Formulate Response
-            GroupReadSuccessResponseDTO responseDTO = new GroupReadSuccessResponseDTO();
-            responseDTO.setGroupName(group.getGroupName());
-            responseDTO.setGroupColor(userGroup.getColor());
-            for (UserGroup curUserGroup : group.getUserGroupList()) {
-                GroupReadSuccessResponseDTO.UserDTO userDTO = new GroupReadSuccessResponseDTO.UserDTO();
-                userDTO.setUserId(curUserGroup.getUser().getId());
-                responseDTO.addUserDTOToList(userDTO);
-            }
-
+            var responseDTO = converter.convertToGroupReadDTO(userGroup);
             return new ResponseEntity<>(new DataWrapDTO(responseDTO), HttpStatus.OK);
         } catch (Exception e) {
+            log.error("Input: groupId: {}", groupId, e);
             var responseDTO = new ErrorWrapDTO(e.getMessage());
             return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
         }
@@ -139,18 +131,10 @@ public class GroupController {
             String groupCode = groupService.getGroupCode(groupId);
 
             // formulate response
-            var responseDTO = new GroupUserListReadResponseSuccessDTO();
-            responseDTO.setGroupCode(groupCode);
-            var responseUsers = users.stream().map((user) -> {
-                var curUser = new GroupUserListReadResponseSuccessDTO.User();
-                curUser.setNickname(user.getNickname());
-                curUser.setProfileImageId(0);
-                return curUser;
-            }).collect(Collectors.toList());
-            responseDTO.setUserList(responseUsers);
-
+            var responseDTO = converter.convertToGroupUserListReadDTO(users, groupCode);
             return new ResponseEntity<>(new DataWrapDTO(responseDTO), HttpStatus.OK);
         } catch (Exception e) {
+            log.error("Input: groupId: {}", groupId, e);
             var responseDTO = new ErrorWrapDTO(e.getMessage());
             return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
         }
@@ -171,27 +155,16 @@ public class GroupController {
             Collection<UserGroup> userGroups = userGroupService.getAllUserGroupOfUser(user);
 
             // Formulate Response
-            GroupReadAllSuccessResponseDTO responseDTO = new GroupReadAllSuccessResponseDTO();
-            List<GroupReadAllSuccessResponseDTO.GroupDTO> groupDTOList = userGroups.stream()
-                    .map(userGroup -> {
-                        GroupReadAllSuccessResponseDTO.GroupDTO groupDTO =
-                                new GroupReadAllSuccessResponseDTO.GroupDTO();
-                        Group group = userGroup.getGroup();
-                        groupDTO.setGroupId(group.getId());
-                        groupDTO.setGroupName(group.getGroupName());
-                        groupDTO.setGroupColor(userGroup.getColor());
-                        groupDTO.setNumPeople(2);
-                        return groupDTO;
-                    })
-                    .toList();
-            responseDTO.setGroupDTOList(groupDTOList);
+            var responseDTO = converter.convertToGroupReadAllDTO(userGroups);
 
             return new ResponseEntity<>(new DataWrapDTO(responseDTO), HttpStatus.OK);
         } catch (Exception e) {
+            log.error("User: {}", user, e);
             var responseDTO = new ErrorWrapDTO(e.getMessage());
             return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
         }
     }
+
 
     @GetMapping("/code")
     public ResponseEntity<?> groupReadWithCode(
@@ -202,22 +175,10 @@ public class GroupController {
             List<User> users = groupService.getAllUserFromGroup(group);
 
             // formulate response
-            var responseDTO = new GroupReadWithCodeSuccessResponseDTO();
-            responseDTO.setGroupName(group.getGroupName());
-
-            var responseUsers = users
-                    .stream()
-                    .map((user) -> {
-                        var curUser = new GroupReadWithCodeSuccessResponseDTO.User();
-                        curUser.setUserId(user.getId());
-                        curUser.setNickname(user.getNickname());
-                        return curUser;
-                    })
-                    .toList();
-
-            responseDTO.setUser(responseUsers);
+            var responseDTO = converter.convertToGroupReadWithCodeDTO(group, users);
             return new ResponseEntity<>(new DataWrapDTO(responseDTO), HttpStatus.OK);
         } catch (Exception e) {
+            log.error("Input: groupCode: {}", groupCode, e);
             var responseDTO = new ErrorWrapDTO(e.getMessage());
             return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
         }
@@ -239,6 +200,7 @@ public class GroupController {
             responseDTO.setGroupId(group.getId());
             return new ResponseEntity<>(new DataWrapDTO(responseDTO), HttpStatus.OK);
         } catch (Exception e) {
+            log.error("Input: {}", requestDTO, e);
             var responseDTO = new ErrorWrapDTO(e.getMessage());
             return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
         }
@@ -253,6 +215,7 @@ public class GroupController {
             userGroupService.removeUserFromGroup(groupId, user);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
+            log.error("Input: groupId: {}", groupId, e);
             var responseDTO = new ErrorWrapDTO(e.getMessage());
             return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
         }

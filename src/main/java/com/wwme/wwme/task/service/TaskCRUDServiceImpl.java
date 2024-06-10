@@ -3,7 +3,6 @@ package com.wwme.wwme.task.service;
 import com.wwme.wwme.group.domain.Group;
 import com.wwme.wwme.group.repository.GroupRepository;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.CreateTaskReceiveDTO;
-import com.wwme.wwme.task.domain.DTO.receiveDTO.TaskListReadByGroupReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.UpdateTaskReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.sendDTO.*;
 import com.wwme.wwme.task.domain.Tag;
@@ -16,13 +15,12 @@ import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -281,15 +279,90 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
     }
 
     @Override
-    public List<TaskListReadByGroupSendDTO> readTaskListByGroup(TaskListReadByGroupReceiveDTO taskListReadByGroupReceiveDTO) {
-        return null;
+    public Collection<Task> readTaskListByGroup(
+            Long lastId,
+            long groupId,
+            User user,
+            boolean isMyTask,
+            String completeStatus,
+            LocalDateTime startDate,
+            LocalDateTime endDate,
+            boolean withDueDate,
+            List<Long> tagList
+    ) {
+        // prepare for query
+        Boolean totalIsDone = false;
+        if (!isMyTask) {
+            user = null; // null means don't specify user
+        }
+
+        if (Objects.equals(completeStatus, "complete")) {
+            totalIsDone = true;
+        } else if (Objects.equals(completeStatus, "incomplete")) {
+            totalIsDone = false;
+        } else if (Objects.equals(completeStatus, "all")) {
+            totalIsDone = null;
+        }
+
+        Task lastTask = null;
+        LocalDateTime lastEndTime = null;
+        if (lastId != null) {
+            lastTask = taskRepository.findById(lastId).orElseThrow(
+                    () -> new NoSuchElementException("Couldn't find task using lastId")
+            );
+            lastEndTime = lastTask.getEndTime();
+        }
+        var pageable = PageRequest.of(0, 20);
+        return taskRepository.findAllByGroupWithArguments(
+                lastId,
+                lastEndTime,
+                groupId,
+                user,
+                totalIsDone,
+                startDate,
+                endDate,
+                tagList,
+                pageable
+        );
     }
+
 
     @Override
     public void deleteTask(Long taskId) {
         taskRepository.deleteById(taskId);
     }
 
+    @Override
+    public boolean getIsDoneMe(User user, Task task) {
+        // loop through user task list to see if I exist
+        for (var userTask : task.getUserTaskList()) {
+            // If I exist, return if I am done
+            if(Objects.equals(userTask.getUser(), user)) {
+                return userTask.getIsDone();
+            }
+        }
+        // I don't exist
+        return false;
+    }
+
+    @Override
+    public int getDoneUserCount(Task task) {
+        int sum = 0;
+        for (var userTask : task.getUserTaskList()) {
+            if (userTask.getIsDone()) sum++;
+        }
+        return sum;
+    }
+
+    @Override
+    public String getDoingNickname(Task task) {
+        // Doesn't have dedicated user of task
+        if (task.getUserTaskList().size() != 1) {
+            return null;
+        }
+
+        return task.getUserTaskList().get(0).getUser().getNickname();
+    }
 
 
     //friend functions.

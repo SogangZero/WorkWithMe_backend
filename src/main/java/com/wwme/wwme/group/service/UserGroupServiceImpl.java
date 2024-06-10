@@ -15,13 +15,14 @@ import java.util.NoSuchElementException;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class UserGroupServiceImpl implements UserGroupService{
+public class UserGroupServiceImpl implements UserGroupService {
     private final GroupRepository groupRepository;
     private final UserGroupRepository userGroupRepository;
 
     @Override
     public UserGroup getUserGroupByIdAndUser(long groupId, User user) {
-        Group group = groupRepository.findById(groupId).orElseThrow();
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new NoSuchElementException("Couldn't find Group with given groupId"));
 
         // if matching user is inside found group return userGroup
         return group.getUserGroupList().stream()
@@ -37,7 +38,7 @@ public class UserGroupServiceImpl implements UserGroupService{
 
     @Override
     public UserGroup addUserToGroupWithColor(Group group, User user, String color) {
-        if (userGroupRepository.findByUserAndGroup(user, group).isPresent()){
+        if (userGroupRepository.findByUserAndGroup(user, group).isPresent()) {
             throw new IllegalArgumentException();
         }
 
@@ -52,8 +53,11 @@ public class UserGroupServiceImpl implements UserGroupService{
 
     @Override
     public void removeUserFromGroup(long groupId, User user) {
-        Group group = groupRepository.findById(groupId).orElseThrow();
-        UserGroup userGroup = userGroupRepository.findByUserAndGroup(user, group).orElseThrow();
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new NoSuchElementException("Couldn't find Group with given groupId"));
+
+        UserGroup userGroup = userGroupRepository.findByUserAndGroup(user, group)
+                .orElseThrow(() -> new NoSuchElementException("Couldn't find UserGroup with given User and Group"));
         userGroupRepository.delete(userGroup);
     }
 }

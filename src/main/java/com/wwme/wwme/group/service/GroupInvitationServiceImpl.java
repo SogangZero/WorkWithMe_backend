@@ -2,14 +2,13 @@ package com.wwme.wwme.group.service;
 
 import com.wwme.wwme.group.domain.Group;
 import com.wwme.wwme.group.domain.GroupInvitation;
-import com.wwme.wwme.group.domain.UserGroup;
 import com.wwme.wwme.group.repository.GroupInvitationRepository;
-import com.wwme.wwme.group.repository.GroupRepository;
 import com.wwme.wwme.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.NoSuchElementException;
 import java.util.Random;
 
 @Service
@@ -36,17 +35,19 @@ public class GroupInvitationServiceImpl implements GroupInvitationService {
 
     @Override
     public Group acceptInvitation(String code, User user, String color) {
-        GroupInvitation groupInvitation = groupInvitationRepository.findByCode(code).orElseThrow();
-        Group group = groupInvitation.getGroup();
+        var groupInvitation = groupInvitationRepository.findByCode(code)
+                .orElseThrow(() -> new NoSuchElementException("Couldn't find a groupInvitation with the given code"));
 
-        UserGroup userGroup = userGroupService.addUserToGroupWithColor(group, user, color);
+        var group = groupInvitation.getGroup();
+
+        var userGroup = userGroupService.addUserToGroupWithColor(group, user, color);
         return userGroup.getGroup();
     }
 
     private String generateRandomUniqueString(String candidate, int len) {
-        while(true){
+        while (true) {
             String generatedString = generateRandomString(candidate, len);
-            if(groupInvitationRepository.findByCode(generatedString).isEmpty()){
+            if (groupInvitationRepository.findByCode(generatedString).isEmpty()) {
                 return generatedString;
             }
         }
@@ -55,7 +56,7 @@ public class GroupInvitationServiceImpl implements GroupInvitationService {
     private String generateRandomString(String candidate, int len) {
         Random random = new Random();
         StringBuilder stringBuilder = new StringBuilder();
-        for(int i=0; i<len; i++){
+        for (int i = 0; i < len; i++) {
             int idx = random.nextInt(candidate.length());
             stringBuilder.append(candidate.charAt(idx));
         }
