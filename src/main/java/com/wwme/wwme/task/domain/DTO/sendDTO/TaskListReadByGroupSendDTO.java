@@ -1,23 +1,47 @@
 package com.wwme.wwme.task.domain.DTO.sendDTO;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class TaskListReadByGroupSendDTO {
-    private Long task_id;
-    private String task_name;
-    private LocalDate end_time;
-    private String task_type;
-    private Long tag_id;
-    private Boolean is_done_total;
-    private Boolean is_done_me;
-    private Integer done_user_count;
-    private String doing_nickname;
+    @JsonProperty("task_list")
+    List<Task> taskList;
+
+    @Data
+    @AllArgsConstructor
+    public static class Task {
+        @JsonProperty("task_id")
+        private Long taskId;
+
+        @JsonProperty("task_name")
+        private String taskName;
+
+        @JsonProperty("end_time")
+        private LocalDateTime endTime;
+
+        @JsonProperty("task_type")
+        private String taskType;
+
+        @JsonProperty("tag_id")
+        private Long tagId;
+
+        @JsonProperty("is_done_total")
+        private Boolean isDoneTotal;
+
+        @JsonProperty("is_done_me")
+        private Boolean isDoneMe;
+
+        @JsonProperty("done_user_count")
+        private Integer doneUserCount;
+
+        @JsonProperty("doing_nickname")
+        private String doingNickname;
+    }
 }

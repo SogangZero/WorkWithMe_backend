@@ -133,7 +133,7 @@ public class TaskCRUDController {
 
     @GetMapping("/list/group")
     public ResponseEntity<?> taskListReadByGroup(
-            @RequestParam(name = "last_id", required = false) long lastId,
+            @RequestParam(name = "last_id", required = false) Long lastId,
             @RequestParam("group_id") long groupId,
             @RequestParam("is_my_task") boolean isMyTask,
             @RequestParam("complete_status") String completeStatus,
@@ -157,9 +157,24 @@ public class TaskCRUDController {
                             tagList
                     );
 
+            var taskDTOList = taskList.stream().map((task) ->
+                new TaskListReadByGroupSendDTO.Task(
+                        task.getId(),
+                        task.getTaskName(),
+                        task.getEndTime(),
+                        task.getTaskType(),
+                        task.getTag().getId(),
+                        task.getTotalIsDone(),
+                        taskCRUDService.getIsDoneMe(user, task),
+                        taskCRUDService.getDoneUserCount(task),
+                        taskCRUDService.getDoingNickname(task)
+                )
+
+            ).toList();
+            var responseDTO = new TaskListReadByGroupSendDTO(taskDTOList);
             return ResponseEntity
                     .ok()
-                    .body(new DataWrapDTO(taskList));
+                    .body(new DataWrapDTO(responseDTO));
         } catch (Exception e) {
             log.error("input: last_id:{} group_id{} isMyTask:{} completeStatus:{} startDate:{} endDate:{} withDueDate:{} tagList:{} ",
                     lastId, groupId, isMyTask, completeStatus, startDate, endDate, withDueDate, tagList, e);

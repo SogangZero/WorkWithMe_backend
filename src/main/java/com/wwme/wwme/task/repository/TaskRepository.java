@@ -80,7 +80,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             "AND t.endTime >= :startDate " +
             "AND t.endTime <= :endDate " +
             "AND tg.id in :tagList " +
-            "AND t.id > :lastId " +
+            "AND (:lastId is NULL or t.id > :lastId) " +
             "AND t.endTime >= :lastEndTime " +
             "ORDER BY t.endTime asc, t.id asc"
     )

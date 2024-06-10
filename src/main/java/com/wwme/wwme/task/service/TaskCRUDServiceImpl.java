@@ -246,7 +246,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
 
     @Override
     public Collection<Task> readTaskListByGroup(
-            long lastId,
+            Long lastId,
             long groupId,
             User user,
             boolean isMyTask,
@@ -297,6 +297,37 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         taskRepository.deleteById(taskId);
     }
 
+    @Override
+    public boolean getIsDoneMe(User user, Task task) {
+        // loop through user task list to see if I exist
+        for (var userTask : task.getUserTaskList()) {
+            // If I exist, return if I am done
+            if(Objects.equals(userTask.getUser(), user)) {
+                return userTask.getIsDone();
+            }
+        }
+        // I don't exist
+        return false;
+    }
+
+    @Override
+    public int getDoneUserCount(Task task) {
+        int sum = 0;
+        for (var userTask : task.getUserTaskList()) {
+            if (userTask.getIsDone()) sum++;
+        }
+        return sum;
+    }
+
+    @Override
+    public String getDoingNickname(Task task) {
+        // Doesn't have dedicated user of task
+        if (task.getUserTaskList().size() != 1) {
+            return null;
+        }
+
+        return task.getUserTaskList().get(0).getUser().getNickname();
+    }
 
 
     //friend functions.
