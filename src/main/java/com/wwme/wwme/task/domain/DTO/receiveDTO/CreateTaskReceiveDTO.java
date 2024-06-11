@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class CreateTaskReceiveDTO {
     private String task_name;
-    private LocalDateTime start_time;
     private LocalDateTime end_time;
     private String task_type;
     private Long tag_id;

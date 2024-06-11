@@ -1,6 +1,7 @@
 package com.wwme.wwme.task.service;
 
 import com.wwme.wwme.task.domain.DTO.receiveDTO.CreateTaskReceiveDTO;
+import com.wwme.wwme.task.domain.DTO.receiveDTO.MakeTaskDoneReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.UpdateTaskReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.sendDTO.*;
 import com.wwme.wwme.task.domain.Task;
@@ -18,7 +19,7 @@ public interface TaskCRUDService {
      * @param createTaskReceiveDTO
      * @return Task entity that has been created
      */
-    public Task createTask(CreateTaskReceiveDTO createTaskReceiveDTO);
+    public Task createTask(CreateTaskReceiveDTO createTaskReceiveDTO) throws Exception;
 
 
     /**
@@ -26,15 +27,15 @@ public interface TaskCRUDService {
      * @param updateTaskReceiveDTO
      * @return updateTaskSendDTO
      */
-   public  Task updateTask(UpdateTaskReceiveDTO updateTaskReceiveDTO);
+   public  Task updateTask(UpdateTaskReceiveDTO updateTaskReceiveDTO) throws Exception;
 
 
     /**
-     *
-     * @param taskId
-     * make the task of "taskid" done
+     * @param makeTaskDoneReceiveDTO
+     * @param user
+     * @return
      */
-    public void makeTaskDone(Long taskId, Boolean done);
+    public MakeTaskDoneSendDTO makeTaskDone(MakeTaskDoneReceiveDTO makeTaskDoneReceiveDTO, User user) throws Exception;
 
 
     /**
@@ -42,7 +43,7 @@ public interface TaskCRUDService {
      * @param date (year month day)
      * @return getTaskCountLIstforMonthSendDTO
      */
-    public GetTaskCountListforMonthSendDTO getTaskCountListforMonth(LocalDate date);
+    public GetTaskCountListforMonthSendDTO getTaskCountListforMonth(LocalDate date) throws Exception;
 
 
     /**
@@ -51,7 +52,7 @@ public interface TaskCRUDService {
      * @param date
      * @return a list of tasks within the day of the "date"
      */
-    public List<TaskListForDaySendDTO> getTaskListForDay(User user, LocalDate date);
+    public List<TaskListForDaySendDTO> getTaskListForDay(User user, LocalDate date) throws Exception;
 
     /**
      *

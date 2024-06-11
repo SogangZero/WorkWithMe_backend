@@ -4,7 +4,7 @@ import com.wwme.wwme.group.DTO.DataWrapDTO;
 import com.wwme.wwme.group.DTO.ErrorWrapDTO;
 import com.wwme.wwme.login.aop.Login;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.CreateTaskReceiveDTO;
-import com.wwme.wwme.task.domain.DTO.receiveDTO.TaskListReadByGroupReceiveDTO;
+import com.wwme.wwme.task.domain.DTO.receiveDTO.MakeTaskDoneReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.UpdateTaskReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.sendDTO.*;
 import com.wwme.wwme.task.domain.Task;
@@ -13,10 +13,6 @@ import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,7 +34,7 @@ public class TaskCRUDController {
 
 
     @PostMapping
-    public ResponseEntity<?> createTask(@RequestBody CreateTaskReceiveDTO createTaskReceiveDTO) {
+    public ResponseEntity<?> createTask(@RequestBody CreateTaskReceiveDTO createTaskReceiveDTO) throws Exception{
         try {
             System.out.println(createTaskReceiveDTO.getGroup_id());
             Task task = taskCRUDService.createTask(createTaskReceiveDTO);
@@ -51,8 +47,9 @@ public class TaskCRUDController {
     }
 
     @PutMapping
-    public ResponseEntity<?> updateTask(@RequestBody UpdateTaskReceiveDTO updateTaskReceiveDTO) {
+    public ResponseEntity<?> updateTask(@RequestBody UpdateTaskReceiveDTO updateTaskReceiveDTO) throws Exception{
         try {
+            log.info("Inisde update task");
             Task task = taskCRUDService.updateTask(updateTaskReceiveDTO);
             UpdateTaskSendDTO updateTaskSendDTO = new UpdateTaskSendDTO();
             updateTaskSendDTO.setTask_id(task.getId());
@@ -68,10 +65,12 @@ public class TaskCRUDController {
     }
 
     @PostMapping("/done")
-    public ResponseEntity<?> makeTaskDone(@RequestBody Long task_id, @RequestBody Boolean done) {
+    public ResponseEntity<?> makeTaskDone(@RequestBody MakeTaskDoneReceiveDTO makeTaskDoneReceiveDTO,
+                                          @Login User user)     {
         try {
-            taskCRUDService.makeTaskDone(task_id, done);
-            return ResponseEntity.ok().build();
+            MakeTaskDoneSendDTO makeTaskDoneSendDTO = taskCRUDService.makeTaskDone(makeTaskDoneReceiveDTO,user);
+            DataWrapDTO dataWrapDTO = new DataWrapDTO(makeTaskDoneSendDTO);
+            return ResponseEntity.ok().body(dataWrapDTO);
         }catch (Exception e){
             log.error(e.getMessage());
             ErrorWrapDTO errorWrapDTO = new ErrorWrapDTO(e.getMessage());
@@ -81,7 +80,7 @@ public class TaskCRUDController {
     }
 
     @GetMapping("/list/month")
-    public ResponseEntity<?> getTaskCountListforMonth(@ModelAttribute LocalDate date) {
+    public ResponseEntity<?> getTaskCountListforMonth(@ModelAttribute("date") LocalDate date) throws Exception{
         try {
             return ResponseEntity.ok(new DataWrapDTO(taskCRUDService.getTaskCountListforMonth(date)));
         } catch (Exception e) {
@@ -92,31 +91,37 @@ public class TaskCRUDController {
     }
 
     @GetMapping("list/day")
-    public ResponseEntity<List<TaskListForDaySendDTO>> getTaskListForDay
-            (@ModelAttribute LocalDate date,
+    public ResponseEntity<?> getTaskListForDay
+            (@ModelAttribute("date") LocalDate date,
              @Login User user) {
-        List<TaskListForDaySendDTO> taskListForDaySendDTO = taskCRUDService.getTaskListForDay(user, date);
-        return ResponseEntity.ok(taskListForDaySendDTO);
+        try {
+            List<TaskListForDaySendDTO> taskListForDaySendDTO = taskCRUDService.getTaskListForDay(user, date);
+            return ResponseEntity.ok(taskListForDaySendDTO);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            ErrorWrapDTO errorWrapDTO = new ErrorWrapDTO(e.getMessage());
+            return ResponseEntity.badRequest().body(errorWrapDTO);
+        }
 
     }
 
     @GetMapping
-    public ResponseEntity<?> readOneTask(@ModelAttribute Long task_id) {
-        ReadOneTaskSendDTO readOneTaskSendDTO = taskCRUDService.readOneTask(task_id);
-
-        DataWrapDTO dataWrapDTO = new DataWrapDTO(readOneTaskSendDTO);
-
-        return ResponseEntity.ok(dataWrapDTO);
+    public ResponseEntity<?> readOneTask(@ModelAttribute("task_id") Long task_id) {
+        try {
+            ReadOneTaskSendDTO readOneTaskSendDTO = taskCRUDService.readOneTask(task_id);
+            DataWrapDTO dataWrapDTO = new DataWrapDTO(readOneTaskSendDTO);
+            return ResponseEntity.ok(dataWrapDTO);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            ErrorWrapDTO errorWrapDTO = new ErrorWrapDTO(e.getMessage());
+            return ResponseEntity.badRequest().body(errorWrapDTO);
+        }
     }
 
-    /**
-     * Read all Incomplete Task of user
-     *
-     * @return
-     */
+
     @GetMapping("/list/user")
     public ResponseEntity<?>
-    taskListReadByUser(@Login User user, @ModelAttribute Long last_task_id) {
+    taskListReadByUser(@Login User user, @RequestParam("last_task_id") Long last_task_id) {
         try {
             List<ReadTaskListByUserSendDTO> readTaskListByUserSendDTOList = taskCRUDService.getTaskListForUser(user, last_task_id);
             DataWrapDTO dataWrapDTO = new DataWrapDTO(readTaskListByUserSendDTOList);
