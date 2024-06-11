@@ -3,9 +3,9 @@ package com.wwme.wwme.group.service;
 import com.wwme.wwme.group.domain.Group;
 import com.wwme.wwme.group.domain.UserGroup;
 import com.wwme.wwme.group.repository.GroupRepository;
+import com.wwme.wwme.group.repository.UserGroupRepository;
 import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.repository.UserRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,7 +16,6 @@ import java.util.Collection;
 import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -28,6 +27,9 @@ public class UserGroupServiceImplTest {
 
     @Autowired
     GroupRepository groupRepository;
+
+    @Autowired
+    UserGroupRepository userGroupRepository;
 
     @Autowired
     GroupService groupService;
@@ -133,5 +135,42 @@ public class UserGroupServiceImplTest {
                 InvalidDataAccessApiUsageException.class,
                 () -> userGroupService.addUserToGroupWithColor(group, user2, groupColor2)
         );
+    }
+
+    @Test
+    void removeUserFromGroupSuccess() {
+        User user = userRepository.save(new User());
+        Group group = groupRepository.save(new Group());
+        UserGroup userGroup = new UserGroup();
+        userGroup.setGroup(group);
+        userGroup.setUser(user);
+        userGroup = userGroupRepository.save(userGroup);
+
+        userGroupService.removeUserFromGroup(group.getId(), user);
+
+        assertThat(userGroupRepository.existsById(userGroup.getId())).isEqualTo(false);
+    }
+
+    @Test
+    void removeUserFromGroupFail_NoGroup() {
+        User user = userRepository.save(new User());
+        Group group = groupRepository.save(new Group());
+        UserGroup userGroup = new UserGroup();
+        userGroup.setGroup(group);
+        userGroup.setUser(user);
+        userGroupRepository.save(userGroup);
+
+        assertThrows(NoSuchElementException.class,
+                () -> userGroupService.removeUserFromGroup(group.getId()-1, user));
+    }
+
+    @Test
+    void removeUserFromGroupFail_NoUserGroup() {
+        User user = userRepository.save(new User());
+        Group group = groupRepository.save(new Group());
+
+        assertThrows(NoSuchElementException.class,
+                () -> userGroupService.removeUserFromGroup(group.getId(), user));
+
     }
 }

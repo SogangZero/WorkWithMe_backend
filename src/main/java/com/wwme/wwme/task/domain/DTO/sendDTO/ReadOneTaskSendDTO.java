@@ -9,6 +9,7 @@ import com.wwme.wwme.user.domain.dto.ReadOneTaskUserDTO;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -24,8 +25,8 @@ public class ReadOneTaskSendDTO {
     private List<ReadOneTaskUserDTO> user_list;
     private String task_type;
     private String group_name;
-    private LocalDate start_time;
-    private LocalDate end_time;
+    private LocalDateTime start_time;
+    private LocalDateTime end_time;
 
 
     //Without is_done_count, total_user_count, and user_list;
@@ -33,7 +34,7 @@ public class ReadOneTaskSendDTO {
     public ReadOneTaskSendDTO(Long task_id,
                               String tag_name,
                               String task_name,
-                              String task_type, String group_name, LocalDate start_time, LocalDate end_time) {
+                              String task_type, String group_name, LocalDateTime start_time, LocalDateTime end_time) {
         this.task_id = task_id;
         this.tag_name = tag_name;
         this.task_name = task_name;
