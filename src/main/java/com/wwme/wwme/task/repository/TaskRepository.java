@@ -1,6 +1,5 @@
 package com.wwme.wwme.task.repository;
 
-import com.wwme.wwme.task.domain.Tag;
 import com.wwme.wwme.task.domain.Task;
 import com.wwme.wwme.user.domain.User;
 import org.springframework.data.domain.Pageable;
@@ -9,9 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,8 +46,8 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     @Query("SELECT t FROM Task t " +
             "LEFT JOIN FETCH t.userTaskList ut " +
             "WHERE ut.user.id = :userId " +
-            "AND t.endTime = :date")
-    List<Task> findAllByUserAndEndTime(Long userId, LocalDate date);
+            "AND t.endTime between :startTime AND :endTime")
+    List<Task> findAllByUserAndStartEndTimes(Long userId, LocalDateTime startTime, LocalDateTime endTime);
 
 
     @Query("SELECT t FROM Task t " +
@@ -67,9 +64,9 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             "LEFT JOIN FETCH t.tag tg " +
             "WHERE ut.user.id = :userId " +
             "AND ut.isDone = false " +
-            "AND t.endTime <= CURRENT_TIMESTAMP " +
+            "AND t.endTime >= :endTime " +
             "ORDER BY t.endTime asc")
-    List<Task> findTasksByUserIdFetchUserTask(@Param("userId") Long userId);
+    List<Task> findTasksByUserIdFetchUserTask(@Param("userId") Long userId, @Param("endTime") LocalDateTime endTime, Pageable pageable);
 
     @Query("SELECT t FROM Task t " +
             "LEFT JOIN FETCH t.userTaskList ut " +
@@ -95,4 +92,9 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             @Param("tagList") List<Long> tagList,
             Pageable pageable
     );
+
+    @Query("SELECT t from Task t " +
+            "LEFT JOIN FETCH t.userTaskList ut " +
+            "WHERE t.id = :taskId")
+    Optional<Task> findByTaskIdWithUserList(Long taskId);
 }
