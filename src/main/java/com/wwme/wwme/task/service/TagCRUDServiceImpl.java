@@ -31,6 +31,11 @@ public class TagCRUDServiceImpl implements TagService {
     public Tag createTag(CreateTagReceiveDTO createTagReceiveDTO){
         Tag tag = new Tag();
 
+        if(createTagReceiveDTO.getTag_name() == null || createTagReceiveDTO.getTag_name().isBlank()){
+            throw new IllegalArgumentException(
+                    "The passed tag name was null or empty");
+        }
+
         Group group = groupRepository.findById(createTagReceiveDTO.getGroup_id()).orElseThrow(()-> new NoSuchElementException(
                 "Could not find Group with ID: " + createTagReceiveDTO.getGroup_id() +
                 " in method createTag. Details: " + createTagReceiveDTO.toString()));

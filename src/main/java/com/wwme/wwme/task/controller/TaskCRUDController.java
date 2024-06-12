@@ -35,7 +35,6 @@ public class TaskCRUDController {
     @PostMapping
     public ResponseEntity<?> createTask(@RequestBody CreateTaskReceiveDTO createTaskReceiveDTO) throws Exception{
         try {
-            System.out.println(createTaskReceiveDTO.getGroup_id());
             Task task = taskCRUDService.createTask(createTaskReceiveDTO);
             log.info("successfully created and added Task");
             return ResponseEntity.ok(Collections.singletonMap("task_id",task.getId()));
