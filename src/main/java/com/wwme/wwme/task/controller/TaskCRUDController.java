@@ -23,7 +23,6 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Controller
-@Transactional
 @Slf4j
 @RequestMapping("/task")
 @RequiredArgsConstructor
@@ -187,7 +186,7 @@ public class TaskCRUDController {
     }
 
     @DeleteMapping
-    public ResponseEntity<?> deleteTask(@ModelAttribute Long task_id) {
+    public ResponseEntity<?> deleteTask(@RequestParam("task_id") Long task_id) {
         try {
             taskCRUDService.deleteTask(task_id);
             return ResponseEntity.ok().build();

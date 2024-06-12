@@ -28,8 +28,8 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 @Slf4j
+@Transactional
 public class TaskCRUDServiceImpl implements TaskCRUDService {
 
     private final TaskRepository taskRepository;

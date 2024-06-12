@@ -27,21 +27,22 @@ public class Tag {
     @ManyToOne(fetch = FetchType.LAZY)
     private Group group;
 
-    @OneToMany(mappedBy = "tag")
+    @OneToMany(mappedBy = "tag", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<Task> taskList = new ArrayList<>();
 
 
-    public void addToTaskList(Task task){
+    public void addToTaskList(Task task) {
         taskList.add(task);
+        task.setTag(this);
     }
 
-    public void deleteFromTaskList(Long taskId){
+    public void deleteFromTaskList(Long taskId) {
         Iterator<Task> it = taskList.iterator();
-
-        while(it.hasNext()){
-            Task t =  (Task) it.next();
-            if(Objects.equals(t.getId(), taskId)){
+        while (it.hasNext()) {
+            Task t = it.next();
+            if (Objects.equals(t.getId(), taskId)) {
                 it.remove();
+                t.setTag(null);
                 break;
             }
         }
