@@ -384,7 +384,13 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
             totalIsDone = null;
         }
 
-        Task lastTask = null;
+        // only display tasks without due date
+        if (!withDueDate) {
+            startDate = LocalDateTime.MAX;
+            endDate = LocalDateTime.MAX;
+        }
+
+        Task lastTask;
         LocalDateTime lastEndTime = null;
         if (lastId != null) {
             lastTask = taskRepository.findById(lastId).orElseThrow(
