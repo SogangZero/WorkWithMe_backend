@@ -24,11 +24,12 @@ public class UserGroupServiceImpl implements UserGroupService {
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new NoSuchElementException("Couldn't find Group with given groupId"));
 
-        // if matching user is inside found group return userGroup
+        // return if current user is inside found group
+        // throw exception if not
         return group.getUserGroupList().stream()
                 .filter(userGroup -> userGroup.getUser().equals(user))
                 .findFirst()
-                .orElseThrow(() -> new NoSuchElementException("No user is found in that group"));
+                .orElseThrow(() -> new NoSuchElementException("Current user isn't found in the group of given group id"));
     }
 
     @Override
