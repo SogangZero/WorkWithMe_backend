@@ -27,7 +27,7 @@ public class Tag {
     @ManyToOne(fetch = FetchType.LAZY)
     private Group group;
 
-    @OneToMany(mappedBy = "tag", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @OneToMany(mappedBy = "tag", cascade = CascadeType.PERSIST, orphanRemoval = false)
     private List<Task> taskList = new ArrayList<>();
 
 

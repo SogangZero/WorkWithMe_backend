@@ -6,7 +6,9 @@ import com.wwme.wwme.task.domain.DTO.receiveDTO.CreateTagReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.UpdateTagReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.sendDTO.TagListReadSendDTO;
 import com.wwme.wwme.task.domain.Tag;
+import com.wwme.wwme.task.domain.Task;
 import com.wwme.wwme.task.repository.TagRepository;
+import com.wwme.wwme.task.repository.TaskRepository;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,12 +26,16 @@ import java.util.NoSuchElementException;
 public class TagCRUDServiceImpl implements TagService {
     private final TagRepository tagRepository;
     private final GroupRepository groupRepository;
-    private final EntityManager entityManager;
-
+    private final TaskRepository taskRepository;
 
     @Override //TODO: is this check algorithm for group necessary?
     public Tag createTag(CreateTagReceiveDTO createTagReceiveDTO){
         Tag tag = new Tag();
+
+        if(createTagReceiveDTO.getTag_name() == null || createTagReceiveDTO.getTag_name().isBlank()){
+            throw new IllegalArgumentException(
+                    "The passed tag name was null or empty");
+        }
 
         Group group = groupRepository.findById(createTagReceiveDTO.getGroup_id()).orElseThrow(()-> new NoSuchElementException(
                 "Could not find Group with ID: " + createTagReceiveDTO.getGroup_id() +
@@ -53,6 +59,15 @@ public class TagCRUDServiceImpl implements TagService {
 
     @Override
     public void deleteTag(Long tag_id){
+        Tag tag = tagRepository.findById(tag_id).orElseThrow(()->new NoSuchElementException(
+                "Could not find Tag with tag_id : "+tag_id+
+                "In function deleteTag"
+        ));
+
+        for(Task task : tag.getTaskList()){
+            task.setTag(null);
+            taskRepository.save(task);
+        }
         tagRepository.deleteById(tag_id);
     }
 
