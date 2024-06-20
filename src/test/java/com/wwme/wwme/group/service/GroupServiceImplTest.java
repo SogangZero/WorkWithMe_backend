@@ -33,7 +33,7 @@ class GroupServiceImplTest {
     void createGroupWithUserAndColorSuccess() {
         User user = userRepository.save(new User());
         String groupName = "someName";
-        String color = "FFFFFF";
+        Long color = 0L;
 
         Group newGroup = groupService.createGroupWithUserAndColor(groupName, user, color);
 
@@ -52,7 +52,7 @@ class GroupServiceImplTest {
     void createGroupWithUserAndColorFail_GroupNameTooLong() {
         User user = userRepository.save(new User());
         String groupName = "Very long group name that exceeds 20 char";
-        String color = "FFFFFF";
+        Long color = 0L;
 
         assertThrows(IllegalArgumentException.class, () -> {
             groupService.createGroupWithUserAndColor(groupName, user, color);
@@ -64,11 +64,11 @@ class GroupServiceImplTest {
     void updateGroupNameAndColorSuccess() {
         User user = userRepository.save(new User());
         String groupName = "someName";
-        String color = "FAFAFA";
+        Long color = 0L;
         Group newGroup = groupService.createGroupWithUserAndColor(groupName, user, color);
 
         String newGroupName = "newName";
-        String newColor = "ABABAB";
+        Long newColor = 1L;
 
         Group updatedGroup = groupService.updateGroupNameAndColor(newGroup.getId(), newGroupName, newColor, user);
 
@@ -88,12 +88,12 @@ class GroupServiceImplTest {
         User user = userRepository.save(new User());
 
         String groupName = "someName";
-        String color = "FAFAFA";
+        Long color = 0L;
 
         Group newGroup = groupService.createGroupWithUserAndColor(groupName, user, color);
 
         String newGroupName = "newName";
-        String newColor = "ABABAB";
+        Long newColor = 1L;
 
         assertThrows(NoSuchElementException.class, () -> {
             User user2 = new User();
@@ -107,12 +107,12 @@ class GroupServiceImplTest {
         User user = userRepository.save(new User());
 
         String groupName = "someName";
-        String color = "FAFAFA";
+        Long color = 0L;
 
         Group newGroup = groupService.createGroupWithUserAndColor(groupName, user, color);
 
         String newGroupName = "newName";
-        String newColor = "ABABAB";
+        Long newColor = 1L;
 
         assertThrows(NoSuchElementException.class, () -> {
             groupService.updateGroupNameAndColor(newGroup.getId() + 1, newGroupName, newColor, user);
@@ -124,12 +124,12 @@ class GroupServiceImplTest {
         User user = userRepository.save(new User());
 
         String groupName = "someName";
-        String color = "FAFAFA";
+        Long color = 0L;
 
         Group newGroup = groupService.createGroupWithUserAndColor(groupName, user, color);
 
         String newGroupName = "newName";
-        String newColor = "ABABAB";
+        Long newColor = 1L;
 
         assertThrows(NoSuchElementException.class, () -> {
             User user2 = userRepository.save(new User());
@@ -144,11 +144,10 @@ class GroupServiceImplTest {
         User user = userRepository.save(new User());
 
         String groupName = "someName";
-        String groupColor = "FAFAFA";
+        Long groupColor = 5L;
 
         Group group = groupService.createGroupWithUserAndColor(groupName, user, groupColor);
         String newGroupName = "this is a very long group name that exceeds max";
-        ;
 
         assertThrows(IllegalArgumentException.class, () -> {
             groupService.updateGroupNameAndColor(group.getId(), newGroupName, groupColor, user);
@@ -159,7 +158,7 @@ class GroupServiceImplTest {
     void getAllUserFromGroupIdSuccess() {
         User user = userRepository.save(new User());
         String groupName = "somename";
-        String groupColor = "FFFFFF";
+        Long groupColor = 5L;
         Group group = groupService.createGroupWithUserAndColor(groupName, user, groupColor);
 
         User user2 = groupService.getAllUserFromGroupId(group.getId()).get(0);
@@ -170,7 +169,7 @@ class GroupServiceImplTest {
     void getAllUserFromGroupIdFail_NoGroupFound() {
         User user = userRepository.save(new User());
         String groupName = "somename";
-        String groupColor = "FFFFFF";
+        Long groupColor = 5L;
 
         assertThrows(NoSuchElementException.class, () -> {
             groupService.getAllUserFromGroupId(-1);
@@ -181,7 +180,7 @@ class GroupServiceImplTest {
     void getAllUserFromGroupSuccess() {
         User user = userRepository.save(new User());
         String groupName = "somename";
-        String groupColor = "FFFFFF";
+        Long groupColor = 5L;
 
         Group group = groupService.createGroupWithUserAndColor(groupName, user, groupColor);
         User user2 = groupService.getAllUserFromGroup(group).get(0);
@@ -193,7 +192,7 @@ class GroupServiceImplTest {
         User user = userRepository.save(new User());
         User user2 = userRepository.save(new User());
         String groupName = "somename";
-        String groupColor = "FFFFFF";
+        Long groupColor = 5L;
 
         Group group = groupService.createGroupWithUserAndColor(groupName, user, groupColor);
         String code = groupInvitationService.createGroupInvitation(group);
@@ -210,7 +209,7 @@ class GroupServiceImplTest {
     void getGroupCodeSuccess() {
         User user = userRepository.save(new User());
         String groupName = "somename";
-        String groupColor = "FFFFFF";
+        Long groupColor = 5L;
 
         Group group = groupService.createGroupWithUserAndColor(groupName, user, groupColor);
         String code = groupInvitationService.createGroupInvitation(group);
@@ -223,7 +222,7 @@ class GroupServiceImplTest {
     void getGroupCodeFail_NoGroupInvitation() {
         User user = userRepository.save(new User());
         String groupName = "somename";
-        String groupColor = "FFFFFF";
+        Long groupColor = 5L;
 
         Group group = groupService.createGroupWithUserAndColor(groupName, user, groupColor);
         assertThrows(NoSuchElementException.class, () -> {
@@ -235,7 +234,7 @@ class GroupServiceImplTest {
     void getGroupByCodeSuccess() {
         User user = userRepository.save(new User());
         String groupName = "somename";
-        String groupColor = "FFFFFF";
+        Long groupColor = 5L;
 
         Group group = groupService.createGroupWithUserAndColor(groupName, user, groupColor);
         String code = groupInvitationService.createGroupInvitation(group);
@@ -249,7 +248,7 @@ class GroupServiceImplTest {
     void getGroupByCodeFail_NoGroupFoundWithCode() {
         User user = userRepository.save(new User());
         String groupName = "somename";
-        String groupColor = "FFFFFF";
+        Long groupColor = 5L;
 
         Group group = groupService.createGroupWithUserAndColor(groupName, user, groupColor);
         groupInvitationService.createGroupInvitation(group);
