@@ -4,7 +4,6 @@ package com.wwme.wwme.group.service;
 import com.wwme.wwme.group.domain.Group;
 import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.repository.UserRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -167,10 +166,6 @@ class GroupServiceImplTest {
 
     @Test
     void getAllUserFromGroupIdFail_NoGroupFound() {
-        User user = userRepository.save(new User());
-        String groupName = "somename";
-        Long groupColor = 5L;
-
         assertThrows(NoSuchElementException.class, () -> {
             groupService.getAllUserFromGroupId(-1);
         });
