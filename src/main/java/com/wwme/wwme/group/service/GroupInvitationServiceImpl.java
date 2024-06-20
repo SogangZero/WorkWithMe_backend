@@ -34,7 +34,7 @@ public class GroupInvitationServiceImpl implements GroupInvitationService {
     }
 
     @Override
-    public Group acceptInvitation(String code, User user, String color) {
+    public Group acceptInvitation(String code, User user, Long color) {
         var groupInvitation = groupInvitationRepository.findByCode(code)
                 .orElseThrow(() -> new NoSuchElementException("Couldn't find a groupInvitation with the given code"));
 

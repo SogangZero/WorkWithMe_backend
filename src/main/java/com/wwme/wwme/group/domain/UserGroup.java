@@ -15,7 +15,7 @@ public class UserGroup {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    String color;
+    Long color;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     User user;

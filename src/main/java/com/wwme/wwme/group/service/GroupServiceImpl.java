@@ -27,7 +27,7 @@ public class GroupServiceImpl implements GroupService {
     private final GroupInvitationRepository groupInvitationRepository;
 
     @Override
-    public Group createGroupWithUserAndColor(String groupName, User user, String color) {
+    public Group createGroupWithUserAndColor(String groupName, User user, Long color) {
         if (groupName.length() > 20) {
             throw new IllegalArgumentException("Nickname should not exceed 20 characters!");
         }
@@ -47,7 +47,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Group updateGroupNameAndColor(long groupId, String groupName, String color, User user) {
+    public Group updateGroupNameAndColor(long groupId, String groupName, Long color, User user) {
         if (groupName.length() > 20) {
             throw new IllegalArgumentException("Nickname should not exceed 20 characters");
         }

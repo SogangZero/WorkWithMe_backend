@@ -13,7 +13,7 @@ public class GroupReadSuccessResponseDTO {
     String groupName;
 
     @JsonProperty("group_color")
-    String groupColor;
+    Long groupColor;
 
     @JsonProperty("user")
     List<UserDTO> userList;

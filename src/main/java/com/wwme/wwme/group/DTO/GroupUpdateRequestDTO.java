@@ -10,5 +10,5 @@ public class GroupUpdateRequestDTO {
     @JsonProperty("group_name")
     String groupName;
     @JsonProperty("group_color")
-    String groupColor;
+    Long groupColor;
 }
