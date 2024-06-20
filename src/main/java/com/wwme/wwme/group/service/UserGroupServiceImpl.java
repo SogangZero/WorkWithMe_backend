@@ -28,7 +28,7 @@ public class UserGroupServiceImpl implements UserGroupService {
         return group.getUserGroupList().stream()
                 .filter(userGroup -> userGroup.getUser().equals(user))
                 .findFirst()
-                .orElseThrow();
+                .orElseThrow(() -> new NoSuchElementException("No user is found in that group"));
     }
 
     @Override
