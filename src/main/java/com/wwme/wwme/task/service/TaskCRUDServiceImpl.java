@@ -94,7 +94,6 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
     }
 
     @Override
-    //TODO: (논의 필요) 현재는 is done personal 과 is done total 을 받는데, 이 사람이 과제의 주인이 아니라면
     //1. is done을 바꿀 수 없어야함.
     //2. 그렇다면 is done 을 어떻게 처리할 것인가?
     public Task updateTask(UpdateTaskReceiveDTO updateTaskReceiveDTO) {
@@ -127,7 +126,6 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
 
 
 
-        //TODO: 내 Task 가 아닌데 Is done personal 과 Is done total 이 넘어오면 안된다.
         List<UserTask> userTaskList = task.getUserTaskList();
         task.setTotalIsDone(updateTaskReceiveDTO.getIs_done_total());
 
@@ -135,13 +133,13 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
     }
 
     @Override
-    //TODO: UserTaskList 내부 확인
     public MakeTaskDoneSendDTO makeTaskDone(MakeTaskDoneReceiveDTO makeTaskDoneReceiveDTO, User user) {
         Task task = taskRepository.findTaskByIdWithUserTaskList(makeTaskDoneReceiveDTO.getTask_id()).orElseThrow(() -> new EntityNotFoundException(
         "Could not find task with ID: " + makeTaskDoneReceiveDTO.getTask_id()));
 
         //setting the task's isdone for the user
         for (UserTask ut : task.getUserTaskList()){
+            log.info("user : "+ut.getUser().getNickname());
             if(ut.getUser().getId().equals(user.getId())){
                 ut.setIsDone(makeTaskDoneReceiveDTO.getDone());
             }
@@ -196,6 +194,9 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
             makeTaskDoneSendUserDTOList.add(makeTaskDoneSendUserDTO);
         }
 
+        log.info("is done count : :"+ is_done_count);
+        log.info("total user count : "+total_user_count);
+
         return MakeTaskDoneSendDTO.builder()
                 .task_id(task.getId())
                 .task_name(task.getTaskName())
@@ -247,8 +248,10 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
             TaskListForDaySendDTO taskListForDaySendDTO = TaskListForDaySendDTO.builder()
                     .taskId(t.getId())
                     .taskName(t.getTaskName())
-                    .tagId(Optional.ofNullable(t.getTag()).map(Tag::getId).orElse(null))
-                    .tagName(Optional.ofNullable(t.getTag()).map(Tag::getTagName).orElse(null))
+                    .tag(new ROT_tagDTO(
+                            Optional.ofNullable(t.getTag()).map(Tag::getId).orElse(null),
+                            Optional.ofNullable(t.getTag()).map(Tag::getTagName).orElse(null)
+                    ))
                     .endDate(t.getEndTime().toLocalDate())
                     .build();
 
@@ -259,9 +262,8 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
     }
 
     @Override
-    public ReadOneTaskSendDTO readOneTask(Long taskId) { //TODO: learn about Builders, and how to exclude / include fields.
+    public ReadOneTaskSendDTO readOneTask(Long taskId, User loginUser) {
 
-        log.info("task_id : "+taskId);
         /**
          * RULES
          * 1. Personal task
@@ -283,45 +285,64 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
                 .task_id(task.getId())
                 .task_name(task.getTaskName())
                 .task_type(task.getTaskType())
-                .group_name(task.getGroup().getGroupName())
-                .tag_name(Optional.ofNullable(task.getTag()).map(Tag::getTagName).orElse(null))
+                .tag(new ROT_tagDTO(
+                        Optional.ofNullable(task.getTag()).map(Tag::getId).orElse(null),
+                        Optional.ofNullable(task.getTag()).map(Tag::getTagName).orElse(null)
+                        ))
+                .group(new ROT_groupDTO( //TODO: fill out group color and num of people
+                        task.getGroup().getId(),
+                        task.getGroup().getGroupName(),
+                        null,
+                        null
+
+                ))
                 .start_time(task.getStartTime())
                 .end_time(task.getEndTime())
                 .build();
 
-//        ReadOneTaskSendDTO readOneTaskSendDTO= new ReadOneTaskSendDTO();
-//        readOneTaskSendDTO.setTask_id(task.getId());
-//        readOneTaskSendDTO.setTag_name(task.getTag().getTagName());
-//        readOneTaskSendDTO.setTask_name(task.getTaskName());
-//        readOneTaskSendDTO.setTask_type(task.getTaskType());
-//        readOneTaskSendDTO.setGroup_name(task.getGroup().getGroupName());
-//        readOneTaskSendDTO.setStart_time(task.getStartTime().toLocalDate());
-//        readOneTaskSendDTO.setEnd_time(task.getEndTime().toLocalDate());
-
         fillUserListForReadOneTaskSendDTO(readOneTaskSendDTO,task);
 
-        Integer total_user_count = 0;
+        //is_done_count, is_done_personal, is_done_total;
+
         Integer is_done_count = 0;
+        boolean is_done_personal = false;
+        boolean is_done_total = true;
         for(ReadOneTaskUserDTO userDTO : readOneTaskSendDTO.getUser_list()){
-            total_user_count++;
             if(userDTO.getIs_done()){
                 is_done_count++;
+            }else{
+                is_done_total = false;
+            }
+
+            if(userDTO.getUser_id().equals(loginUser.getId()) && userDTO.getIs_done()){
+                is_done_personal = true;
             }
         }
-        readOneTaskSendDTO.setTotal_user_count(total_user_count);
         readOneTaskSendDTO.setIs_done_count(is_done_count);
+        readOneTaskSendDTO.setIs_done_total(is_done_total);
+        readOneTaskSendDTO.setIs_done_personal(is_done_personal);
+
+
+
 
         return readOneTaskSendDTO;
     }
 
 
-    //TODO: 내가 다 해도 group원이 일을 끝내지 않았다면 표시합니까? --> 일단은 표시 안 하도록 하겠습니다.
     @Override
     public List<ReadTaskListByUserSendDTO> getTaskListForUser(User loginUser, Long last_task_id) {
         log.info("loginUser : "+loginUser);
         log.info("last_task_id : "+last_task_id);
 
-        LocalDateTime endTime =  taskRepository.findById(last_task_id).orElseThrow().getEndTime();
+        LocalDateTime endTime;
+        if(last_task_id != null){
+             endTime =  taskRepository.findById(last_task_id).orElseThrow(
+                    ()-> new NoSuchElementException("Could not find Task with ID: "+last_task_id
+                            +"In function getTaskListForUser")).getEndTime();
+        }else{
+            endTime = LocalDateTime.MIN;
+        }
+
 
         Pageable pageable = PageRequest.of(0,20);
         List<Task> taskList =  taskRepository.findTasksByUserIdFetchUserTask(loginUser.getId(), endTime, pageable);
@@ -337,15 +358,20 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
                     break;
                 }
             }
-
+            //TODO: insert group color
             ReadTaskListByUserSendDTO readTaskListByUserSendDTO = ReadTaskListByUserSendDTO.builder()
                     .task_id(t.getId())
                     .task_name(t.getTaskName())
                     .task_type(t.getTaskType())
                     .start_time(t.getStartTime())
                     .end_time(t.getEndTime())
-                    .tag_id(Optional.ofNullable(t.getTag()).map(Tag::getId).orElse(null))
-                    .tag_name(Optional.ofNullable(t.getTag()).map(Tag::getTagName).orElse(null))
+                    .tag(new ROT_tagDTO(
+                            Optional.ofNullable(t.getTag()).map(Tag::getId).orElse(null),
+                            Optional.ofNullable(t.getTag()).map(Tag::getTagName).orElse(null)))
+                    .group(new RTL_groupDTO(
+                            t.getGroup().getId(),
+                            null
+                    ))
                     .group_id(t.getGroup().getId())
                     .group_color(t.getGroup().getGroupName())
                     .is_done_personal(is_done_personal)
@@ -409,6 +435,11 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
 
     @Override
     public void deleteTask(Long taskId) {
+        if(taskRepository.findById(taskId).isEmpty()) {
+            throw new NoSuchElementException("Could not find Task with ID: "+taskId
+            +"in function deleteTask");
+        }
+        log.info("Task With Id ["+taskId+"] exists in DB");
         taskRepository.deleteById(taskId);
     }
 

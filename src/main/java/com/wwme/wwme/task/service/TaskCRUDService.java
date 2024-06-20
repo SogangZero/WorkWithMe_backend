@@ -59,7 +59,7 @@ public interface TaskCRUDService {
      * @param taskId
      * @return
      */
-    public ReadOneTaskSendDTO readOneTask(Long taskId);
+    public ReadOneTaskSendDTO readOneTask(Long taskId, User loginUser);
 
     /**
      * return incomlpete task of user

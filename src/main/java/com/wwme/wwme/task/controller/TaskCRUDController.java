@@ -12,6 +12,7 @@ import com.wwme.wwme.task.service.TaskCRUDService;
 import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -104,9 +105,10 @@ public class TaskCRUDController {
     }
 
     @GetMapping
-    public ResponseEntity<?> readOneTask(@ModelAttribute("task_id") Long task_id) {
+    public ResponseEntity<?> readOneTask(@ModelAttribute("task_id") Long task_id,
+                                         @Login User user) {
         try {
-            ReadOneTaskSendDTO readOneTaskSendDTO = taskCRUDService.readOneTask(task_id);
+            ReadOneTaskSendDTO readOneTaskSendDTO = taskCRUDService.readOneTask(task_id,user);
             DataWrapDTO dataWrapDTO = new DataWrapDTO(readOneTaskSendDTO);
             return ResponseEntity.ok(dataWrapDTO);
         } catch (Exception e) {
@@ -119,7 +121,8 @@ public class TaskCRUDController {
 
     @GetMapping("/list/user")
     public ResponseEntity<?>
-    taskListReadByUser(@Login User user, @RequestParam("last_task_id") Long last_task_id) {
+    taskListReadByUser(@Login User user,
+                       @RequestParam(name = "last_task_id", required = false) Long last_task_id) {
         try {
             List<ReadTaskListByUserSendDTO> readTaskListByUserSendDTOList = taskCRUDService.getTaskListForUser(user, last_task_id);
             DataWrapDTO dataWrapDTO = new DataWrapDTO(readTaskListByUserSendDTOList);
@@ -187,6 +190,7 @@ public class TaskCRUDController {
     @DeleteMapping
     public ResponseEntity<?> deleteTask(@RequestParam("task_id") Long task_id) {
         try {
+            log.info("Task Id : "+task_id);
             taskCRUDService.deleteTask(task_id);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
