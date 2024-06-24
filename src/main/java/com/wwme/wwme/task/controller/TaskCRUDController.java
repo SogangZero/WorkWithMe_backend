@@ -68,8 +68,8 @@ public class TaskCRUDController {
                                           @Login User user)     {
         try {
             MakeTaskDoneSendDTO makeTaskDoneSendDTO = taskCRUDService.makeTaskDone(makeTaskDoneReceiveDTO,user);
-            DataWrapDTO dataWrapDTO = new DataWrapDTO(makeTaskDoneSendDTO);
-            return ResponseEntity.ok().body(dataWrapDTO);
+//            DataWrapDTO dataWrapDTO = new DataWrapDTO(makeTaskDoneSendDTO); //No more returns (0624)
+            return ResponseEntity.ok().build();
         }catch (Exception e){
             log.error(e.getMessage());
             ErrorWrapDTO errorWrapDTO = new ErrorWrapDTO(e.getMessage());
