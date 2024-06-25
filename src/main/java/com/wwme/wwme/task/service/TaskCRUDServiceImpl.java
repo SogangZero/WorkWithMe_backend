@@ -359,7 +359,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
 
         Pageable pageable = PageRequest.of(0,20);
         List<Task> taskList =  taskRepository.findTasksByUserIdFetchUserTask(loginUser.getId(), endTime, pageable);
-
+        log.info("tasklist elements : "+ taskList.size());
         List<ReadTaskListByUserSendDTO> readTaskListByUserSendDTOList = new ArrayList<>();
 
         for(Task t : taskList){
@@ -375,7 +375,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
             Group group = groupRepository.findGroupByIdLoadUserTaskList(t.getGroup().getId())
                     .orElseThrow(()->new NoSuchElementException("Could not find group with ID: "+ t.getGroup().getId()
                                                                 + "in fuction getTaskListForUser"));
-
+            log.info("found group : "+ group.getId());
             UserGroup ug = group.getUserGroupList().stream()
                     .filter(s -> s.getUser().getId().equals(loginUser.getId())).findAny()
                     .orElseThrow(()-> new NoSuchElementException("Could not find userGroup with userID: "
