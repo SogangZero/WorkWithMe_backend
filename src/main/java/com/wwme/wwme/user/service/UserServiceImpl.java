@@ -13,7 +13,7 @@ public class UserServiceImpl implements UserService{
     @Override
     public UserInfoDTO getUserInfo(User user) {
         return UserInfoDTO.builder()
-                .success(true)
+                .user_id(user.getId())
                 .nickname(user.getNickname())
                 .profile_image_id(user.getProfileImageId())
                 .build();
