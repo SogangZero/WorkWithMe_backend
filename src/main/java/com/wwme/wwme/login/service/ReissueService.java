@@ -6,6 +6,7 @@ import com.wwme.wwme.login.exception.JwtTokenException;
 import com.wwme.wwme.login.exception.NullRefreshTokenException;
 import com.wwme.wwme.login.repository.RefreshRepository;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,14 +18,9 @@ public class ReissueService {
     private final JWTUtilService jwtUtilService;
     private final RefreshRepository refreshRepository;
 
-    public String validateRefreshToken(Cookie[] cookies)
+    public String validateRefreshToken(HttpServletResponse response)
             throws NullRefreshTokenException, JwtTokenException, InvalidRefreshTokenException {
-        String refresh = null;
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals("refresh")) {
-                refresh = cookie.getValue();
-            }
-        }
+        String refresh = response.getHeader("refresh");
 
         if (refresh == null) {
             throw new NullRefreshTokenException("Cannot Find Refresh Token At Request Header");

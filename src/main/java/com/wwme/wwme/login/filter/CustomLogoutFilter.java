@@ -51,13 +51,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
         }
 
         //get refresh token
-        String refresh = null;
-        Cookie[] cookies = request.getCookies();
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals("refresh")) {
-                refresh = cookie.getValue();
-            }
-        }
+        String refresh = response.getHeader("refresh");
 
         if (refresh == null) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -87,12 +81,6 @@ public class CustomLogoutFilter extends GenericFilterBean {
 
         //logout logic
         refreshRepository.deleteByRefresh(refresh);
-        Cookie cookie = new Cookie("refresh", null);
-        cookie.setMaxAge(0);
-        cookie.setPath("/");
-
-        log.info("User logout [refresh token : {}]", refresh);
-        response.addCookie(cookie);
         response.setStatus(HttpServletResponse.SC_OK);
     }
 
