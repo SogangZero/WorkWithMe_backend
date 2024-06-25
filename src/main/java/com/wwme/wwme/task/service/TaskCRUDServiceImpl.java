@@ -520,7 +520,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
                     ()-> new NoSuchElementException("Could not find Task with ID: "+last_task_id
                             +"In function getTaskListForUser")).getEndTime();
         }else{
-            endTime = LocalDateTime.MIN;
+            endTime = LocalDateTime.of(1999,12,7,12,12,12);
         }
 
 
@@ -602,8 +602,8 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
 
         // only display tasks without due date
         if (!withDueDate) {
-            startDate = LocalDateTime.MAX;
-            endDate = LocalDateTime.MAX;
+            startDate = LocalDateTime.of(2099,12,7,12,12,12);
+            endDate = LocalDateTime.of(2099,12,7,12,12,12);
         }
 
         Task lastTask;
