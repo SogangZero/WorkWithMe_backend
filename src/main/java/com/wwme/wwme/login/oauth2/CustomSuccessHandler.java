@@ -70,7 +70,8 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         try {
             User user = userRepository.findByUserKey(userKey).orElseThrow(NoSuchElementException::new); //NoSuchElementException
-            String redirectURL = "webauthcallback://?access=" + access +
+            String redirectURL = "webauthcallback://"+
+                    "?access=" + access +
                     "&refresh=" + refresh +
                     "&state=ZeroAuth" + user.getSocialProvider();
             response.setStatus(HttpServletResponse.SC_TEMPORARY_REDIRECT);
