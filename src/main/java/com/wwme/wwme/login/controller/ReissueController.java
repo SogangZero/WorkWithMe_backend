@@ -36,12 +36,18 @@ public class ReissueController {
         try {
             Cookie[] cookies = request.getCookies();
             String refresh = reissueService.validateRefreshToken(response);
+            log.info("refresh {}", refresh);
             String userKey = jwtUtilService.getUserKey(refresh);
+            log.info("userkey {}", userKey);
             String role = jwtUtilService.getRole(refresh);
+            log.info("role {}", role);
             String newAccess = reissueService.generateAccessToken(userKey, role);
+            log.info("newAccess {}", newAccess);
             String newRefresh = reissueService.exchangeRefreshToken(userKey, role, refresh);
+            log.info("newRefresh {}", newRefresh);
             User user = userRepository.findByUserKey(userKey)
                     .orElseThrow(() -> new IllegalArgumentException("not exist user"));
+            log.info("user id {}", user.getId());
             UserInfoReissueDTO userInfoReissue = userService.getUserInfoReissue(user);
 
             log.info("User[{}] re-generate access and refresh token", userKey);
