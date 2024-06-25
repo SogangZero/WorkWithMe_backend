@@ -19,8 +19,8 @@ import java.util.List;
 @RequestMapping("/tag")
 public class TagController {
 
-    private TaskCRUDService taskCRUDService;
-    private TagCRUDServiceImpl tagCRUDServiceImpl;
+    private final TaskCRUDService taskCRUDService;
+    private final TagCRUDServiceImpl tagCRUDServiceImpl;
 
     @Autowired
     public TagController(TaskCRUDService taskCRUDService, TagCRUDServiceImpl tagCRUDServiceImpl) {

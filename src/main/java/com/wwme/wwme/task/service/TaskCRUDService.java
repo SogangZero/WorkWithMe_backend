@@ -1,7 +1,5 @@
 package com.wwme.wwme.task.service;
 
-import com.wwme.wwme.task.domain.DTO.receiveDTO.CreateTaskReceiveDTO;
-import com.wwme.wwme.task.domain.DTO.receiveDTO.UpdateTaskReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.sendDTO.*;
 import com.wwme.wwme.task.domain.Task;
 import com.wwme.wwme.user.domain.User;
@@ -13,20 +11,28 @@ import java.util.List;
 
 public interface TaskCRUDService {
 
-    /**
-     *
-     * @param createTaskReceiveDTO
-     * @return Task entity that has been created
-     */
-    public Task createTask(CreateTaskReceiveDTO createTaskReceiveDTO);
+ /**
+  * @param
+  * @return Task entity that has been created
+  */
+ public Task createTask(String taskName,
+                        LocalDateTime endTime,
+                        String taskType,
+                        Long tagId,
+                        Long groupId,
+                        Long todoUserId,
+                        User user);
 
 
-    /**
-     *
-     * @param updateTaskReceiveDTO
-     * @return updateTaskSendDTO
-     */
-   public  Task updateTask(UpdateTaskReceiveDTO updateTaskReceiveDTO);
+ /**
+  * @return updateTaskSendDTO
+  */
+ public Task updateTask(Long taskId,
+                        LocalDateTime endTime,
+                        String taskType,
+                        Long tagId,
+                        Long todoUserId,
+                        User user);
 
 
     /**

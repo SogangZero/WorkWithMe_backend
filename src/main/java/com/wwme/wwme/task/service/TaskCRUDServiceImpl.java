@@ -1,15 +1,15 @@
 package com.wwme.wwme.task.service;
 
 import com.wwme.wwme.group.domain.Group;
+import com.wwme.wwme.group.domain.UserGroup;
 import com.wwme.wwme.group.repository.GroupRepository;
-import com.wwme.wwme.task.domain.DTO.receiveDTO.CreateTaskReceiveDTO;
-import com.wwme.wwme.task.domain.DTO.receiveDTO.UpdateTaskReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.sendDTO.*;
 import com.wwme.wwme.task.domain.Tag;
 import com.wwme.wwme.task.domain.Task;
 import com.wwme.wwme.task.domain.UserTask;
 import com.wwme.wwme.task.repository.TagRepository;
 import com.wwme.wwme.task.repository.TaskRepository;
+import com.wwme.wwme.task.repository.UserTaskRepository;
 import com.wwme.wwme.user.domain.dto.ReadOneTaskUserDTO;
 import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.repository.UserRepository;
@@ -31,79 +31,267 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
     private final TagRepository tagRepository;
     private final GroupRepository groupRepository;
     private final UserRepository userRepository;
+    private final UserTaskRepository userTaskRepository;
 
 
     @Override
-    public Task createTask(CreateTaskReceiveDTO createTaskReceiveDTO) {
-        Task task = new Task();
-        task.setTaskName(createTaskReceiveDTO.getTask_name());
-        task.setStartTime(createTaskReceiveDTO.getStart_time());
-        task.setEndTime(createTaskReceiveDTO.getEnd_time());
-        task.setTaskType(createTaskReceiveDTO.getTask_type());
+    public Task createTask(String taskName,
+                           LocalDateTime endTime,
+                           String taskType,
+                           Long tagId,
+                           Long groupId,
+                           Long todoUserId,
+                           User user) throws IllegalArgumentException{
 
-        User user = userRepository.findById(createTaskReceiveDTO.getTodo_user_id()).orElseThrow(() -> new EntityNotFoundException(
-                "Could not find user with ID: " + createTaskReceiveDTO.getTodo_user_id() +
-                " in method createTask. Details: " + createTaskReceiveDTO.toString()));
-        if(createTaskReceiveDTO.getTag_id() != null){
-            Tag tag = tagRepository.findById(createTaskReceiveDTO.getTag_id()).orElseThrow(() -> new EntityNotFoundException(
-                    "Could not find tag with ID: " + createTaskReceiveDTO.getTodo_user_id() +
-                            " in method createTask. Details: " + createTaskReceiveDTO.toString()));
-            task.setTag(tag);
+        //parameter validation
+        checkParameterValidity(taskName, endTime, taskType);
+        Tag tag = getTagFromDB(tagId);
+        Group group = getGroupFromDB(groupId);
+        User todoUser = getTodoUserForPersonalTask(taskType, todoUserId);
+        checkGroupIncludeTag(tag, group);
+        checkUsersInSameGroup(taskType, user, group, todoUser);
+
+        //엔티티 구성
+        Task taskEntity = Task.builder()
+                .taskName(taskName)
+                .startTime(LocalDateTime.now())
+                .endTime(endTime)
+                .taskType(taskType)
+                .totalIsDone(false)
+                .tag(tag)
+                .group(group)
+                .userTaskList(new ArrayList<>())
+                .build();
+
+        //userTask 추가
+        addUserTaskByTaskType(taskType, group, taskEntity, todoUser);
+
+        //DB에 추가
+        return taskRepository.save(taskEntity);
+    }
+
+    private User getTodoUserForPersonalTask(String taskType, Long todoUserId) {
+        User todoUser = null;
+        if (taskType.equals("personal")) {
+            todoUser = userRepository.findById(todoUserId).orElseThrow(() -> (
+                new IllegalArgumentException("Create Task Fail - Not Found Todo User")
+            ));
         }
+        return todoUser;
+    }
 
+    private Group getGroupFromDB(Long groupId) {
+        Group group = groupRepository.findById(groupId).orElseThrow(() -> (
+                new IllegalArgumentException("Create Task Fail - Not Found Group")
+        ));
+        return group;
+    }
 
+    private Tag getTagFromDB(Long tagId) {
+        Tag tag = tagRepository.findById(tagId).orElseThrow(() -> (
+                new IllegalArgumentException("Create Task Fail - Not Found Tag")
+        ));
+        return tag;
+    }
 
-
-        Group group = groupRepository.findById(createTaskReceiveDTO.getGroup_id()).orElseThrow(() -> new EntityNotFoundException(
-                "Could not find group with ID: " + createTaskReceiveDTO.getTodo_user_id() +
-                " in method createTask. Details: " + createTaskReceiveDTO.toString()));
-        task.setGroup(group);
-
-        if(createTaskReceiveDTO.getTask_type().equals("personal")){
-            UserTask userTask = new UserTask();
-            userTask.setUser(user);
-            userTask.setTask(task);
-
-            task.getUserTaskList().add(userTask);
+    private static void checkParameterValidity(String taskName, LocalDateTime endTime, String taskType) {
+        if (taskName == null || taskName.isEmpty()) {
+            throw new IllegalArgumentException("Create Task Fail - No content of TaskName");
         }
+        if (endTime == null || endTime.isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Create Task Fail - EndTime is before now");
+        }
+        if (taskType == null || !(taskType.equals("group") || taskType.equals("personal") || taskType.equals("anyone"))) {
+            throw new IllegalArgumentException("Create Task Fail - No matched Task Type");
+        }
+    }
 
-        return taskRepository.save(task);
+    private static void checkGroupIncludeTag(Tag tag, Group group) {
+        if (!tag.getGroup().getId().equals(group.getId())) {
+            System.out.println("TaskCRUDServiceImpl.createTask");
+            throw new IllegalArgumentException("Create Task Fail - tag and group Match Fail"
+                    + "Tag Id" + tag.getId()
+                    + "Group Id" + group.getId());
+        }
+    }
 
+    private static void checkUsersInSameGroup(String taskType, User user, Group group, User todoUser) {
+        boolean userExist = group.existUser(user);
+        boolean todoUserExist = group.existUser(todoUser);
+
+        if (taskType.equals("personal") && !(userExist && todoUserExist)) {
+            throw new IllegalArgumentException("Create Task Fail - User or TodoUser Not In Group");
+        }
+    }
+
+    private static void addUserTaskByTaskType(String taskType, Group group, Task taskEntity, User todoUser) {
+        switch (taskType) {
+            case "group" -> {
+                for (UserGroup userGroup : group.getUserGroupList()) {
+                    User groupMember = userGroup.getUser();
+                    UserTask userTask = UserTask.builder()
+                            .task(taskEntity)
+                            .user(groupMember)
+                            .isDone(false)
+                            .build();
+                    taskEntity.addUserTask(userTask);
+                }
+            }
+            case "personal" -> {
+                UserTask userTask = UserTask.builder()
+                        .task(taskEntity)
+                        .user(todoUser)
+                        .isDone(false)
+                        .build();
+                taskEntity.addUserTask(userTask);
+            }
+            case "anyone" -> {
+            }
+            //anyone은 어떻게 UserTask 인자 넣지?
+            default -> throw new IllegalArgumentException("Create Task Fail - No Matched Task Type");
+        }
     }
 
     @Override
-    //TODO: (논의 필요) 현재는 is done personal 과 is done total 을 받는데, 이 사람이 과제의 주인이 아니라면
-    //1. is done을 바꿀 수 없어야함.
-    //2. 그렇다면 is done 을 어떻게 처리할 것인가?
-    public Task updateTask(UpdateTaskReceiveDTO updateTaskReceiveDTO) {
-        Task task = taskRepository.findTaskByIdWithUserTaskList(updateTaskReceiveDTO.getTask_id()).orElseThrow(() -> new EntityNotFoundException(
-                "Could not find task with ID: " + updateTaskReceiveDTO.getTask_id() +
-                " in method updateTask. Details: " + updateTaskReceiveDTO.toString()));
+    public Task updateTask(Long taskId,
+                           LocalDateTime endTime,
+                           String taskType,
+                           Long tagId,
+                           Long todoUserId,
+                           User user) {
+        Task task = getTaskFromDB(taskId);
+        User todoUser = getTodoUserFromDB(todoUserId);
+        Tag tag = getTagFromDB(tagId);
 
-        task.setTaskName(updateTaskReceiveDTO.getTask_name());
-        task.setStartTime(updateTaskReceiveDTO.getStart_time());
-        task.setEndTime(updateTaskReceiveDTO.getEnd_time());
-        task.setTaskType(updateTaskReceiveDTO.getTask_type());
+        validateUsers(todoUserId, user, task);
 
-        Tag tag = tagRepository.findById(updateTaskReceiveDTO.getTag_id()).orElseThrow(() -> new EntityNotFoundException(
-                "Could not find Tag with ID: " + updateTaskReceiveDTO.getTag_id() +
-                "in method updateTag. Details: " + updateTaskReceiveDTO.toString()));
+        //업데이트
+        updateTag(tag, task);
+        updateEndTime(endTime, task);
+        updateTaskType(taskType, task, todoUser);
+        updateTodoUser(task, todoUser);
 
-        if(!tag.getGroup().getId().equals(updateTaskReceiveDTO.getGroup_id())){
-            throw new EntityNotFoundException(
-                    String.format("The tag ID [%d] you wish to update to is NOT in the current Group of the task[%d]" +
-                                    "Current Task/Tag Group ID : %d" +
-                                    "New Tag Group ID : %d "
-                    ,tag.getId(),task.getId(),updateTaskReceiveDTO.getGroup_id(),tag.getGroup().getId())
-            );
+        return task;
+    }
+
+    private static void validateUsers(Long todoUserId, User user, Task task) {
+        if (!task.getGroup().existUser(user) || !task.getGroup().existUserById(todoUserId)) {
+            throw new IllegalArgumentException("Update Task Fail - Task Group Not Matched User Groups");
         }
-        task.setTag(tag);
+    }
 
-        //TODO: 내 Task 가 아닌데 Is done personal 과 Is done total 이 넘어오면 안된다.
-        List<UserTask> userTaskList = task.getUserTaskList();
-        task.setTotalIsDone(updateTaskReceiveDTO.getIs_done_total());
+    private void updateTodoUser(Task task, User todoUser) {
+        if (task.getTaskType().equals("personal") && !task.getUserTaskList().get(0).getUser().equals(todoUser)) {
+            userTaskRepository.deleteByTask(task);
+            UserTask userTask = UserTask.builder()
+                    .user(todoUser)
+                    .task(task)
+                    .isDone(false)
+                    .build();
 
-        return  taskRepository.save(task);
+            task.addUserTask(userTask);
+        }
+    }
+
+    private void updateTaskType(String taskType, Task task, User todoUser) {
+        if (taskType != null && !task.getTaskType().equals(taskType)) {
+            changeTaskType(taskType, task, todoUser);
+        }
+    }
+
+    private static void updateEndTime(LocalDateTime endTime, Task task) {
+        if (endTime != null && !task.getEndTime().equals(endTime)) {
+            if (endTime.isBefore(LocalDateTime.now())) {
+                throw new IllegalArgumentException("Update Task Fail - EndTime is before now");
+            }
+            task.changeEndTime(endTime);
+        }
+    }
+
+    private static void updateTag(Tag tag, Task task) {
+        if (!tag.equals(task.getTag())) {
+            if (!task.validateTagIdInGroup(tag)) {
+                throw new IllegalArgumentException("Update Task Fail - Tag Not Matched Group");
+            }
+            task.changeTag(tag);
+        }
+    }
+
+    private User getTodoUserFromDB(Long todoUserId) {
+        return userRepository.findById(todoUserId).orElseThrow(() -> (
+                new IllegalArgumentException("Update Task Fail - Not Found TodoUser")
+        ));
+    }
+
+    private Task getTaskFromDB(Long taskId) {
+        return taskRepository.findById(taskId).orElseThrow(() -> (
+                new IllegalArgumentException("Update Task Fail - Not Task In DB")
+        ));
+    }
+
+    private void changeTaskType(String taskType, Task task, User todoUser) {
+        if (!task.validateTaskType(taskType)) {
+            throw new IllegalArgumentException("Update Task Fail - TaskType is Invalid");
+        }
+        //personal -> group : personal 이외의 group에 속한 유저에 대해 UserTask 추가
+        if (task.getTaskType().equals("personal") && taskType.equals("group")) {
+            User existUser = task.getUserTaskList().get(0).getUser();
+            for (UserGroup userGroup : task.getGroup().getUserGroupList()) {
+                User addUser = userGroup.getUser();
+                if (addUser.equals(existUser)) {
+                    continue;
+                }
+                UserTask userTask = UserTask.builder()
+                        .user(addUser)
+                        .task(task)
+                        .isDone(false)
+                        .build();
+                task.addUserTask(userTask);
+            }
+
+            task.changeTaskType("group");
+        }
+        //personal -> anyone : UserTask를 삭제해줌
+        if (task.getTaskType().equals("personal") && taskType.equals("anyone")) {
+            userTaskRepository.deleteByTask(task);
+            task.changeTaskType("anyone");
+        }
+
+        //group -> personal : group원들의 UserTask를 todoUser를 제외하고 삭제
+        if (task.getTaskType().equals("group") && taskType.equals("personal")) {
+            userTaskRepository.deleteByTaskExceptForOnePerson(task, todoUser);
+            task.changeTaskType("personal");
+        }
+        //group -> anyone : UserTask 들을 삭제해줌
+        if (task.getTaskType().equals("group") && taskType.equals("anyone")) {
+            userTaskRepository.deleteByTask(task);
+            task.changeTaskType("anyone");
+        }
+
+        //anyone -> personal : personal에 대한 userTask를 추가해줌
+        if (task.getTaskType().equals("anyone") && taskType.equals("personal")) {
+            UserTask userTask = UserTask.builder()
+                    .user(todoUser)
+                    .task(task)
+                    .isDone(false)
+                    .build();
+            task.addUserTask(userTask);
+
+            task.changeTaskType("personal");
+        }
+
+        //anyone -> group : group원들의 UserTask를 추가해줌
+        if (task.getTaskType().equals("anyone") && taskType.equals("group")) {
+            for (UserGroup userGroup : task.getGroup().getUserGroupList()) {
+                UserTask userTask = UserTask.builder()
+                        .user(userGroup.getUser())
+                        .task(task)
+                        .isDone(false)
+                        .build();
+                task.addUserTask(userTask);
+            }
+            task.changeTaskType("group");
+        }
     }
 
     @Override
