@@ -1,5 +1,6 @@
 package com.wwme.wwme.login.controller;
 
+import com.wwme.wwme.login.domain.dto.UserInfoReissueDTO;
 import com.wwme.wwme.login.domain.dto.response.DataDTO;
 import com.wwme.wwme.login.domain.dto.response.ErrorDTO;
 import com.wwme.wwme.login.exception.InvalidRefreshTokenException;
@@ -41,15 +42,15 @@ public class ReissueController {
             String newRefresh = reissueService.exchangeRefreshToken(userKey, role, refresh);
             User user = userRepository.findByUserKey(userKey)
                     .orElseThrow(() -> new IllegalArgumentException("not exist user"));
-            UserInfoDTO userInfo = userService.getUserInfo(user);
+            UserInfoReissueDTO userInfoReissue = userService.getUserInfoReissue(user);
 
             log.info("User[{}] re-generate access and refresh token", userKey);
             response.setHeader("access", newAccess);
             response.setHeader("refresh", newRefresh);
 
-            return new ResponseEntity<>(new DataDTO(userInfo), HttpStatus.OK);
+            return new ResponseEntity<>(new DataDTO(userInfoReissue), HttpStatus.OK);
         } catch (NullRefreshTokenException | InvalidRefreshTokenException | Exception e) {
-            log.info("User has expired or invalid refresh token");
+            log.error("User has expired or invalid refresh token" + e.getMessage());
             ErrorDTO errorDTO = new ErrorDTO(e.getMessage());
             return new ResponseEntity<>(errorDTO, HttpStatus.BAD_REQUEST);
         }
