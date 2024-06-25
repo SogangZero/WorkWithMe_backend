@@ -14,20 +14,28 @@ import java.util.List;
 
 public interface TaskCRUDService {
 
-    /**
-     *
-     * @param createTaskReceiveDTO
-     * @return Task entity that has been created
-     */
-    public Task createTask(CreateTaskReceiveDTO createTaskReceiveDTO) throws Exception;
+ /**
+  * @param
+  * @return Task entity that has been created
+  */
+ public Task createTask(String taskName,
+                        LocalDateTime endTime,
+                        String taskType,
+                        Long tagId,
+                        Long groupId,
+                        Long todoUserId,
+                        User user);
 
 
-    /**
-     *
-     * @param updateTaskReceiveDTO
-     * @return updateTaskSendDTO
-     */
-   public  Task updateTask(UpdateTaskReceiveDTO updateTaskReceiveDTO) throws Exception;
+ /**
+  * @return updateTaskSendDTO
+  */
+ public Task updateTask(Long taskId,
+                        LocalDateTime endTime,
+                        String taskType,
+                        Long tagId,
+                        Long todoUserId,
+                        User user);
 
 
     /**
@@ -59,7 +67,7 @@ public interface TaskCRUDService {
      * @param taskId
      * @return
      */
-    public ReadOneTaskSendDTO readOneTask(Long taskId);
+    public ReadOneTaskSendDTO readOneTask(Long taskId, User loginUser);
 
     /**
      * return incomlpete task of user

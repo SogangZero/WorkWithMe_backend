@@ -14,4 +14,10 @@ public class GroupCreateSuccessResponseDTO {
 
     @JsonProperty("group_code")
     String groupCode;
+
+    @JsonProperty("group_name")
+    String groupName;
+
+    @JsonProperty("group_color")
+    Long groupColor;
 }

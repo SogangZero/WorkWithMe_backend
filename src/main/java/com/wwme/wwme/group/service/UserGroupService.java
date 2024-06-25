@@ -25,7 +25,7 @@ public interface UserGroupService {
      */
     Collection<UserGroup> getAllUserGroupOfUser(User user);
 
-    UserGroup addUserToGroupWithColor(Group group, User user, String color);
+    UserGroup addUserToGroupWithColor(Group group, User user, Long color);
 
     void removeUserFromGroup(long groupId, User user);
 }

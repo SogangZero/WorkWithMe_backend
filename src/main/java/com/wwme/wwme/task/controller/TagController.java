@@ -8,6 +8,7 @@ import com.wwme.wwme.task.domain.DTO.sendDTO.TagListReadSendDTO;
 import com.wwme.wwme.task.domain.Tag;
 import com.wwme.wwme.task.service.TagCRUDServiceImpl;
 import com.wwme.wwme.task.service.TaskCRUDService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -17,10 +18,11 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/tag")
+@Slf4j
 public class TagController {
 
-    private TaskCRUDService taskCRUDService;
-    private TagCRUDServiceImpl tagCRUDServiceImpl;
+    private final TaskCRUDService taskCRUDService;
+    private final TagCRUDServiceImpl tagCRUDServiceImpl;
 
     @Autowired
     public TagController(TaskCRUDService taskCRUDService, TagCRUDServiceImpl tagCRUDServiceImpl) {
@@ -32,9 +34,10 @@ public class TagController {
     public ResponseEntity<?> createTag(@RequestBody CreateTagReceiveDTO createTagReceiveDTO){
         try {
             Tag tag = tagCRUDServiceImpl.createTag(createTagReceiveDTO);
-            return ResponseEntity.ok(null); //TODO: what to send when data is null?
+            return ResponseEntity.ok().build(); //TODO: what to send when data is null?
         } catch (Exception e) {
             ErrorWrapDTO errorWrapDTO = new ErrorWrapDTO(e.getMessage());
+            log.error(e.getMessage());
             return ResponseEntity.badRequest().body(errorWrapDTO);
         }
     }
@@ -43,7 +46,7 @@ public class TagController {
     public ResponseEntity<?> updateTag(@RequestBody UpdateTagReceiveDTO updateTagReceiveDTO){
         try {
             tagCRUDServiceImpl.updateTag(updateTagReceiveDTO);
-            return ResponseEntity.ok(null);
+            return ResponseEntity.ok().build();
         } catch (Exception e) {
             ErrorWrapDTO errorWrapDTO = new ErrorWrapDTO(e.getMessage());
             return ResponseEntity.badRequest().body(errorWrapDTO);
@@ -66,7 +69,7 @@ public class TagController {
     public ResponseEntity<?> deleteTag(@RequestParam Long tag_id){
         try {
             tagCRUDServiceImpl.deleteTag(tag_id);
-            return ResponseEntity.ok(null);
+            return ResponseEntity.ok().build();
         } catch (Exception e) {
             ErrorWrapDTO errorWrapDTO = new ErrorWrapDTO(e.getMessage());
             return ResponseEntity.badRequest().body(errorWrapDTO);        }
