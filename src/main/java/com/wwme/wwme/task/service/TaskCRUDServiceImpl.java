@@ -300,13 +300,20 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
                 .group(new ROT_groupDTO(
                         task.getGroup().getId(),
                         task.getGroup().getGroupName(),
-                        group.getUserGroupList().size()
+                        group.getUserGroupList().size(),
+                        group.getUserGroupList().stream()
+                        .filter(s -> s.getUser().getId().equals(loginUser.getId()))
+                        .findAny()
+                        .orElseThrow(() -> new NoSuchElementException("Could not find UserGroup Matching" +
+                                "user id " + loginUser.getId() + "in function fillUserListForReadOneTaskSendDTO"))
+                                .getColor()
+
                 ))
                 .start_time(task.getStartTime())
                 .end_time(task.getEndTime())
                 .build();
 
-        fillUserListForReadOneTaskSendDTO(readOneTaskSendDTO,task,group);
+        fillUserListForReadOneTaskSendDTO(readOneTaskSendDTO,task);
 
         //is_done_count, is_done_personal, is_done_total;
 
@@ -499,25 +506,16 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
 
 
     //friend functions.
-    private static void fillUserListForReadOneTaskSendDTO(ReadOneTaskSendDTO readOneTaskSendDTO, Task task, Group group){
+    private static void fillUserListForReadOneTaskSendDTO(ReadOneTaskSendDTO readOneTaskSendDTO, Task task){
 
         List<ReadOneTaskUserDTO> userDTOList = new ArrayList<>();
-        Long group_color = null;
         for(UserTask userTask : task.getUserTaskList()){
-
-            UserGroup ug = group.getUserGroupList().stream()
-                    .filter(s -> s.getUser().getId().equals(userTask.getUser().getId()))
-                    .findAny()
-                    .orElseThrow(() -> new NoSuchElementException("Could not find UserGroup Matching" +
-                            "user id " + userTask.getUser().getId() + "in function fillUserListForReadOneTaskSendDTO"));
-            group_color = ug.getColor();
 
             ReadOneTaskUserDTO userDTO = ReadOneTaskUserDTO.builder()
                     .user_id(userTask.getUser().getId())
                     .nickname(userTask.getUser().getNickname())
                     .profile_image_id(userTask.getUser().getProfileImageId())
                     .is_done(userTask.getIsDone())
-                    .group_color(group_color)
                     .build();
 
             userDTOList.add(userDTO);

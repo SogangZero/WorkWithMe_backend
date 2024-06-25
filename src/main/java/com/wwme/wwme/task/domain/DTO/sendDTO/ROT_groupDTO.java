@@ -11,4 +11,5 @@ public class ROT_groupDTO {
     private Long group_id;
     private String group_name;
     private Integer num_people;
+    private Long group_color;
 }
