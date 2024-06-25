@@ -18,9 +18,8 @@ public class ReissueService {
     private final JWTUtilService jwtUtilService;
     private final RefreshRepository refreshRepository;
 
-    public String validateRefreshToken(HttpServletResponse response)
+    public String validateRefreshToken(String refresh)
             throws NullRefreshTokenException, JwtTokenException, InvalidRefreshTokenException {
-        String refresh = response.getHeader("refresh");
 
         if (refresh == null) {
             throw new NullRefreshTokenException("Cannot Find Refresh Token At Request Header");

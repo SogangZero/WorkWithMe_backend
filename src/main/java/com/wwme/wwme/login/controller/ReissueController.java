@@ -34,9 +34,11 @@ public class ReissueController {
     public ResponseEntity<?> reissue(HttpServletRequest request,
                                      HttpServletResponse response) {
         try {
-            Cookie[] cookies = request.getCookies();
-            String refresh = reissueService.validateRefreshToken(response);
-            log.info("refresh {}", refresh);
+            log.info("start /reissue");
+            String refreshToken = response.getHeader("refresh");
+            log.info("refresh1 {}", refreshToken);
+            String refresh = reissueService.validateRefreshToken(refreshToken);
+            log.info("refresh2 {}", refresh);
             String userKey = jwtUtilService.getUserKey(refresh);
             log.info("userkey {}", userKey);
             String role = jwtUtilService.getRole(refresh);
