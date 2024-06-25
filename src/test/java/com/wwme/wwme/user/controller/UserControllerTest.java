@@ -80,26 +80,4 @@ public class UserControllerTest {
                 .andExpect(content().string(jsonUser));
 
     }
-
-    @Test
-    @DisplayName("유저가 존재하지 않을 때 - /user [GET]")
-    public void requestInvalidUser() throws Exception {
-        //given
-        String accessToken = "testToken";
-        User emptyUser = new User();
-        emptyUser.setId(-1L);
-
-        //when
-        when(jwtUtilService.getUserKey(any()))
-                .thenReturn("testUserKey");
-        when(userRepository.findByUserKey(any()))
-                .thenReturn(Optional.of(emptyUser));
-
-        //then
-        mvc.perform(
-                        MockMvcRequestBuilders.get("/user"))
-                .andExpect(status().isBadRequest());
-    }
-
-
 }

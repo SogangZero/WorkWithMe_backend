@@ -1,10 +1,16 @@
 package com.wwme.wwme.login.controller;
 
+import com.wwme.wwme.login.domain.dto.UserInfoReissueDTO;
+import com.wwme.wwme.login.domain.dto.response.DataDTO;
 import com.wwme.wwme.login.domain.dto.response.ErrorDTO;
 import com.wwme.wwme.login.exception.InvalidRefreshTokenException;
 import com.wwme.wwme.login.exception.NullRefreshTokenException;
 import com.wwme.wwme.login.service.JWTUtilService;
 import com.wwme.wwme.login.service.ReissueService;
+import com.wwme.wwme.user.domain.User;
+import com.wwme.wwme.user.domain.dto.UserInfoDTO;
+import com.wwme.wwme.user.repository.UserRepository;
+import com.wwme.wwme.user.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,25 +27,30 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReissueController {
     private final JWTUtilService jwtUtilService;
     private final ReissueService reissueService;
+    private final UserService userService;
+    private final UserRepository userRepository;
 
     @PostMapping("/reissue")
     public ResponseEntity<?> reissue(HttpServletRequest request,
                                      HttpServletResponse response) {
         try {
-            Cookie[] cookies = request.getCookies();
-            String refresh = reissueService.validateRefreshToken(cookies);
+            String refreshToken = request.getHeader("refresh");
+            String refresh = reissueService.validateRefreshToken(refreshToken);
             String userKey = jwtUtilService.getUserKey(refresh);
             String role = jwtUtilService.getRole(refresh);
             String newAccess = reissueService.generateAccessToken(userKey, role);
             String newRefresh = reissueService.exchangeRefreshToken(userKey, role, refresh);
+            User user = userRepository.findByUserKey(userKey)
+                    .orElseThrow(() -> new IllegalArgumentException("not exist user"));
+            UserInfoReissueDTO userInfoReissue = userService.getUserInfoReissue(user);
 
             log.info("User[{}] re-generate access and refresh token", userKey);
             response.setHeader("access", newAccess);
-            response.addCookie(createCookie("refresh", newRefresh));
+            response.setHeader("refresh", newRefresh);
 
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(new DataDTO(userInfoReissue), HttpStatus.OK);
         } catch (NullRefreshTokenException | InvalidRefreshTokenException | Exception e) {
-            log.info("User has expired or invalid refresh token");
+            log.error("User has expired or invalid refresh token" + e.getMessage());
             ErrorDTO errorDTO = new ErrorDTO(e.getMessage());
             return new ResponseEntity<>(errorDTO, HttpStatus.BAD_REQUEST);
         }

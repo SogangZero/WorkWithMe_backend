@@ -2,16 +2,15 @@ package com.wwme.wwme.task.domain;
 
 import com.wwme.wwme.user.domain.User;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 @Entity
 @Getter
 @Setter
 @ToString
+@Builder
 @RequiredArgsConstructor
+@AllArgsConstructor
 public class UserTask {
 
     @Id
@@ -26,5 +25,5 @@ public class UserTask {
     @JoinColumn(name = "task_id")
     Task task;
 
-    Boolean isDone = false;
+    Boolean isDone;
 }

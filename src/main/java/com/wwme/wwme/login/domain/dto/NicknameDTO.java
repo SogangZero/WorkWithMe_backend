@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class NicknameDTO {
     private String nickname;
-    private Integer profile_image_id;
+    private Long profile_image_id;
 }

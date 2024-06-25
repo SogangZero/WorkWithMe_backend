@@ -1,6 +1,8 @@
 package com.wwme.wwme.login.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wwme.wwme.login.exhandler.CustomAccessDeniedHandler;
+import com.wwme.wwme.login.exhandler.CustomAuthenticationEntryPoint;
 import com.wwme.wwme.login.filter.CustomLogoutFilter;
 import com.wwme.wwme.login.filter.WwmeAuthenticationFilter;
 import com.wwme.wwme.login.service.JWTUtilService;
@@ -13,9 +15,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.ExceptionHandlingConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
@@ -35,6 +39,8 @@ public class SecurityConfig {
     private final RefreshRepository refreshRepository;
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -69,6 +75,12 @@ public class SecurityConfig {
                         .requestMatchers("/", "/login", "/favicon.ico", "/reissue", "/login/oauth2/code/**").permitAll()
                         .anyRequest().hasAnyRole("ADMIN", "USER")
                 );
+
+        //access denied handler
+        http
+                .exceptionHandling((exception) -> exception
+                        .accessDeniedHandler(customAccessDeniedHandler)
+                        .authenticationEntryPoint(customAuthenticationEntryPoint));
 
 
         //From login disable

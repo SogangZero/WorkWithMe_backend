@@ -1,12 +1,13 @@
 package com.wwme.wwme.task.repository;
 
 import com.wwme.wwme.task.domain.Task;
+import com.wwme.wwme.user.domain.User;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -45,8 +46,8 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     @Query("SELECT t FROM Task t " +
             "LEFT JOIN FETCH t.userTaskList ut " +
             "WHERE ut.user.id = :userId " +
-            "AND t.endTime = :date")
-    List<Task> findAllByUserAndEndTime(Long userId, LocalDate date);
+            "AND t.endTime between :startTime AND :endTime")
+    List<Task> findAllByUserAndStartEndTimes(Long userId, LocalDateTime startTime, LocalDateTime endTime);
 
 
     @Query("SELECT t FROM Task t " +
@@ -63,6 +64,37 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             "LEFT JOIN FETCH t.tag tg " +
             "WHERE ut.user.id = :userId " +
             "AND ut.isDone = false " +
+            "AND t.endTime >= :endTime " +
             "ORDER BY t.endTime asc")
-    List<Task> findTasksByUserIdFetchUserTask(@Param("userId") Long userId);
+    List<Task> findTasksByUserIdFetchUserTask(@Param("userId") Long userId, @Param("endTime") LocalDateTime endTime, Pageable pageable);
+
+    @Query("SELECT t FROM Task t " +
+            "LEFT JOIN FETCH t.userTaskList ut " +
+            "LEFT JOIN FETCH t.group gp " +
+            "LEFT JOIN FETCH t.tag tg " +
+            "WHERE gp.id = :groupId " +
+            "AND (:user is NULL or ut = :user) " +
+            "AND (:totalIsDone is NULL or t.totalIsDone = :totalIsDone) " +
+            "AND t.endTime >= :startDate " +
+            "AND t.endTime <= :endDate " +
+            "AND tg.id in :tagList " +
+            "AND (:lastId IS NULL OR (t.endTime > :lastEndTime) OR (t.endTime = :lastEndTime AND t.id > :lastId)) " +
+            "ORDER BY t.endTime asc, t.id asc"
+    )
+    List<Task> findAllByGroupWithArguments(
+            @Param("lastId") Long lastId,
+            @Param("lastEndTime") LocalDateTime lastEndTime,
+            @Param("groupId") Long groupId,
+            @Param("user") User user,
+            @Param("totalIsDone") Boolean totalIsDone,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate,
+            @Param("tagList") List<Long> tagList,
+            Pageable pageable
+    );
+
+    @Query("SELECT t from Task t " +
+            "LEFT JOIN FETCH t.userTaskList ut " +
+            "WHERE t.id = :taskId")
+    Optional<Task> findByTaskIdWithUserList(Long taskId);
 }

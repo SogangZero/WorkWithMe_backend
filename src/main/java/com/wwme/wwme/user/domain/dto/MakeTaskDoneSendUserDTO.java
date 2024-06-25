@@ -1,13 +1,13 @@
 package com.wwme.wwme.user.domain.dto;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
-@RequiredArgsConstructor
-public class ReadOneTaskUserDTO {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class MakeTaskDoneSendUserDTO {
     private Long user_id;
     private String nickname;
     private Long profile_image_id;

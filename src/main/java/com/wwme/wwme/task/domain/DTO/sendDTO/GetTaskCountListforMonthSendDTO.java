@@ -1,14 +1,14 @@
 package com.wwme.wwme.task.domain.DTO.sendDTO;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
 @Getter
 @Setter
-@RequiredArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class GetTaskCountListforMonthSendDTO {
     private List<Integer> number_list;
 }

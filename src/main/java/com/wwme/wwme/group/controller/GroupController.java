@@ -52,7 +52,9 @@ public class GroupController {
             String code = groupInvitationService.createGroupInvitation(createdGroup);
 
             // Formulate response
-            var responseDTO = new GroupCreateSuccessResponseDTO(createdGroup.getId(), code);
+            var responseDTO = new GroupCreateSuccessResponseDTO(
+                    createdGroup.getId(), code,
+                    requestDTO.getGroupName(), requestDTO.getGroupColor());
             return new ResponseEntity<>(new DataWrapDTO(responseDTO), HttpStatus.OK);
         } catch (Exception e) {
             log.error("Input: {}", requestDTO, e);
@@ -157,7 +159,7 @@ public class GroupController {
             // Formulate Response
             var responseDTO = converter.convertToGroupReadAllDTO(userGroups);
 
-            return new ResponseEntity<>(new DataWrapDTO(responseDTO), HttpStatus.OK);
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
         } catch (Exception e) {
             log.error("User: {}", user, e);
             var responseDTO = new ErrorWrapDTO(e.getMessage());

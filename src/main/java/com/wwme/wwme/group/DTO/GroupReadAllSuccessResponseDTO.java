@@ -10,7 +10,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class GroupReadAllSuccessResponseDTO {
-    @JsonProperty("group_list")
+    @JsonProperty("data")
     List<GroupDTO> groupDTOList;
 
     @Data
@@ -22,7 +22,7 @@ public class GroupReadAllSuccessResponseDTO {
         String groupName;
 
         @JsonProperty("group_color")
-        String groupColor;
+        Long groupColor;
 
         @JsonProperty("num_people")
         int numPeople;

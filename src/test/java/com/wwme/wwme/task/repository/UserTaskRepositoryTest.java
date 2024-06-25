@@ -1,112 +1,93 @@
 package com.wwme.wwme.task.repository;
 
-
 import com.wwme.wwme.task.domain.Task;
 import com.wwme.wwme.task.domain.UserTask;
 import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.repository.UserRepository;
-import org.assertj.core.api.Assertions;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.annotation.Rollback;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
-@SpringBootTest
-@Transactional
+import static org.assertj.core.api.Assertions.assertThat;
+
+@DataJpaTest
 public class UserTaskRepositoryTest {
-    private static final Logger logger = LoggerFactory.getLogger(UserTaskRepositoryTest.class);
-    private TagRepository tagRepository;
-    private TaskRepository taskRepository;
-    private UserRepository userRepository;
-    private UserTaskRepository userTaskRepository;
-
-
-    private User savedUser1;
-    private Task savedTask1;
-    private User savedUser2;
-    private Task savedTask2;
-
 
     @Autowired
-    public UserTaskRepositoryTest(TagRepository tagRepository, TaskRepository taskRepository, UserRepository userRepository, UserTaskRepository userTaskRepository) {
-        this.tagRepository = tagRepository;
-        this.taskRepository = taskRepository;
-        this.userRepository = userRepository;
-        this.userTaskRepository = userTaskRepository;
-    }
+    private UserTaskRepository userTaskRepository;
 
+    @Autowired
+    private TaskRepository taskRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    private Task task;
+    private User user;
 
     @BeforeEach
-    void insertUserAndTask(){
-        userRepository.deleteAll();
-        taskRepository.deleteAll();
+    void init() {
+        user = User.builder()
+                .userKey("test")
+                .build();
+        user = userRepository.save(user);
 
-        //insert Test task
-        Task task = new Task();
-        task.setTaskName("testTask1");
-        task.setStartTime(LocalDateTime.now());
-        task.setEndTime(LocalDateTime.now().plusDays(1));
-        task.setTotalIsDone(false);
-        savedTask1 = taskRepository.save(task);
+        task = Task.builder()
+                .taskName("test")
+                .build();
+        task = taskRepository.save(task);
 
-        Task task2 = new Task();
-        task2.setTaskName("testTask2");
-        task2.setStartTime(LocalDateTime.now());
-        task2.setEndTime(LocalDateTime.now().plusDays(1));
-        task2.setTotalIsDone(false);
-        savedTask2 = taskRepository.save(task2);
-
-        //insert Test User
-        User user = new User();
-        user.setRegisterDate(LocalDateTime.now());
-        user.setNickname("testUser1");
-        user.setSocialProvider("seswses?");
-        savedUser1 = userRepository.save(user);
-
-        User user2 = new User();
-        user2.setRegisterDate(LocalDateTime.now());
-        user2.setNickname("testUser2");
-        user2.setSocialProvider("what?");
-        savedUser2 = userRepository.save(user2);
+        UserTask userTask = UserTask.builder()
+                .task(task)
+                .user(user)
+                .isDone(false)
+                .build();
+        userTaskRepository.save(userTask);
     }
 
     @Test
-    void insertUserTask() {
+    @DisplayName("deleteByTask - task로 UserTask 삭제")
+    @Transactional
+    @Rollback
+    void deleteByTaskTest() {
+        //when
+        userTaskRepository.deleteByTask(task);
 
-        Assertions.assertThat(savedUser1).isNotNull();
-        Assertions.assertThat(savedTask1).isNotNull();
-
-        UserTask userTask = new UserTask();
-        userTask.setUser(savedUser1);
-        userTask.setTask(savedTask1);
-        userTask.setIsDone(false);
-
-        UserTask savedUserTask = userTaskRepository.save(userTask);
-        Assertions.assertThat(savedUserTask.getUser().getId()).isEqualTo(savedUser1.getId());
-        Assertions.assertThat(savedUserTask.getTask().getId()).isEqualTo(savedTask1.getId());
-
+        //then
+        List<UserTask> result = userTaskRepository.findAll();
+        assertThat(result).isEmpty();
     }
-//
-//    @Test
-//    void cascadeUserTaskTest(){
-//        Assertions.assertThat(savedUser1).isNotNull();
-//        Assertions.assertThat(savedTask1).isNotNull();
-//
-//        UserTask userTask = new UserTask();
-//        userTask.setUser(savedUser1);
-//        userTask.setTask(savedTask1);
-//        userTask.setIsDone(false);
-//        UserTask savedUserTask = userTaskRepository.save(userTask);
-//
-//
-//        userRepository.deleteById(savedUser1.getId());
-//
-//        Assertions.assertThat(userTaskRepository.findById(savedUserTask.getId())).isEmpty();
-//    }
 
+    @Test
+    @DisplayName("deleteByTaskExceptForOnePerson - 특정 유저 제외 task로 UserTask 삭제")
+    @Transactional
+    @Rollback
+    void deleteByTaskExceptForOnePersonTest() {
+        //given
+        User anotherUser = User.builder()
+                .userKey("anotherTest")
+                .build();
+        anotherUser = userRepository.save(anotherUser);
+
+        UserTask anotherUserTask = UserTask.builder()
+                .task(task)
+                .user(anotherUser)
+                .isDone(false)
+                .build();
+        userTaskRepository.save(anotherUserTask);
+
+        //when
+        userTaskRepository.deleteByTaskExceptForOnePerson(task, user);
+
+        //then
+        List<UserTask> result = userTaskRepository.findAll();
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(result.get(0).getUser()).isEqualTo(user);
+    }
 }

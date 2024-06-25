@@ -31,6 +31,7 @@ public class User {
     private Long profileImageId; //added profile photo info
 
     //Cascade : 부모 (one side) 가 없어지면 자식도 모두 사라진다.
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     List<UserTask> userTaskList = new ArrayList<>();
 

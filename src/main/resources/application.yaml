@@ -1,3 +1,9 @@
+server:
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
 spring:
   security:
     oauth2:
@@ -7,7 +13,7 @@ spring:
             client-name: naver
             client-id: 0FY85WBCk_xdDKOfLSlM
             client-secret: ${NAVER_CLIENT_SECRET}
-            redirect-uri: http://${DOMAIN_NAME}/login/oauth2/code/naver
+            redirect-uri: https://${DOMAIN_NAME}/login/oauth2/code/naver
             authorization-grant-type: authorization_code
             scope: name
 
@@ -16,7 +22,7 @@ spring:
             client-id: 7faee11710abb4932d0360ba40724295
             client-secret: ${KAKAO_CLIENT_SECRET}
             client-authentication-method: client_secret_post
-            redirect-uri: http://${DOMAIN_NAME}/login/oauth2/code/kakao
+            redirect-uri: https://${DOMAIN_NAME}/login/oauth2/code/kakao
             authorization-grant-type: authorization_code
             scope: profile_nickname
 
@@ -24,7 +30,7 @@ spring:
             client-name: google
             client-id: 678206844749-valeev05unb0m70vnlh1dbe7lr4fvj94.apps.googleusercontent.com
             client-secret: ${GOOGLE_CLIENT_SECRET}
-            redirect-uri: http://${DOMAIN_NAME}/login/oauth2/code/google
+            redirect-uri: https://${DOMAIN_NAME}/login/oauth2/code/google
             authorization-grant-type: authorization_code
             scope: profile
 
