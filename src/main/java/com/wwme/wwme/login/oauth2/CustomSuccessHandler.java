@@ -60,9 +60,9 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         addRefreshToken(userKey, refresh, refreshTokenDurationMS);
 
         //response setting
-        response.setHeader("access", access);
-        response.addCookie(createCookie("refresh", refresh));
-        response.setStatus(HttpStatus.OK.value());
+//        response.setHeader("access", access);
+//        response.addCookie(createCookie("refresh", refresh));
+//        response.setStatus(HttpStatus.OK.value());
 
         log.info("Log Success Handler {}[{}]", userKey, role);
         log.info("access Token : {}", access);
@@ -70,13 +70,17 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         try {
             User user = userRepository.findByUserKey(userKey).orElseThrow(NoSuchElementException::new); //NoSuchElementException
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.setContentType("application/json");
-            response.setCharacterEncoding("utf-8");
-            JoinStatusDTO joinStatusDTO = checkJoinStatus(user);
-            DataDTO data = new DataDTO(joinStatusDTO);
-            String jsonBody = objectMapper.writeValueAsString(data);
-            response.getWriter().write(jsonBody);
+            String redirectURL = "webauthcallback://?access=" + access +
+                    "&refresh=" + refresh +
+                    "&state=ZeroAuth" + user.getSocialProvider();
+            response.setStatus(HttpServletResponse.SC_TEMPORARY_REDIRECT);
+            response.setHeader("Location", redirectURL);
+//            response.setContentType("application/json");
+//            response.setCharacterEncoding("utf-8");
+//            JoinStatusDTO joinStatusDTO = checkJoinStatus(user);
+//            DataDTO data = new DataDTO(joinStatusDTO);
+//            String jsonBody = objectMapper.writeValueAsString(data);
+//            response.getWriter().write(jsonBody);
         } catch (NoSuchElementException e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
