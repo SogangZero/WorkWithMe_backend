@@ -112,31 +112,12 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         }
     }
 
-    private static void checkGroupIncludeTag(Tag tag, Group group) {
+    private void checkGroupIncludeTag(Tag tag, Group group) {
         if (!tag.getGroup().getId().equals(group.getId())) {
             System.out.println("TaskCRUDServiceImpl.createTask");
             throw new IllegalArgumentException("Create Task Fail - tag and group Match Fail"
                     + "Tag Id" + tag.getId()
                     + "Group Id" + group.getId());
-        if(createTaskReceiveDTO.getTask_type().equals("personal")){
-            User user = userRepository.findById(createTaskReceiveDTO.getTodo_user_id()).orElseThrow(() -> new EntityNotFoundException(
-                    "Could not find user with ID: " + createTaskReceiveDTO.getTodo_user_id() +
-                            " in method createTask. Details: " + createTaskReceiveDTO.toString()));
-
-            UserTask userTask = new UserTask();
-            userTask.setUser(user);
-            userTask.setTask(task);
-            userTask.setIsDone(false);
-            task.getUserTaskList().add(userTask);
-        }else{ // add everyone in the group to the usertask list
-            List<User> userList = userRepository.findAllByGroupID(createTaskReceiveDTO.getGroup_id());
-            for (User u : userList){
-                UserTask userTask = new UserTask();
-                userTask.setUser(u);
-                userTask.setTask(task);
-                userTask.setIsDone(false);
-                task.getUserTaskList().add(userTask);
-            }
         }
     }
 

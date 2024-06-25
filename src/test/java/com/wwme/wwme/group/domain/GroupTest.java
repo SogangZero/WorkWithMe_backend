@@ -30,7 +30,7 @@ public class GroupTest {
                 .id(1L)
                 .user(new User())
                 .group(group)
-                .color("test")
+                .color(1L)
                 .build();
         group.addUserGroup(userGroup);
 
@@ -52,7 +52,7 @@ public class GroupTest {
                 .id(1L)
                 .user(user)
                 .group(group)
-                .color("test")
+                .color(1L)
                 .build();
 
         //then
@@ -73,7 +73,7 @@ public class GroupTest {
                 .id(1L)
                 .user(user)
                 .group(group)
-                .color("test")
+                .color(1L)
                 .build();
 
         group.addUserGroup(userGroup);
@@ -96,7 +96,7 @@ public class GroupTest {
                 .id(1L)
                 .user(user)
                 .group(group)
-                .color("test")
+                .color(1L)
                 .build();
 
         //then
@@ -117,7 +117,7 @@ public class GroupTest {
                 .id(1L)
                 .user(user)
                 .group(group)
-                .color("test")
+                .color(1L)
                 .build();
 
         group.addUserGroup(userGroup);

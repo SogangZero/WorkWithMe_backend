@@ -110,7 +110,7 @@ public class TaskCRUDServiceTest {
 
         userGroup = UserGroup.builder()
                 .id(1L)
-                .color("RED")
+                .color(1L)
                 .user(user)
                 .group(group)
                 .build();
@@ -200,7 +200,7 @@ public class TaskCRUDServiceTest {
                 .id(2L)
                 .user(sameGroupUser)
                 .group(group)
-                .color("BLUE")
+                .color(1L)
                 .build();
 
         sameGroupUser.getUserGroup().add(userGroup2);

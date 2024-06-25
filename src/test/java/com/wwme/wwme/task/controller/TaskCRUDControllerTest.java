@@ -95,7 +95,7 @@ public class TaskCRUDControllerTest {
 
         UserGroup userGroup = UserGroup.builder()
                 .id(1L)
-                .color("RED")
+                .color(1L)
                 .user(user)
                 .group(group)
                 .build();
@@ -221,7 +221,7 @@ public class TaskCRUDControllerTest {
 
         UserGroup userGroup = UserGroup.builder()
                 .id(1L)
-                .color("RED")
+                .color(1L)
                 .user(user)
                 .group(group)
                 .build();
