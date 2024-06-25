@@ -11,5 +11,6 @@ public interface GroupInvitationService {
      * @return group invitation code
      */
     String createGroupInvitation(Group group);
-    Group acceptInvitation(String code, User user, String color);
+
+    Group acceptInvitation(String code, User user, Long color);
 }

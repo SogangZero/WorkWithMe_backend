@@ -9,5 +9,5 @@ public class InvitationAcceptRequestDTO {
     String groupCode;
 
     @JsonProperty("group_color")
-    String groupColor;
+    Long groupColor;
 }

@@ -22,7 +22,7 @@ public class GroupReadAllSuccessResponseDTO {
         String groupName;
 
         @JsonProperty("group_color")
-        String groupColor;
+        Long groupColor;
 
         @JsonProperty("num_people")
         int numPeople;
