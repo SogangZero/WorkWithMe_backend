@@ -197,7 +197,7 @@ public class TaskCRUDController {
             var responseDTO = new TaskListReadByGroupSendDTO(taskDTOList);
             return ResponseEntity
                     .ok()
-                    .body(new DataWrapDTO(responseDTO));
+                    .body(responseDTO);
         } catch (Exception e) {
             log.error("input: last_id:{} group_id{} isMyTask:{} completeStatus:{} startDate:{} endDate:{} withDueDate:{} tagList:{} ",
                     lastId, groupId, isMyTask, completeStatus, startDate, endDate, withDueDate, tagList, e);
