@@ -15,8 +15,6 @@ public class ReadTaskListByUserSendDTO {
     private LocalDateTime start_time;
     private LocalDateTime end_time;
     private String task_type;
-    private Long group_id;
-    private String group_color;
     private Boolean is_done_personal;
     private Boolean is_done_total;
 

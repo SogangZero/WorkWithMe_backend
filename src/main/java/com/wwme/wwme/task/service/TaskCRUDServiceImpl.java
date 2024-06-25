@@ -1,6 +1,7 @@
 package com.wwme.wwme.task.service;
 
 import com.wwme.wwme.group.domain.Group;
+import com.wwme.wwme.group.domain.UserGroup;
 import com.wwme.wwme.group.repository.GroupRepository;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.CreateTaskReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.MakeTaskDoneReceiveDTO;
@@ -276,8 +277,15 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
          *      - total_user_count must be the size of the list.
          */
         Task task = taskRepository.findTaskByIdWithUserTaskList(taskId).orElseThrow(() -> new EntityNotFoundException(
-                "Could not find group with ID: " + taskId +
+                "Could not find task with ID: " + taskId +
                 " in method readOneTask. Details: " + taskId));
+
+        Group group = groupRepository.findGroupByIdLoadUserTaskList(task.getGroup().getId()).orElseThrow(()-> new EntityNotFoundException(
+                "Could not find group with ID: " + task.getGroup().getId() +
+                        " in method readOneTask. Details: " + task.getGroup().getId()
+        ));
+
+
 
 
         //convert task into readOneTaskSedDTO
@@ -289,18 +297,16 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
                         Optional.ofNullable(task.getTag()).map(Tag::getId).orElse(null),
                         Optional.ofNullable(task.getTag()).map(Tag::getTagName).orElse(null)
                         ))
-                .group(new ROT_groupDTO( //TODO: fill out group color and num of people
+                .group(new ROT_groupDTO(
                         task.getGroup().getId(),
                         task.getGroup().getGroupName(),
-                        null,
-                        null
-
+                        group.getUserGroupList().size()
                 ))
                 .start_time(task.getStartTime())
                 .end_time(task.getEndTime())
                 .build();
 
-        fillUserListForReadOneTaskSendDTO(readOneTaskSendDTO,task);
+        fillUserListForReadOneTaskSendDTO(readOneTaskSendDTO,task,group);
 
         //is_done_count, is_done_personal, is_done_total;
 
@@ -359,6 +365,17 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
                 }
             }
             //TODO: insert group color
+            Group group = groupRepository.findGroupByIdLoadUserTaskList(t.getGroup().getId())
+                    .orElseThrow(()->new NoSuchElementException("Could not find group with ID: "+ t.getGroup().getId()
+                                                                + "in fuction getTaskListForUser"));
+
+            UserGroup ug = group.getUserGroupList().stream()
+                    .filter(s -> s.getUser().getId().equals(loginUser.getId())).findAny()
+                    .orElseThrow(()-> new NoSuchElementException("Could not find userGroup with userID: "
+                            + loginUser.getId() + "In function getTaskListForUser" ));
+
+
+
             ReadTaskListByUserSendDTO readTaskListByUserSendDTO = ReadTaskListByUserSendDTO.builder()
                     .task_id(t.getId())
                     .task_name(t.getTaskName())
@@ -370,10 +387,9 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
                             Optional.ofNullable(t.getTag()).map(Tag::getTagName).orElse(null)))
                     .group(new RTL_groupDTO(
                             t.getGroup().getId(),
-                            null
+                            ug.getColor(),
+                            t.getGroup().getGroupName()
                     ))
-                    .group_id(t.getGroup().getId())
-                    .group_color(t.getGroup().getGroupName())
                     .is_done_personal(is_done_personal)
                     .is_done_total(t.getTotalIsDone())
                     .build();
@@ -483,23 +499,26 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
 
 
     //friend functions.
-    private static void fillUserListForReadOneTaskSendDTO(ReadOneTaskSendDTO readOneTaskSendDTO, Task task){
+    private static void fillUserListForReadOneTaskSendDTO(ReadOneTaskSendDTO readOneTaskSendDTO, Task task, Group group){
 
         List<ReadOneTaskUserDTO> userDTOList = new ArrayList<>();
-
+        Long group_color = null;
         for(UserTask userTask : task.getUserTaskList()){
+
+            UserGroup ug = group.getUserGroupList().stream()
+                    .filter(s -> s.getUser().getId().equals(userTask.getUser().getId()))
+                    .findAny()
+                    .orElseThrow(() -> new NoSuchElementException("Could not find UserGroup Matching" +
+                            "user id " + userTask.getUser().getId() + "in function fillUserListForReadOneTaskSendDTO"));
+            group_color = ug.getColor();
+
             ReadOneTaskUserDTO userDTO = ReadOneTaskUserDTO.builder()
                     .user_id(userTask.getUser().getId())
                     .nickname(userTask.getUser().getNickname())
                     .profile_image_id(userTask.getUser().getProfileImageId())
                     .is_done(userTask.getIsDone())
+                    .group_color(group_color)
                     .build();
-
-//            ReadOneTaskUserDTO userDTO = new ReadOneTaskUserDTO();
-//            userDTO.setUser_id(userTask.getUser().getId());
-//            userDTO.setNickname(userTask.getUser().getNickname());
-//            userDTO.setProfile_image_id(userTask.getUser().getProfileImageId());
-//            userDTO.setIs_done(userTask.getIsDone());
 
             userDTOList.add(userDTO);
         }

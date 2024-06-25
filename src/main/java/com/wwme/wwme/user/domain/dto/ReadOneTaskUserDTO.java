@@ -12,4 +12,5 @@ public class ReadOneTaskUserDTO {
     private String nickname;
     private Long profile_image_id;
     private Boolean is_done;
+    private Long group_color;
 }

@@ -10,6 +10,5 @@ import lombok.*;
 public class ROT_groupDTO {
     private Long group_id;
     private String group_name;
-    private Long group_color;
     private Integer num_people;
 }

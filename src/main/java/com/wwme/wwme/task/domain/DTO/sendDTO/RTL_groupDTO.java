@@ -11,5 +11,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class RTL_groupDTO {
     private Long group_id;
-    private Integer group_color;
+    private Long group_color;
+    private String group_name;
 }
