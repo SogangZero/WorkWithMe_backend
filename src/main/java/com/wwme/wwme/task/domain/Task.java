@@ -24,14 +24,13 @@ public class Task {
     private LocalDateTime endTime;
     private String taskType;
     private Boolean totalIsDone;
-    //건의사항 : 완료한 날짜/시간를 넣자
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tag_id")
+    @JoinColumn
     private Tag tag;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "group_id")
+    @JoinColumn
     private Group group;
 
     @Builder.Default

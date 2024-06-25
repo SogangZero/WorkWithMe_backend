@@ -1,5 +1,8 @@
 package com.wwme.wwme.task.service;
 
+import com.wwme.wwme.task.domain.DTO.receiveDTO.CreateTaskReceiveDTO;
+import com.wwme.wwme.task.domain.DTO.receiveDTO.MakeTaskDoneReceiveDTO;
+import com.wwme.wwme.task.domain.DTO.receiveDTO.UpdateTaskReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.sendDTO.*;
 import com.wwme.wwme.task.domain.Task;
 import com.wwme.wwme.user.domain.User;
@@ -36,11 +39,11 @@ public interface TaskCRUDService {
 
 
     /**
-     *
-     * @param taskId
-     * make the task of "taskid" done
+     * @param makeTaskDoneReceiveDTO
+     * @param user
+     * @return
      */
-    public void makeTaskDone(Long taskId, Boolean done);
+    public MakeTaskDoneSendDTO makeTaskDone(MakeTaskDoneReceiveDTO makeTaskDoneReceiveDTO, User user) throws Exception;
 
 
     /**
@@ -48,7 +51,7 @@ public interface TaskCRUDService {
      * @param date (year month day)
      * @return getTaskCountLIstforMonthSendDTO
      */
-    public GetTaskCountListforMonthSendDTO getTaskCountListforMonth(LocalDate date);
+    public GetTaskCountListforMonthSendDTO getTaskCountListforMonth(LocalDate date) throws Exception;
 
 
     /**
@@ -57,14 +60,14 @@ public interface TaskCRUDService {
      * @param date
      * @return a list of tasks within the day of the "date"
      */
-    public List<TaskListForDaySendDTO> getTaskListForDay(User user, LocalDate date);
+    public List<TaskListForDaySendDTO> getTaskListForDay(User user, LocalDate date) throws Exception;
 
     /**
      *
      * @param taskId
      * @return
      */
-    public ReadOneTaskSendDTO readOneTask(Long taskId);
+    public ReadOneTaskSendDTO readOneTask(Long taskId, User loginUser);
 
     /**
      * return incomlpete task of user

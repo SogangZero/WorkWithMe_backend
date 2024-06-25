@@ -1,14 +1,14 @@
 package com.wwme.wwme.task.domain.DTO.sendDTO;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@RequiredArgsConstructor
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class TaskListReadbyUserSendDTO {
     private Long task_id;
     private String task_name;

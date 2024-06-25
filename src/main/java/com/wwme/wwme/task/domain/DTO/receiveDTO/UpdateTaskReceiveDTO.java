@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
 public class UpdateTaskReceiveDTO {
     private Long task_id;
     private String task_name;

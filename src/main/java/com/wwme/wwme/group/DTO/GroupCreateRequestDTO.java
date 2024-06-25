@@ -13,5 +13,5 @@ public class GroupCreateRequestDTO {
     String groupName;
 
     @JsonProperty("group_color")
-    String groupColor;
+    Long groupColor;
 }

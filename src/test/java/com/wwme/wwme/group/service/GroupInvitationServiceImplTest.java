@@ -7,7 +7,6 @@ import com.wwme.wwme.group.repository.GroupInvitationRepository;
 import com.wwme.wwme.group.repository.UserGroupRepository;
 import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.repository.UserRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,7 +16,6 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
@@ -41,7 +39,7 @@ public class GroupInvitationServiceImplTest {
     @Test
     void createGroupInvitationSuccess() {
         String groupName = "groupName";
-        String groupColor = "123456";
+        Long groupColor = 0L;
         User user = userRepository.save(new User());
         Group group = groupService.createGroupWithUserAndColor(groupName, user, groupColor);
 
@@ -67,8 +65,8 @@ public class GroupInvitationServiceImplTest {
     @Test
     void acceptInvitationSuccess() {
         String groupName = "group1";
-        String groupColor = "ABABAB";
-        String groupColor2 = "BCBCBC";
+        Long groupColor = 2L;
+        Long groupColor2 = 3L;
 
         User user = userRepository.save(new User());
         Group group = groupService.createGroupWithUserAndColor(groupName, user, groupColor);
@@ -93,15 +91,15 @@ public class GroupInvitationServiceImplTest {
         User user = userRepository.save(new User());
         assertThrows(
                 NoSuchElementException.class,
-                () -> groupInvitationService.acceptInvitation("non-existent-code", user, "AFAFAF")
+                () -> groupInvitationService.acceptInvitation("non-existent-code", user, 0L)
         );
     }
 
     @Test
     void acceptInvitationFail_UserAlreadyInGroup() {
         String groupName = "group1";
-        String groupColor = "ABABAB";
-        String groupColor2 = "BCBCBC";
+        Long groupColor = 2L;
+        Long groupColor2 = 3L;
 
         User user = userRepository.save(new User());
         Group group = groupService.createGroupWithUserAndColor(groupName, user, groupColor);
