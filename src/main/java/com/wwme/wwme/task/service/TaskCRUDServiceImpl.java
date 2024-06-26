@@ -132,7 +132,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
 
     private static void addUserTaskByTaskType(String taskType, Group group, Task taskEntity, User todoUser) {
         switch (taskType) {
-            case "group" -> {
+            case "group", "anyone" -> {
                 for (UserGroup userGroup : group.getUserGroupList()) {
                     User groupMember = userGroup.getUser();
                     UserTask userTask = UserTask.builder()
@@ -151,14 +151,13 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
                         .build();
                 taskEntity.addUserTask(userTask);
             }
-            case "anyone" -> {
-            }
-            //anyone은 어떻게 UserTask 인자 넣지?
+
             default -> throw new IllegalArgumentException("Create Task Fail - No Matched Task Type");
         }
     }
 
     @Override
+    //TODO: update 한 뒤에 Task 자체의 is_done 을 확인해줘야 한다.
     public Task updateTask(Long taskId,
                            LocalDateTime endTime,
                            String taskType,
@@ -200,6 +199,8 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
     }
 
     private void updateTaskType(String taskType, Task task, User todoUser) {
+        log.info("original task type : "+task.getTaskType());
+        log.info("changing task type : "+taskType);
         if (taskType != null && !task.getTaskType().equals(taskType)) {
             changeTaskType(taskType, task, todoUser);
         }
@@ -257,9 +258,22 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
 
             task.changeTaskType("group");
         }
-        //personal -> anyone : UserTask를 삭제해줌
+        //personal -> anyone : 그룹원 모두 UserTask 객체 할당
+        //TODO : fix personal -> anyone : UserTask needed for all group members
         if (task.getTaskType().equals("personal") && taskType.equals("anyone")) {
-            userTaskRepository.deleteByTask(task);
+            User existUser = task.getUserTaskList().get(0).getUser();
+            for (UserGroup userGroup : task.getGroup().getUserGroupList()) {
+                User addUser = userGroup.getUser();
+                if (addUser.equals(existUser)) {
+                    continue;
+                }
+                UserTask userTask = UserTask.builder()
+                        .user(addUser)
+                        .task(task)
+                        .isDone(false)
+                        .build();
+                task.addUserTask(userTask);
+            }
             task.changeTaskType("anyone");
         }
 
@@ -268,34 +282,21 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
             userTaskRepository.deleteByTaskExceptForOnePerson(task, todoUser);
             task.changeTaskType("personal");
         }
-        //group -> anyone : UserTask 들을 삭제해줌
+        //group -> anyone : 그대로 놔둠
         if (task.getTaskType().equals("group") && taskType.equals("anyone")) {
-            userTaskRepository.deleteByTask(task);
             task.changeTaskType("anyone");
         }
 
         //anyone -> personal : personal에 대한 userTask를 추가해줌
+        //TODO: userTask 를 먼저 모두 지워줘야함.
         if (task.getTaskType().equals("anyone") && taskType.equals("personal")) {
-            UserTask userTask = UserTask.builder()
-                    .user(todoUser)
-                    .task(task)
-                    .isDone(false)
-                    .build();
-            task.addUserTask(userTask);
-
+            userTaskRepository.deleteByTaskExceptForOnePerson(task, todoUser);
             task.changeTaskType("personal");
         }
 
         //anyone -> group : group원들의 UserTask를 추가해줌
+        //TODO: 따로 추가가 필요하지 않다.
         if (task.getTaskType().equals("anyone") && taskType.equals("group")) {
-            for (UserGroup userGroup : task.getGroup().getUserGroupList()) {
-                UserTask userTask = UserTask.builder()
-                        .user(userGroup.getUser())
-                        .task(task)
-                        .isDone(false)
-                        .build();
-                task.addUserTask(userTask);
-            }
             task.changeTaskType("group");
         }
     }
