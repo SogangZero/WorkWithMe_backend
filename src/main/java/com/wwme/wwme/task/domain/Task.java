@@ -69,15 +69,17 @@ public class Task {
         return this.getGroup().equals(tag.getGroup());
     }
 
-    public Boolean isDonePersonal() {
-        if (!this.taskType.equals("personal")) return false;
-        return this.userTaskList.get(0).getIsDone();
-    }
+//    public Boolean isDonePersonal() {
+////        if (!this.taskType.equals("personal")) return false;
+////        return this.userTaskList.get(0).getIsDone();
+//        UserTask ut = this.getUserTaskList().stream()
+//                .filter(s -> s.user.getId().equals())
+//    }
 
-    public Boolean isDoneTotal() {
-        return userTaskList.stream()
-                .allMatch(UserTask::getIsDone);
-    }
+//    public Boolean isDoneTotal() { //TODO : check for anyone task type
+//        return userTaskList.stream()
+//                .allMatch(UserTask::getIsDone);
+//    }
 
     public Integer countDoneUser() {
         return (int) userTaskList.stream()
