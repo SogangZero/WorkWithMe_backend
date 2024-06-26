@@ -21,7 +21,12 @@ import java.util.List;
 public class TaskDTOBinder {
     private final TaskRepository taskRepository;
 
+
+
     public CUTaskSendDTO bindCUTaskSendDTO(Task task) {
+        //checking is_done_total
+        boolean task_is_done_total = setAndReturnIsDoneTotal(task);
+
         return CUTaskSendDTO.builder()
                 .task_id(task.getId())
                 .task_name(task.getTaskName())
@@ -29,12 +34,33 @@ public class TaskDTOBinder {
                 .tag(bindTagInfo(task.getTag()))
                 .is_done_count(task.countDoneUser())
                 .is_done_personal(task.isDonePersonal())
-                .is_done_total(task.isDoneTotal())
+                .is_done_total(task_is_done_total)
                 .user_list(bindUserListInfo(task.getUserTaskList()))
                 .task_type(task.getTaskType())
                 .start_time(task.getStartTime())
                 .end_time(task.getEndTime())
                 .build();
+    }
+    public boolean setAndReturnIsDoneTotal(Task task){
+        switch (task.getTaskType()){
+            case "personal":
+                task.setTotalIsDone(task.getUserTaskList().get(0).getIsDone());
+                break;
+            case "anyone":
+                boolean anyIsDone = task.getUserTaskList().stream()
+                        .anyMatch(UserTask::getIsDone);
+                task.setTotalIsDone(anyIsDone);
+                break;
+            case "group":
+                boolean allIsDone = task.getUserTaskList().stream()
+                        .allMatch(UserTask::getIsDone);
+                task.setTotalIsDone(allIsDone);
+                break;
+            default:
+                throw new IllegalArgumentException("Task type is invalid: "+task.getTaskType()
+                + "in function checkAndSetIsDoneTotal");
+        }
+        return taskRepository.save(task).getTotalIsDone();
     }
 
     private List<CUTaskUserDTO> bindUserListInfo(List<UserTask> userTaskList) {

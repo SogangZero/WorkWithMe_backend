@@ -74,10 +74,10 @@ public class Task {
         return this.userTaskList.get(0).getIsDone();
     }
 
-    public Boolean isDoneTotal() {
-        return userTaskList.stream()
-                .allMatch(UserTask::getIsDone);
-    }
+//    public Boolean isDoneTotal() { //TODO : check for anyone task type
+//        return userTaskList.stream()
+//                .allMatch(UserTask::getIsDone);
+//    }
 
     public Integer countDoneUser() {
         return (int) userTaskList.stream()
