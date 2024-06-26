@@ -199,6 +199,8 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
     }
 
     private void updateTaskType(String taskType, Task task, User todoUser) {
+        log.info("original task type : "+task.getTaskType());
+        log.info("changing task type : "+taskType);
         if (taskType != null && !task.getTaskType().equals(taskType)) {
             changeTaskType(taskType, task, todoUser);
         }
@@ -282,20 +284,13 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         }
         //group -> anyone : 그대로 놔둠
         if (task.getTaskType().equals("group") && taskType.equals("anyone")) {
-            ;
+            task.changeTaskType("anyone");
         }
 
         //anyone -> personal : personal에 대한 userTask를 추가해줌
         //TODO: userTask 를 먼저 모두 지워줘야함.
         if (task.getTaskType().equals("anyone") && taskType.equals("personal")) {
             userTaskRepository.deleteByTaskExceptForOnePerson(task, todoUser);
-            UserTask userTask = UserTask.builder()
-                    .user(todoUser)
-                    .task(task)
-                    .isDone(false)
-                    .build();
-            task.addUserTask(userTask);
-
             task.changeTaskType("personal");
         }
 
