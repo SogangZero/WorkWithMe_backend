@@ -162,8 +162,8 @@ public class TaskCRUDController {
             @RequestParam("group_id") long groupId,
             @RequestParam("is_my_task") boolean isMyTask,
             @RequestParam("complete_status") String completeStatus,
-            @RequestParam("start_date") LocalDateTime startDate,
-            @RequestParam("end_date") LocalDateTime endDate,
+            @RequestParam(value = "start_date", required = false) LocalDateTime startDate,
+            @RequestParam(value = "end_date", required = false) LocalDateTime endDate,
             @RequestParam("with_due_date") boolean withDueDate,
             @RequestParam("tag_list") List<Long> tagList,
             @Login User user

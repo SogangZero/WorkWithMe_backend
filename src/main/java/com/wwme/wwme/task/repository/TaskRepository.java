@@ -73,7 +73,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             "LEFT JOIN FETCH t.group gp " +
             "LEFT JOIN FETCH t.tag tg " +
             "WHERE gp.id = :groupId " +
-            "AND (:user is NULL or ut = :user) " +
+            "AND (:user is NULL or ut.user = :user) " +
             "AND (:totalIsDone is NULL or t.totalIsDone = :totalIsDone) " +
             "AND t.endTime >= :startDate " +
             "AND t.endTime <= :endDate " +
