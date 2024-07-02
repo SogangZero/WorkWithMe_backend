@@ -1,13 +1,15 @@
-package com.wwme.wwme.user.domain.dto;
+package com.wwme.wwme.login.domain.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Data
-@Builder
+@NoArgsConstructor
 @AllArgsConstructor
-public class UserInfoDTO {
+@Builder
+@Data
+public class UserInfoReissueDTO {
     private Long user_id;
     private String nickname;
     private Long profile_image_id;

@@ -16,6 +16,9 @@ public class GroupUserListReadResponseSuccessDTO {
 
     @Data
     public static class User {
+        @JsonProperty("user_id")
+        Long userId;
+
         @JsonProperty("nickname")
         String nickname;
 

@@ -11,7 +11,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 public class TaskListReadByGroupSendDTO {
-    @JsonProperty("task_list")
+    @JsonProperty("data")
     List<Task> taskList;
 
     @Data

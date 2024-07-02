@@ -44,7 +44,9 @@ public class TaskCRUDController {
     public ResponseEntity<?> createTask(@RequestBody CreateTaskReceiveDTO createTaskReceiveDTO,
                                         @Login User user) {
         log.info("Create Task Controller");
+        log.info("Test Log createTask");
         try {
+            log.info("Inside Try block of createTask");
             Task task = taskCRUDService.createTask(createTaskReceiveDTO.getTask_name(),
                     createTaskReceiveDTO.getEnd_time(),
                     createTaskReceiveDTO.getTask_type(),
@@ -55,7 +57,7 @@ public class TaskCRUDController {
 
             log.info("Create New Task[{}]", task.getId());
 
-            CUTaskSendDTO cuTaskSendDTO = taskDTOBinder.bindCUTaskSendDTO(task);
+            CUTaskSendDTO cuTaskSendDTO = taskDTOBinder.bindCUTaskSendDTO(task,user);
             return new ResponseEntity<>(new DataResponseDTO(cuTaskSendDTO), HttpStatus.OK);   
         } catch (Exception e) {
             log.error("Create New Task ERROR " + e.getMessage());
@@ -75,7 +77,7 @@ public class TaskCRUDController {
                     updateTaskReceiveDTO.getTodo_user_id(),
                     user);
 
-            CUTaskSendDTO cuTaskSendDTO = taskDTOBinder.bindCUTaskSendDTO(task);
+            CUTaskSendDTO cuTaskSendDTO = taskDTOBinder.bindCUTaskSendDTO(task,user);
             return new ResponseEntity<>(new DataResponseDTO(cuTaskSendDTO), HttpStatus.OK);
         } catch (Exception e) {
             log.error("Update Task ERROR " + e.getMessage());
@@ -160,13 +162,15 @@ public class TaskCRUDController {
             @RequestParam("group_id") long groupId,
             @RequestParam("is_my_task") boolean isMyTask,
             @RequestParam("complete_status") String completeStatus,
-            @RequestParam("start_date") LocalDateTime startDate,
-            @RequestParam("end_date") LocalDateTime endDate,
+            @RequestParam(value = "start_date", required = false) LocalDateTime startDate,
+            @RequestParam(value = "end_date", required = false) LocalDateTime endDate,
             @RequestParam("with_due_date") boolean withDueDate,
             @RequestParam("tag_list") List<Long> tagList,
             @Login User user
     ) {
         try {
+            log.info("input: last_id:{} group_id{} isMyTask:{} completeStatus:{} startDate:{} endDate:{} withDueDate:{} tagList:{} ",
+                    lastId, groupId, isMyTask, completeStatus, startDate, endDate, withDueDate, tagList);
             var taskList =
                     taskCRUDService.readTaskListByGroup(
                             lastId,
@@ -180,24 +184,29 @@ public class TaskCRUDController {
                             tagList
                     );
 
-            var taskDTOList = taskList.stream().map((task) ->
-                new TaskListReadByGroupSendDTO.Task(
-                        task.getId(),
-                        task.getTaskName(),
-                        task.getEndTime(),
-                        task.getTaskType(),
-                        task.getTag().getId(),
-                        task.getTotalIsDone(),
-                        taskCRUDService.getIsDoneMe(user, task),
-                        taskCRUDService.getDoneUserCount(task),
-                        taskCRUDService.getDoingNickname(task)
-                )
+            var taskDTOList = taskList.stream().map((task) -> {
+                        var tag = task.getTag();
+                        Long tagId = null;
+                        if (tag != null)
+                            tagId = task.getId();
+                        return new TaskListReadByGroupSendDTO.Task(
+                                task.getId(),
+                                task.getTaskName(),
+                                task.getEndTime(),
+                                task.getTaskType(),
+                                tagId,
+                                task.getTotalIsDone(),
+                                taskCRUDService.getIsDoneMe(user, task),
+                                taskCRUDService.getDoneUserCount(task),
+                                taskCRUDService.getDoingNickname(task)
+                        );
+                    }
 
             ).toList();
             var responseDTO = new TaskListReadByGroupSendDTO(taskDTOList);
             return ResponseEntity
                     .ok()
-                    .body(new DataWrapDTO(responseDTO));
+                    .body(responseDTO);
         } catch (Exception e) {
             log.error("input: last_id:{} group_id{} isMyTask:{} completeStatus:{} startDate:{} endDate:{} withDueDate:{} tagList:{} ",
                     lastId, groupId, isMyTask, completeStatus, startDate, endDate, withDueDate, tagList, e);

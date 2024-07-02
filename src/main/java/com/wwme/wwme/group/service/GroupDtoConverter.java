@@ -33,6 +33,7 @@ public class GroupDtoConverter {
     public GroupUserListReadResponseSuccessDTO convertToGroupUserListReadDTO(List<User> users, String groupCode) {
         var responseUsers = users.stream().map((user) -> {
             var curUser = new GroupUserListReadResponseSuccessDTO.User();
+            curUser.setUserId(user.getId());
             curUser.setNickname(user.getNickname());
             curUser.setProfileImageId(0);
             return curUser;
@@ -70,6 +71,7 @@ public class GroupDtoConverter {
                 .toList();
 
         return new GroupReadWithCodeSuccessResponseDTO(
+                group.getId(),
                 group.getGroupName(),
                 responseUsers
         );

@@ -65,19 +65,21 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             "WHERE ut.user.id = :userId " +
             "AND ut.isDone = false " +
             "AND t.endTime >= :endTime " +
+            "AND (:last_task_id IS NULL OR t.id != :last_task_id) " +
             "ORDER BY t.endTime asc")
-    List<Task> findTasksByUserIdFetchUserTask(@Param("userId") Long userId, @Param("endTime") LocalDateTime endTime, Pageable pageable);
+    List<Task> findTasksByUserIdFetchUserTask(@Param("userId") Long userId, @Param("endTime") LocalDateTime endTime,
+                                              @Param("last_task_id") Long last_task_id, Pageable pageable);
 
     @Query("SELECT t FROM Task t " +
             "LEFT JOIN FETCH t.userTaskList ut " +
             "LEFT JOIN FETCH t.group gp " +
             "LEFT JOIN FETCH t.tag tg " +
             "WHERE gp.id = :groupId " +
-            "AND (:user is NULL or ut = :user) " +
-            "AND (:totalIsDone is NULL or t.totalIsDone = :totalIsDone) " +
+            "AND (:user is NULL or ut.user = :user) " +
+            "AND (:totalIsDone IS NULL or t.totalIsDone = :totalIsDone) " +
             "AND t.endTime >= :startDate " +
             "AND t.endTime <= :endDate " +
-            "AND tg.id in :tagList " +
+            "AND ((:listSize=0 and tg.id is NULL) or tg.id in :tagList) " +
             "AND (:lastId IS NULL OR (t.endTime > :lastEndTime) OR (t.endTime = :lastEndTime AND t.id > :lastId)) " +
             "ORDER BY t.endTime asc, t.id asc"
     )
@@ -90,6 +92,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate,
             @Param("tagList") List<Long> tagList,
+            @Param("listSize") int listSize,
             Pageable pageable
     );
 

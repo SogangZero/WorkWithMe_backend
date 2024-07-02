@@ -10,7 +10,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class GroupReadAllSuccessResponseDTO {
-    @JsonProperty("group_list")
+    @JsonProperty("data")
     List<GroupDTO> groupDTOList;
 
     @Data

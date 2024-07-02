@@ -159,7 +159,7 @@ public class GroupController {
             // Formulate Response
             var responseDTO = converter.convertToGroupReadAllDTO(userGroups);
 
-            return new ResponseEntity<>(new DataWrapDTO(responseDTO), HttpStatus.OK);
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
         } catch (Exception e) {
             log.error("User: {}", user, e);
             var responseDTO = new ErrorWrapDTO(e.getMessage());

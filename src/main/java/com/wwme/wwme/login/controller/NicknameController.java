@@ -24,8 +24,9 @@ public class NicknameController {
                                           @Login User user) {
         try {
             String nickname = nicknameDTO.getNickname();
+            Long profileImage = nicknameDTO.getProfile_image_id();
             String userKey = user.getUserKey();
-            nicknameService.saveNickname(nickname, userKey);
+            nicknameService.saveNickname(nickname, userKey, profileImage);
             log.info("User[{}] request nickname setting by {}", userKey, nickname);
 
             SuccessDTO successDTO = new SuccessDTO(true);
