@@ -56,10 +56,17 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
 
         //parameter validation
         checkParameterValidity(taskName, endTime, taskType);
-        Tag tag = getTagFromDB(tagId);
         Group group = getGroupFromDB(groupId);
         User todoUser = getTodoUserForPersonalTask(taskType, todoUserId);
-        checkGroupIncludeTag(tag, group);
+
+        Tag tag = null;
+        log.info("Tag Id =  "+tagId);
+        if(tagId != null){
+            log.info("Tag ID IS NOT NULL! Tag_ID : "+tagId);
+            tag = getTagFromDB(tagId);
+            checkGroupIncludeTag(tag, group);
+        }
+
         checkUsersInSameGroup(taskType, user, group, todoUser);
 
         //엔티티 구성
@@ -77,6 +84,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         //userTask 추가
         addUserTaskByTaskType(taskType, group, taskEntity, todoUser);
         //DB에 추가
+        log.info("Before return to Controller : Task Create");
         return taskRepository.save(taskEntity);
     }
 
@@ -118,6 +126,10 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
     }
 
     private void checkGroupIncludeTag(Tag tag, Group group) {
+        if (tag == null) {
+            return; // If tag is null, no further checks are needed
+        }
+
         if (!tag.getGroup().getId().equals(group.getId())) {
             System.out.println("TaskCRUDServiceImpl.createTask");
             throw new IllegalArgumentException("Create Task Fail - tag and group Match Fail"

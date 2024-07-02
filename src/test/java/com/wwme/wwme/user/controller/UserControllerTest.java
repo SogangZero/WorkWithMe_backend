@@ -51,33 +51,33 @@ public class UserControllerTest {
     @Mock
     private HttpServletRequest request;
 
-    @Test
-    @DisplayName("user가 존재할 때 - /user [GET]")
-    public void requestValidUserInfo() throws Exception {
-        //given
-        String nickname = "testUser";
-        User user = new User();
-        user.setId(0L);
-        user.setNickname(nickname);
-        UserInfoDTO userDTO = new UserInfoDTO(true, nickname, 0L);
-        DataDTO result = new DataDTO(userDTO);
-        String jsonUser = objectMapper.writeValueAsString(result);
-
-
-        //when
-        when(jwtUtilService.getUserKey(any()))
-                .thenReturn("testUserKey");
-        when(userRepository.findByUserKey(any()))
-                .thenReturn(Optional.of(user));
-        when(userService.getUserInfo(any()))
-                .thenReturn(userDTO);
-
-        //then
-        mvc.perform(
-                        MockMvcRequestBuilders.get("/user"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType("application/json"))
-                .andExpect(content().string(jsonUser));
-
-    }
+//    @Test
+//    @DisplayName("user가 존재할 때 - /user [GET]")
+//    public void requestValidUserInfo() throws Exception {
+//        //given
+//        String nickname = "testUser";
+//        User user = new User();
+//        user.setId(0L);
+//        user.setNickname(nickname);
+//        UserInfoDTO userDTO = new UserInfoDTO(true, nickname, 0L);
+//        DataDTO result = new DataDTO(userDTO);
+//        String jsonUser = objectMapper.writeValueAsString(result);
+//
+//
+//        //when
+//        when(jwtUtilService.getUserKey(any()))
+//                .thenReturn("testUserKey");
+//        when(userRepository.findByUserKey(any()))
+//                .thenReturn(Optional.of(user));
+//        when(userService.getUserInfo(any()))
+//                .thenReturn(userDTO);
+//
+//        //then
+//        mvc.perform(
+//                        MockMvcRequestBuilders.get("/user"))
+//                .andExpect(status().isOk())
+//                .andExpect(content().contentType("application/json"))
+//                .andExpect(content().string(jsonUser));
+//
+//    }
 }

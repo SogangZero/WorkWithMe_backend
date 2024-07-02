@@ -44,7 +44,9 @@ public class TaskCRUDController {
     public ResponseEntity<?> createTask(@RequestBody CreateTaskReceiveDTO createTaskReceiveDTO,
                                         @Login User user) {
         log.info("Create Task Controller");
+        log.info("Test Log createTask");
         try {
+            log.info("Inside Try block of createTask");
             Task task = taskCRUDService.createTask(createTaskReceiveDTO.getTask_name(),
                     createTaskReceiveDTO.getEnd_time(),
                     createTaskReceiveDTO.getTask_type(),
