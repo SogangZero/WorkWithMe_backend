@@ -60,7 +60,9 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         User todoUser = getTodoUserForPersonalTask(taskType, todoUserId);
 
         Tag tag = null;
+        log.info("Tag Id =  "+tagId);
         if(tagId != null){
+            log.info("Tag ID IS NOT NULL! Tag_ID : "+tagId);
             tag = getTagFromDB(tagId);
             checkGroupIncludeTag(tag, group);
         }
@@ -82,6 +84,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         //userTask 추가
         addUserTaskByTaskType(taskType, group, taskEntity, todoUser);
         //DB에 추가
+        log.info("Before return to Controller : Task Create");
         return taskRepository.save(taskEntity);
     }
 
