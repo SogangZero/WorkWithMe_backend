@@ -9,6 +9,8 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class GroupReadWithCodeSuccessResponseDTO {
+    @JsonProperty("group_id")
+    Long groupId;
     @JsonProperty("group_name")
     String groupName;
     @JsonProperty("user")
