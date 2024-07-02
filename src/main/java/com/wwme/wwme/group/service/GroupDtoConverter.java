@@ -70,6 +70,7 @@ public class GroupDtoConverter {
                 .toList();
 
         return new GroupReadWithCodeSuccessResponseDTO(
+                group.getId(),
                 group.getGroupName(),
                 responseUsers
         );
