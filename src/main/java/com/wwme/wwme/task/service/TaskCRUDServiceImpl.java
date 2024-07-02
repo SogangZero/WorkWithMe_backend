@@ -543,7 +543,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
 
 
         Pageable pageable = PageRequest.of(0,20);
-        List<Task> taskList =  taskRepository.findTasksByUserIdFetchUserTask(loginUser.getId(), endTime, pageable);
+        List<Task> taskList =  taskRepository.findTasksByUserIdFetchUserTask(loginUser.getId(), endTime, last_task_id ,pageable);
         log.info("tasklist elements : "+ taskList.size());
         List<ReadTaskListByUserSendDTO> readTaskListByUserSendDTOList = new ArrayList<>();
 

@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 public class CUTaskGroupDTO {
     private Long group_id;
     private String group_name;
-    private String group_color;
+    private Long group_color;
     private Integer num_people;
 }

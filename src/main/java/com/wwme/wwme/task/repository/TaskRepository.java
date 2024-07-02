@@ -65,8 +65,10 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             "WHERE ut.user.id = :userId " +
             "AND ut.isDone = false " +
             "AND t.endTime >= :endTime " +
+            "AND t.id != :last_task_id " +
             "ORDER BY t.endTime asc")
-    List<Task> findTasksByUserIdFetchUserTask(@Param("userId") Long userId, @Param("endTime") LocalDateTime endTime, Pageable pageable);
+    List<Task> findTasksByUserIdFetchUserTask(@Param("userId") Long userId, @Param("endTime") LocalDateTime endTime,
+                                              @Param("last_task_id") Long last_task_id, Pageable pageable);
 
     @Query("SELECT t FROM Task t " +
             "LEFT JOIN FETCH t.userTaskList ut " +
