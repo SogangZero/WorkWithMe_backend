@@ -17,17 +17,15 @@ import java.io.IOException;
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
     private final ObjectMapper objectMapper;
 
-
     @Override
     public void commence(HttpServletRequest request,
                          HttpServletResponse response,
                          AuthenticationException authException)
             throws IOException, ServletException {
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         response.setContentType("application/json");
 
-        ErrorDTO errorDTO = new ErrorDTO("Not Authenticated Access - 401 error occurred");
-
+        ErrorDTO errorDTO = new ErrorDTO("Not Authenticated Access - 403 error occurred");
         String result = objectMapper.writeValueAsString(errorDTO);
         response.getWriter().write(result);
     }

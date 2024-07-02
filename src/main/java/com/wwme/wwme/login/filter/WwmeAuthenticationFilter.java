@@ -62,9 +62,9 @@ public class WwmeAuthenticationFilter extends OncePerRequestFilter {
         } catch (JwtTokenException e) {
             log.info("AccessToken is invalid");
 
-            ErrorDTO errorDTO = new ErrorDTO("Access Token Is Invalid. Unauthorized Access.");
+            ErrorDTO errorDTO = new ErrorDTO("Access Token Is Invalid. Un-authentication Access.");
             String result = objectMapper.writeValueAsString(errorDTO);
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             response.getWriter().write(result);
             return;
         }

@@ -83,7 +83,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 //            String jsonBody = objectMapper.writeValueAsString(data);
 //            response.getWriter().write(jsonBody);
         } catch (NoSuchElementException e) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         }
     }
 
