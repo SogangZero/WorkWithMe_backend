@@ -26,7 +26,6 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         response.setContentType("application/json");
 
         ErrorDTO errorDTO = new ErrorDTO("Not Authenticated Access - 403 error occurred");
-
         String result = objectMapper.writeValueAsString(errorDTO);
         response.getWriter().write(result);
     }
