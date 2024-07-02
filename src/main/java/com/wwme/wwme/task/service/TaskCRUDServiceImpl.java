@@ -123,6 +123,10 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
     }
 
     private void checkGroupIncludeTag(Tag tag, Group group) {
+        if (tag == null) {
+            return; // If tag is null, no further checks are needed
+        }
+
         if (!tag.getGroup().getId().equals(group.getId())) {
             System.out.println("TaskCRUDServiceImpl.createTask");
             throw new IllegalArgumentException("Create Task Fail - tag and group Match Fail"

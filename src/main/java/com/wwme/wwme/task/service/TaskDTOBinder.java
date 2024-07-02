@@ -102,9 +102,19 @@ public class TaskDTOBinder {
     }
 
     private CUTaskTagDTO bindTagInfo(Tag tag) {
+        Long tag_id;
+        String tag_name;
+        if(tag==null){
+            tag_id = null;
+            tag_name = null;
+        }else{
+            tag_id = tag.getId();
+            tag_name = tag.getTagName();
+        }
+
         return CUTaskTagDTO.builder()
-                .tag_id(tag.getId())
-                .tag_name(tag.getTagName())
+                .tag_id(tag_id)
+                .tag_name(tag_name)
                 .build();
     }
 
