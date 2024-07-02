@@ -56,10 +56,15 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
 
         //parameter validation
         checkParameterValidity(taskName, endTime, taskType);
-        Tag tag = getTagFromDB(tagId);
         Group group = getGroupFromDB(groupId);
         User todoUser = getTodoUserForPersonalTask(taskType, todoUserId);
-        checkGroupIncludeTag(tag, group);
+
+        Tag tag = null;
+        if(tagId != null){
+            tag = getTagFromDB(tagId);
+            checkGroupIncludeTag(tag, group);
+        }
+
         checkUsersInSameGroup(taskType, user, group, todoUser);
 
         //엔티티 구성
