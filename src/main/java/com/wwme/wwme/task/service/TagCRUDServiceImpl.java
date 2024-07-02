@@ -74,12 +74,10 @@ public class TagCRUDServiceImpl implements TagService {
 
     @Override
     public List<TagListReadSendDTO> getTagList(Long group_id){
+        groupRepository.findById(group_id).orElseThrow(()->
+                new NoSuchElementException("Could not find group with group_id : "
+                +group_id + "in method getTagList."));
         List<Tag> tagList= tagRepository.findAllByGroupId(group_id);
-        if(tagList.isEmpty()){
-            throw new NoSuchElementException(
-                    "Could not find Group with ID: " + group_id +
-                    " in method getTagList.");
-        }
 
 
         List<TagListReadSendDTO> tagListReadSendDTOList = new ArrayList<>();
