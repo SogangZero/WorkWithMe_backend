@@ -1,6 +1,7 @@
 package com.wwme.wwme.task.service;
 
 import com.wwme.wwme.group.domain.Group;
+import com.wwme.wwme.group.repository.GroupRepository;
 import com.wwme.wwme.task.domain.DTO.sendDTO.CUTaskGroupDTO;
 import com.wwme.wwme.task.domain.DTO.sendDTO.CUTaskSendDTO;
 import com.wwme.wwme.task.domain.DTO.sendDTO.CUTaskTagDTO;
@@ -23,6 +24,7 @@ import java.util.NoSuchElementException;
 @Slf4j
 public class TaskDTOBinder {
     private final TaskRepository taskRepository;
+    private final GroupRepository groupRepository;
 
 
 
@@ -31,10 +33,24 @@ public class TaskDTOBinder {
         boolean task_is_done_total = setAndReturnIsDoneTotal(task);
         boolean task_is_done_personal = setAndReturnIsDonePersonal(task, loginUser);
 
+        //checking group color for individual
+        Group group = groupRepository.findGroupByIdLoadUserTaskList(task.getGroup().getId()).orElseThrow(
+                ()-> new NoSuchElementException("Could not find group by ID : "+task.getGroup().getId()
+                + "in function bindCUTasskSendDTO"  )
+        );
+
+        CUTaskGroupDTO cuTaskGroupDTO = CUTaskGroupDTO.builder()
+                .group_id(group.getId())
+                .group_name(group.getGroupName())
+                .group_color(group.getUserGroupList().stream().filter(ug -> ug.getUser().getId().equals(loginUser.getId()))
+                        .findFirst().orElseThrow().getColor())
+                .num_people(group.getUserNumInGroup())
+                .build();
+
         return CUTaskSendDTO.builder()
                 .task_id(task.getId())
                 .task_name(task.getTaskName())
-                .group(bindGroupInfo(task.getGroup()))
+                .group(cuTaskGroupDTO)
                 .tag(bindTagInfo(task.getTag()))
                 .is_done_count(task.countDoneUser())
                 .is_done_personal(task_is_done_personal)
@@ -118,12 +134,12 @@ public class TaskDTOBinder {
                 .build();
     }
 
-    private CUTaskGroupDTO bindGroupInfo(Group group) {
-        return CUTaskGroupDTO.builder()
-                .group_id(group.getId())
-                .group_name(group.getGroupName())
-                .group_color("TEMPCOLOR")
-                .num_people(group.getUserNumInGroup())
-                .build();
-    }
+//    private CUTaskGroupDTO bindGroupInfo(Group group) {
+//        return CUTaskGroupDTO.builder()
+//                .group_id(group.getId())
+//                .group_name(group.getGroupName())
+//                .group_color("TEMPCOLOR")
+//                .num_people(group.getUserNumInGroup())
+//                .build();
+//    }
 }
