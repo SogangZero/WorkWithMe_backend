@@ -45,6 +45,7 @@ public class TaskCRUDController {
                                         @Login User user) {
         log.info("Create Task Controller");
         try {
+            log.info("Inside Try block of createTask");
             Task task = taskCRUDService.createTask(createTaskReceiveDTO.getTask_name(),
                     createTaskReceiveDTO.getEnd_time(),
                     createTaskReceiveDTO.getTask_type(),
