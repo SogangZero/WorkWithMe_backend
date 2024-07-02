@@ -638,6 +638,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
             lastEndTime = lastTask.getEndTime();
         }
         var pageable = PageRequest.of(0, 20);
+        log.info("{} {} {} {}", startDate, endDate, totalIsDone, groupId);
         return taskRepository.findAllByGroupWithArguments(
                 lastId,
                 lastEndTime,
@@ -647,6 +648,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
                 startDate,
                 endDate,
                 tagList,
+                tagList.size(),
                 pageable
         );
     }
