@@ -50,6 +50,10 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
                            Long todoUserId,
                            User user) throws IllegalArgumentException{
 
+        if(endTime == null){
+            endTime = LocalDateTime.of(2099,12,12,12,12,12);
+        }
+
         //parameter validation
         checkParameterValidity(taskName, endTime, taskType);
         Tag tag = getTagFromDB(tagId);
@@ -104,12 +108,13 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         if (taskName == null || taskName.isEmpty()) {
             throw new IllegalArgumentException("Create Task Fail - No content of TaskName");
         }
-        if (endTime == null || endTime.isBefore(LocalDateTime.now())) {
+        if (endTime.isBefore(LocalDateTime.now())) {
             throw new IllegalArgumentException("Create Task Fail - EndTime is before now");
         }
         if (taskType == null || !(taskType.equals("group") || taskType.equals("personal") || taskType.equals("anyone"))) {
             throw new IllegalArgumentException("Create Task Fail - No matched Task Type");
         }
+
     }
 
     private void checkGroupIncludeTag(Tag tag, Group group) {
