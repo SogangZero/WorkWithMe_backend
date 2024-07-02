@@ -169,6 +169,8 @@ public class TaskCRUDController {
             @Login User user
     ) {
         try {
+            log.info("input: last_id:{} group_id{} isMyTask:{} completeStatus:{} startDate:{} endDate:{} withDueDate:{} tagList:{} ",
+                    lastId, groupId, isMyTask, completeStatus, startDate, endDate, withDueDate, tagList);
             var taskList =
                     taskCRUDService.readTaskListByGroup(
                             lastId,
@@ -182,18 +184,23 @@ public class TaskCRUDController {
                             tagList
                     );
 
-            var taskDTOList = taskList.stream().map((task) ->
-                new TaskListReadByGroupSendDTO.Task(
-                        task.getId(),
-                        task.getTaskName(),
-                        task.getEndTime(),
-                        task.getTaskType(),
-                        task.getTag().getId(),
-                        task.getTotalIsDone(),
-                        taskCRUDService.getIsDoneMe(user, task),
-                        taskCRUDService.getDoneUserCount(task),
-                        taskCRUDService.getDoingNickname(task)
-                )
+            var taskDTOList = taskList.stream().map((task) -> {
+                        var tag = task.getTag();
+                        Long tagId = null;
+                        if (tag != null)
+                            tagId = task.getId();
+                        return new TaskListReadByGroupSendDTO.Task(
+                                task.getId(),
+                                task.getTaskName(),
+                                task.getEndTime(),
+                                task.getTaskType(),
+                                tagId,
+                                task.getTotalIsDone(),
+                                taskCRUDService.getIsDoneMe(user, task),
+                                taskCRUDService.getDoneUserCount(task),
+                                taskCRUDService.getDoingNickname(task)
+                        );
+                    }
 
             ).toList();
             var responseDTO = new TaskListReadByGroupSendDTO(taskDTOList);
