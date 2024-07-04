@@ -183,7 +183,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
                            User user) {
         Task task = getTaskFromDB(taskId);
         User todoUser = getTodoUserFromDB(todoUserId);
-        Tag tag = getTagFromDB(tagId);
+        Tag tag = (tagId == null) ? null : getTagFromDB(tagId);
 
         validateUsers(todoUserId, user, task);
 
@@ -233,7 +233,9 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
     }
 
     private static void updateTag(Tag tag, Task task) {
-        if (!tag.equals(task.getTag())) {
+        if(tag == null){
+            task.changeTag(null);
+        }else if (!tag.equals(task.getTag())) {
             if (!task.validateTagIdInGroup(tag)) {
                 throw new IllegalArgumentException("Update Task Fail - Tag Not Matched Group");
             }
@@ -325,7 +327,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
 
         //setting the task's isdone for the user
         for (UserTask ut : task.getUserTaskList()){
-            log.info("user : "+ut.getUser().getNickname());
+            log.info("User In UserTask : "+ut.getUser().getNickname());
             if(ut.getUser().getId().equals(user.getId())){
                 ut.setIsDone(makeTaskDoneReceiveDTO.getDone());
             }
@@ -357,13 +359,18 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         }else{ // anyone task
             boolean isDoneFlag = false;
             for(UserTask ut : task.getUserTaskList()){
+                log.info("UserTask Info : User["+ut.getUser().getNickname()+"]" +
+                        " Task ["+ ut.getTask().getId() +"]" + " IsDone :  "+ut.getIsDone());
                 if(ut.getIsDone()){
+                    log.info("User  ["+ut.getUser().getNickname() + "] has finished "+
+                            " anyone task ["+task.getTaskName() + "], will break");
                     isDoneFlag = true;
-                    is_done_count = 1;
+                    is_done_count++;
                     break;
                 }
             }
             total_user_count = task.getUserTaskList().size();
+            log.info("total is done flag : "+isDoneFlag);
             task.setTotalIsDone(isDoneFlag);
         }
 
@@ -504,20 +511,17 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
 
         Integer is_done_count = 0;
         boolean is_done_personal = false;
-        boolean is_done_total = true;
+
         for(ReadOneTaskUserDTO userDTO : readOneTaskSendDTO.getUser_list()){
             if(userDTO.getIs_done()){
                 is_done_count++;
-            }else{
-                is_done_total = false;
             }
-
             if(userDTO.getUser_id().equals(loginUser.getId()) && userDTO.getIs_done()){
                 is_done_personal = true;
             }
         }
         readOneTaskSendDTO.setIs_done_count(is_done_count);
-        readOneTaskSendDTO.setIs_done_total(is_done_total);
+        readOneTaskSendDTO.setIs_done_total(task.getTotalIsDone());
         readOneTaskSendDTO.setIs_done_personal(is_done_personal);
 
 

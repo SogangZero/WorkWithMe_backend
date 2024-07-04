@@ -80,7 +80,7 @@ public class TaskCRUDController {
             CUTaskSendDTO cuTaskSendDTO = taskDTOBinder.bindCUTaskSendDTO(task,user);
             return new ResponseEntity<>(new DataResponseDTO(cuTaskSendDTO), HttpStatus.OK);
         } catch (Exception e) {
-            log.error("Update Task ERROR " + e.getMessage());
+            log.error("Update Task ERROR " + e.getMessage() + Arrays.toString(e.getStackTrace()));
             return new ResponseEntity<>(new ErrorResponseDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
