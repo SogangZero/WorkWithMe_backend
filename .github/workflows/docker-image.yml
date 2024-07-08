@@ -23,4 +23,6 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
     
     - name: Push Docker image to Docker Hub
-      run: docker push ${{secrets.DOCKER_USERNAME}}/workwithme:${VERSION}
+      run: |
+        docker push ${{secrets.DOCKER_USERNAME}}/workwithme:${VERSION}
+        docker push ${{secrets.DOCKER_USERNAME}}/workwithme:latest
