@@ -192,8 +192,51 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         updateEndTime(endTime, task);
         updateTaskType(taskType, task, todoUser);
         updateTodoUser(task, todoUser);
+        updateIsDoneTotal(task,todoUser);
+
+
 
         return task;
+    }
+
+    private void updateIsDoneTotal(Task task,User todoUser) {
+
+        if(task.getUserTaskList().isEmpty()){
+            throw new IllegalArgumentException("UserTaskList inside Task is empty in function updateIsDoneTotal");
+        }
+
+
+        switch (task.getTaskType()){
+            case "anyone":
+                for(UserTask ut : task.getUserTaskList()){
+                    if (ut.getIsDone()) {
+                        task.setTotalIsDone(true);
+                        return;
+                    }
+                }
+                task.setTotalIsDone(false);
+                break;
+            case "personal":
+                for(UserTask ut : task.getUserTaskList()){
+                    if (ut.getUser().getId().equals(todoUser.getId())) {
+                        task.setTotalIsDone(ut.getIsDone());
+                        break;
+                    }
+                }
+                break;
+            case "group":
+                for(UserTask ut : task.getUserTaskList()){
+                    if (!ut.getIsDone()) {
+                        task.setTotalIsDone(false);
+                        return;
+                    }
+                }
+                task.setTotalIsDone(true);
+                break;
+            default:
+                throw new NoSuchElementException("Illegal task type : "+task.getTaskType()
+                +"In function updateIsDoneTotal");
+        }
     }
 
     private static void validateUsers(Long todoUserId, User user, Task task) {
@@ -221,6 +264,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         if (taskType != null && !task.getTaskType().equals(taskType)) {
             changeTaskType(taskType, task, todoUser);
         }
+
     }
 
     private static void updateEndTime(LocalDateTime endTime, Task task) {

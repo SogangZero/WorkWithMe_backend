@@ -60,7 +60,8 @@ public class Task {
 
     public void changeTaskType(String taskType) {
         if (!validateTaskType(taskType)) {
-            throw new IllegalArgumentException("Tag name error");
+            throw new IllegalArgumentException("Task Type name error : Task Type Name not valid"
+            + "in function changeTaskType");
         }
         this.taskType = taskType;
     }
