@@ -2,40 +2,40 @@ package com.wwme.wwme.log.domain.DTO;
 
 import com.wwme.wwme.group.domain.Group;
 import com.wwme.wwme.log.domain.OperationType;
+import com.wwme.wwme.task.domain.Tag;
 import com.wwme.wwme.user.domain.User;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@Getter
-public class DeleteTaskLogDTO extends EventDTO{
 
-    private String deletedTaskName;
+@Getter
+public class UpdateTaskDeleteTagDTO extends EventDTO{
+    private Tag deletedTag;
 
     @Builder(builderMethodName = "buildFromService")
-    public DeleteTaskLogDTO(User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, String deletedTaskName) {
+    public UpdateTaskDeleteTagDTO(User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, Tag deletedTag) {
         super(user, group, operationTypeEnum, operationTime);
-        this.deletedTaskName = deletedTaskName;
+        this.deletedTag = deletedTag;
         setOperationStr();
     }
 
     @Builder(builderMethodName = "buildFromDB")
-    public DeleteTaskLogDTO(Long id, User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, String operationString, String deletedTaskName) {
+    public UpdateTaskDeleteTagDTO(Long id, User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, String operationString) {
         super(id, user, group, operationTypeEnum, operationTime, operationString);
-        this.deletedTaskName = deletedTaskName;
         setSpecificFields();
     }
 
     @Override
     public void setOperationStr() {
-        this.operationString = deletedTaskName;
+        this.operationString = deletedTag.getTagName();
     }
 
     @Override
     public void setSpecificFields() {
-        this.deletedTaskName = operationString;
+        //TODO: how do you want to set tag?
     }
+
+
 }
