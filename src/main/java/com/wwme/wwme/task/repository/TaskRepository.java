@@ -1,5 +1,6 @@
 package com.wwme.wwme.task.repository;
 
+import com.wwme.wwme.group.domain.Group;
 import com.wwme.wwme.task.domain.Task;
 import com.wwme.wwme.user.domain.User;
 import org.springframework.data.domain.Pageable;
@@ -100,4 +101,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             "LEFT JOIN FETCH t.userTaskList ut " +
             "WHERE t.id = :taskId")
     Optional<Task> findByTaskIdWithUserList(Long taskId);
+
+
+    void deleteByGroup(Group group);
 }
