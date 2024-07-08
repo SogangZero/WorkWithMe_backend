@@ -38,7 +38,6 @@ public class TaskDTOBinder {
                 ()-> new NoSuchElementException("Could not find group by ID : "+task.getGroup().getId()
                 + "in function bindCUTasskSendDTO"  )
         );
-
         CUTaskGroupDTO cuTaskGroupDTO = CUTaskGroupDTO.builder()
                 .group_id(group.getId())
                 .group_name(group.getGroupName())
@@ -46,6 +45,9 @@ public class TaskDTOBinder {
                         .findFirst().orElseThrow().getColor())
                 .num_people(group.getUserNumInGroup())
                 .build();
+
+        //checking Tag information  (tag can be null)
+
 
         return CUTaskSendDTO.builder()
                 .task_id(task.getId())
@@ -120,6 +122,7 @@ public class TaskDTOBinder {
     private CUTaskTagDTO bindTagInfo(Tag tag) {
         Long tag_id;
         String tag_name;
+        log.info("Inside bindTagInfo");
         if(tag==null){
             tag_id = null;
             tag_name = null;
@@ -134,12 +137,4 @@ public class TaskDTOBinder {
                 .build();
     }
 
-//    private CUTaskGroupDTO bindGroupInfo(Group group) {
-//        return CUTaskGroupDTO.builder()
-//                .group_id(group.getId())
-//                .group_name(group.getGroupName())
-//                .group_color("TEMPCOLOR")
-//                .num_people(group.getUserNumInGroup())
-//                .build();
-//    }
 }
