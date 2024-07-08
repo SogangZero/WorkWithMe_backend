@@ -173,6 +173,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
     @Override
     //TODO: update 한 뒤에 Task 자체의 is_done 을 확인해줘야 한다.
     public Task updateTask(Long taskId,
+                           String taskName,
                            LocalDateTime endTime,
                            String taskType,
                            Long tagId,
@@ -196,6 +197,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
 
 
         //업데이트
+        updateTaskName(taskName,task);
         updateTag(tag, task);
         updateEndTime(endTime, task);
         updateTaskType(taskType, task, todoUser);
@@ -204,6 +206,10 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
 
 
         return task;
+    }
+
+    private void updateTaskName(String taskName, Task task) {
+        task.setTaskName(taskName);
     }
 
     private void updateIsDoneTotal(Task task,User todoUser) {
