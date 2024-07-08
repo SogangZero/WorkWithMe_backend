@@ -71,6 +71,7 @@ public class TaskCRUDController {
         log.info("Update Task Controller");
         try {
             Task task = taskCRUDService.updateTask(updateTaskReceiveDTO.getTask_id(),
+                    updateTaskReceiveDTO.getTask_name(),
                     updateTaskReceiveDTO.getEnd_time(),
                     updateTaskReceiveDTO.getTask_type(),
                     updateTaskReceiveDTO.getTag_id(),
