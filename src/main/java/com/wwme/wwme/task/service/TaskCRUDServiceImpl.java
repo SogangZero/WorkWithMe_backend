@@ -627,10 +627,9 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         if (endDate == null)
             endDate = LocalDateTime.of(2099,12,12,12,12,12);
 
-        // only display tasks without due date
+        // only display tasks with due date
         if (!withDueDate) {
-            startDate = LocalDateTime.of(2099,12,12,12,12,12);
-            endDate = LocalDateTime.of(2099,12,12,12,12,12);
+            endDate = LocalDateTime.of(2099,12,12,12,12,11);
         }
 
         Task lastTask;

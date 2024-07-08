@@ -1,5 +1,7 @@
 package com.wwme.wwme.group.domain;
 
+import com.wwme.wwme.task.domain.Tag;
+import com.wwme.wwme.task.domain.Task;
 import com.wwme.wwme.user.domain.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -20,8 +22,19 @@ public class Group {
     private Long id;
     private String groupName;
 
-    @OneToMany(mappedBy = "group")
+    @OneToMany(mappedBy = "group", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     Collection<UserGroup> userGroupList = new ArrayList<>();
+
+
+    @OneToMany(mappedBy = "group", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    Collection<Task> tasksList;
+
+    @OneToMany(mappedBy = "group", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    Collection<GroupInvitation> groupInvitationList;
+
+    @OneToMany(mappedBy = "group", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    Collection<Tag> tagList;
+
 
     public Group(String groupName) {
         this.groupName = groupName;
