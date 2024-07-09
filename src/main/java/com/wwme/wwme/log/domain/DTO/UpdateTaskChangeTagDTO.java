@@ -6,18 +6,18 @@ import com.wwme.wwme.task.domain.Tag;
 import com.wwme.wwme.user.domain.User;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
 @Getter
-@Builder
+@SuperBuilder
 public class UpdateTaskChangeTagDTO extends EventDTO{
 
     private Tag previousTag;
     private Tag updatedTag;
 
 
-    @Builder(builderMethodName = "buildFromService")
     public UpdateTaskChangeTagDTO(User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, Tag previousTag, Tag updatedTag) {
         super(user, group, operationTypeEnum, operationTime);
         this.previousTag = previousTag;
@@ -25,7 +25,6 @@ public class UpdateTaskChangeTagDTO extends EventDTO{
         setOperationStr();
     }
 
-    @Builder(builderMethodName = "buildFromDB")
 
     public UpdateTaskChangeTagDTO(Long id, User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, String operationString) {
         super(id, user, group, operationTypeEnum, operationTime, operationString);

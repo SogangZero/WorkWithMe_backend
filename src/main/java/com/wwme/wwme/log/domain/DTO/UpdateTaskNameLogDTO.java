@@ -7,16 +7,17 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
 @Getter
+@SuperBuilder
 public class UpdateTaskNameLogDTO extends EventDTO{
 
     private String beforeTaskName;
     private String afterTaskName;
 
-    @Builder(builderMethodName = "buildFromService")
     public UpdateTaskNameLogDTO(User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, String beforeTaskName, String afterTaskName) {
         super(user, group, operationTypeEnum, operationTime);
         this.beforeTaskName = beforeTaskName;
@@ -24,7 +25,6 @@ public class UpdateTaskNameLogDTO extends EventDTO{
         setOperationStr();
     }
 
-    @Builder(builderMethodName = "buildFromDB")
     public UpdateTaskNameLogDTO(Long id, User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, String operationString) {
         super(id, user, group, operationTypeEnum, operationTime, operationString);
         setSpecificFields();

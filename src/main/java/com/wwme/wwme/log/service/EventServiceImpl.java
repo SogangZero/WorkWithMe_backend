@@ -2,8 +2,7 @@ package com.wwme.wwme.log.service;
 
 import com.wwme.wwme.group.domain.Group;
 import com.wwme.wwme.group.repository.GroupRepository;
-import com.wwme.wwme.log.domain.DTO.CreateTaskLogDTO;
-import com.wwme.wwme.log.domain.DTO.EventDTO;
+import com.wwme.wwme.log.domain.DTO.*;
 import com.wwme.wwme.log.domain.Event;
 import com.wwme.wwme.log.repository.EventRepository;
 import com.wwme.wwme.user.domain.User;
@@ -56,10 +55,26 @@ public class EventServiceImpl implements EventService {
 
 
     private EventDTO convertToDTO(Event event){
-        switch (event.getOperationTypeEnum()){
-            case CREATE_TASK :
-                CreateTaskLogDTO.builder().
-        }
+        EventDTO.EventDTOBuilder builder = switch (event.getOperationTypeEnum()) {
+            case CREATE_TASK -> CreateTaskLogDTO.builder();
+            case DELETE_TASK -> DeleteTaskLogDTO.builder();
+            case UPDATE_TASK_CHANGE_TAG -> UpdateTaskChangeTagDTO.builder();
+            case UPDATE_TASK_NAME -> UpdateTaskNameLogDTO.builder();
+            case UPDATE_TASK_DELETE_TAG -> UpdateTaskDeleteTagDTO.builder();
+            case UPDATE_TASK_DUE_DATE -> UpdateTaskDueDateLogDTO.builder();
+            case UPDATE_TASK_TYPE -> UpdateTaskTypeLogDTO.builder();
+            default ->
+                    throw new IllegalArgumentException("operationTypeEnum Error : unsupported enum : " + event.getOperationTypeEnum());
+        };
+
+        return builder
+                .id(event.getId())
+                .operationTime(event.getOperationTime())
+                .operationTypeEnum(event.getOperationTypeEnum())
+                .group(event.getGroup())
+                .user(event.getUser())
+                .operationString(event.getOperationString())
+                .build();
     }
 
 }

@@ -7,22 +7,22 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
 @Getter
+@SuperBuilder
 public class DeleteTaskLogDTO extends EventDTO{
 
     private String deletedTaskName;
 
-    @Builder(builderMethodName = "buildFromService")
     public DeleteTaskLogDTO(User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, String deletedTaskName) {
         super(user, group, operationTypeEnum, operationTime);
         this.deletedTaskName = deletedTaskName;
         setOperationStr();
     }
 
-    @Builder(builderMethodName = "buildFromDB")
     public DeleteTaskLogDTO(Long id, User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, String operationString, String deletedTaskName) {
         super(id, user, group, operationTypeEnum, operationTime, operationString);
         this.deletedTaskName = deletedTaskName;

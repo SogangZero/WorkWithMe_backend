@@ -5,16 +5,17 @@ import com.wwme.wwme.log.domain.OperationType;
 import com.wwme.wwme.user.domain.User;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
 @Getter
+@SuperBuilder
 public class UpdateTaskDueDateLogDTO extends EventDTO{
 
     LocalDateTime previousDueDate;
     LocalDateTime updatedDueDate;
 
-    @Builder(builderMethodName = "buildFromService")
     public UpdateTaskDueDateLogDTO(User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, LocalDateTime previousDueDate, LocalDateTime updatedDueDate) {
         super(user, group, operationTypeEnum, operationTime);
         this.previousDueDate = previousDueDate;
@@ -22,7 +23,6 @@ public class UpdateTaskDueDateLogDTO extends EventDTO{
         setOperationStr();
     }
 
-    @Builder(builderMethodName = "buildFromDB")
     public UpdateTaskDueDateLogDTO(Long id, User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, String operationString) {
         super(id, user, group, operationTypeEnum, operationTime, operationString);
         setSpecificFields();
