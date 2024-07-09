@@ -38,10 +38,10 @@ public class ReissueService {
         }
 
         //check if the refresh token is in DB
-        Boolean isExist = refreshRepository.existsByRefresh(refresh);
-        if (!isExist) {
-            throw new InvalidRefreshTokenException("Refresh Token Has Invalid Content [Not Exist in DB]");
-        }
+//        Boolean isExist = refreshRepository.existsByRefresh(refresh);
+//        if (!isExist) {
+//            throw new InvalidRefreshTokenException("Refresh Token Has Invalid Content [Not Exist in DB]");
+//        }
 
         return refresh;
     }
@@ -56,8 +56,8 @@ public class ReissueService {
 
 
         //delete old refresh token and save new refresh token
-        refreshRepository.deleteByRefresh(oldRefresh);
-        addRefreshToken(userKey, newRefresh, TokenTime.refreshTokenExpirationMS);
+//        refreshRepository.deleteByRefresh(oldRefresh);
+//        addRefreshToken(userKey, newRefresh, TokenTime.refreshTokenExpirationMS);
 
         return newRefresh;
     }
