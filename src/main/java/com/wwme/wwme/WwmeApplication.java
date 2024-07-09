@@ -1,6 +1,7 @@
 package com.wwme.wwme;
 
 import jakarta.annotation.PostConstruct;
+import lombok.experimental.SuperBuilder;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;

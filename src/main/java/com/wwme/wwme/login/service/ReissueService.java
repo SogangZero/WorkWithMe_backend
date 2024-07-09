@@ -1,5 +1,6 @@
 package com.wwme.wwme.login.service;
 
+import com.wwme.wwme.login.domain.TokenTime;
 import com.wwme.wwme.login.domain.entity.RefreshEntity;
 import com.wwme.wwme.login.exception.InvalidRefreshTokenException;
 import com.wwme.wwme.login.exception.JwtTokenException;
@@ -47,17 +48,17 @@ public class ReissueService {
     }
 
     public String generateAccessToken(String userKey, String role) {
-        String newAccess = jwtUtilService.createJwt("access", userKey, role, 10 * 60 * 1000L);//10 minutes
+        String newAccess = jwtUtilService.createJwt("access", userKey, role, TokenTime.accessTokenExpirationMS);//10 minutes
         return newAccess;
     }
 
     public String exchangeRefreshToken(String userKey, String role, String oldRefresh) {
-        String newRefresh = jwtUtilService.createJwt("refresh", userKey, role, 24 * 60 * 60 * 1000L);//24 hours
+        String newRefresh = jwtUtilService.createJwt("refresh", userKey, role, TokenTime.refreshTokenExpirationMS);//24 hours
 
 
         //delete old refresh token and save new refresh token
         refreshRepository.deleteByRefresh(oldRefresh);
-        addRefreshToken(userKey, newRefresh, 24 * 60 * 60 * 1000L);
+        addRefreshToken(userKey, newRefresh, TokenTime.refreshTokenExpirationMS);
 
         return newRefresh;
     }
