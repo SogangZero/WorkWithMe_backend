@@ -46,7 +46,7 @@ public class ReissueController {
                     .orElseThrow(() -> new IllegalArgumentException("not exist user"));
             UserInfoReissueDTO userInfoReissue = userService.getUserInfoReissue(user);
 
-            log.info("User[{}] re-generate access and refresh token", userKey);
+            log.info("User[{}] re-generate access[{}] and refresh[{}] token ", userKey, newAccess, newRefresh);
             response.setHeader("access", newAccess);
             response.setHeader("refresh", newRefresh);
 
