@@ -21,7 +21,6 @@ public class ReissueService {
 
     public String validateRefreshToken(String refresh)
             throws NullRefreshTokenException, JwtTokenException, InvalidRefreshTokenException {
-
         if (refresh == null) {
             throw new NullRefreshTokenException("Cannot Find Refresh Token At Request Header");
         }

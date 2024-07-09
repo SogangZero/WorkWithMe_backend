@@ -8,7 +8,6 @@ import com.wwme.wwme.login.exception.NullRefreshTokenException;
 import com.wwme.wwme.login.service.JWTUtilService;
 import com.wwme.wwme.login.service.ReissueService;
 import com.wwme.wwme.user.domain.User;
-import com.wwme.wwme.user.domain.dto.UserInfoDTO;
 import com.wwme.wwme.user.repository.UserRepository;
 import com.wwme.wwme.user.service.UserService;
 import jakarta.servlet.http.Cookie;
@@ -37,6 +36,7 @@ public class ReissueController {
                                      HttpServletResponse response) {
         try {
             String refreshToken = request.getHeader("refresh");
+            log.info("/reissue refresh : {}", refreshToken);
             String refresh = reissueService.validateRefreshToken(refreshToken);
             String userKey = jwtUtilService.getUserKey(refresh);
             String role = jwtUtilService.getRole(refresh);
