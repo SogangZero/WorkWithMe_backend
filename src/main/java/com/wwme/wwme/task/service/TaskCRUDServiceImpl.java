@@ -769,6 +769,11 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
     }
 
     @Override
+    public int getTotalUserCount(Task task) {
+        return task.getUserTaskList().size();
+    }
+
+    @Override
     public String getDoingNickname(Task task) {
         // Doesn't have dedicated user of task
         if (task.getUserTaskList().size() != 1) {

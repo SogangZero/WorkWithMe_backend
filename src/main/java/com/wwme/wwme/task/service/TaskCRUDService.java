@@ -99,5 +99,7 @@ public interface TaskCRUDService {
 
     int getDoneUserCount(Task task);
 
-    String getDoingNickname(Task task);
+   int getTotalUserCount(Task task);
+
+   String getDoingNickname(Task task);
 }

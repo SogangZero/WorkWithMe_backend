@@ -41,6 +41,9 @@ public class TaskListReadByGroupSendDTO {
         @JsonProperty("done_user_count")
         private Integer doneUserCount;
 
+        @JsonProperty("total_user_count")
+        private Integer totalUserCount;
+
         @JsonProperty("doing_nickname")
         private String doingNickname;
     }

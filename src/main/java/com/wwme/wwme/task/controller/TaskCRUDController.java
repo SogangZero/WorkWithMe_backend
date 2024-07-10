@@ -199,6 +199,7 @@ public class TaskCRUDController {
                                 task.getTotalIsDone(),
                                 taskCRUDService.getIsDoneMe(user, task),
                                 taskCRUDService.getDoneUserCount(task),
+                                taskCRUDService.getTotalUserCount(task),
                                 taskCRUDService.getDoingNickname(task)
                         );
                     }
