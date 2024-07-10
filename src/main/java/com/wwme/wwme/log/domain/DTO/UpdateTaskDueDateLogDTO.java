@@ -10,12 +10,12 @@ import lombok.experimental.SuperBuilder;
 import java.time.LocalDateTime;
 
 @Getter
-@SuperBuilder
 public class UpdateTaskDueDateLogDTO extends EventDTO{
 
     LocalDateTime previousDueDate;
     LocalDateTime updatedDueDate;
 
+    @Builder(builderMethodName = "buildWithSpecificParamsNoID")
     public UpdateTaskDueDateLogDTO(User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, LocalDateTime previousDueDate, LocalDateTime updatedDueDate) {
         super(user, group, operationTypeEnum, operationTime);
         this.previousDueDate = previousDueDate;
@@ -23,6 +23,7 @@ public class UpdateTaskDueDateLogDTO extends EventDTO{
         setOperationStr();
     }
 
+    @Builder(builderMethodName = "buildWithOperationStringID")
     public UpdateTaskDueDateLogDTO(Long id, User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, String operationString) {
         super(id, user, group, operationTypeEnum, operationTime, operationString);
         setSpecificFields();

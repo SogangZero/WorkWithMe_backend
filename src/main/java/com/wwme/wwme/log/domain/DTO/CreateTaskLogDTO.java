@@ -9,19 +9,22 @@ import lombok.experimental.SuperBuilder;
 import java.time.LocalDateTime;
 
 @Getter
-@SuperBuilder
 public class CreateTaskLogDTO extends EventDTO{
-    public String newTaskName;
+    private String newTaskName;
 
+    @Builder(builderMethodName = "buildWithSpecificParamsNoID")
     public CreateTaskLogDTO(User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, String newTaskName) {
         super(user, group, operationTypeEnum, operationTime);
         this.newTaskName = newTaskName;
+        setOperationStr();
     }
 
+    @Builder(builderMethodName = "buildWithOperationStringID")
     public CreateTaskLogDTO(Long id, User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, String operationString) {
         super(id, user, group, operationTypeEnum, operationTime, operationString);
         setSpecificFields();
     }
+
 
 
 
@@ -34,6 +37,12 @@ public class CreateTaskLogDTO extends EventDTO{
     @Override
     public void setSpecificFields() {
         this.newTaskName = operationString;
+    }
+
+    @Override
+    public String convertToString() {
+        return "\"" + this.getUser().getNickname() + "\" 님이 " + "\"" + this.getNewTaskName() +"\""
+                + "과제를 생성하였습니다.";
     }
 
 

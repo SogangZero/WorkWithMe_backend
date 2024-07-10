@@ -11,21 +11,20 @@ import lombok.experimental.SuperBuilder;
 import java.time.LocalDateTime;
 
 @Getter
-@SuperBuilder
 public class UpdateTaskChangeTagDTO extends EventDTO{
 
-    private Tag previousTag;
-    private Tag updatedTag;
+    private String previousTagName;
+    private String updateTagName;
 
-
-    public UpdateTaskChangeTagDTO(User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, Tag previousTag, Tag updatedTag) {
+    @Builder(builderMethodName = "buildWithSpecificParamsNoID")
+    public UpdateTaskChangeTagDTO(User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, String previousTagName, String updateTagName) {
         super(user, group, operationTypeEnum, operationTime);
-        this.previousTag = previousTag;
-        this.updatedTag = updatedTag;
+        this.previousTagName = previousTagName;
+        this.updateTagName = updateTagName;
         setOperationStr();
     }
 
-
+    @Builder(builderMethodName = "buildWithOperationStringID")
     public UpdateTaskChangeTagDTO(Long id, User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, String operationString) {
         super(id, user, group, operationTypeEnum, operationTime, operationString);
         setSpecificFields();
@@ -35,11 +34,20 @@ public class UpdateTaskChangeTagDTO extends EventDTO{
 
     @Override
     public void setOperationStr() {
-         super.operationString = previousTag.getTagName() + "|" + updatedTag.getTagName();
+         super.operationString = this.getPreviousTagName() + "|" + this.getUpdateTagName();
     }
 
     @Override
     public void setSpecificFields() {
-        //TODO: make DB access
+        String[] strings = this.operationString.split("\\|");
+        this.previousTagName = strings[0];
+        this.updateTagName = strings[1];
     }
+
+    @Override
+    public String convertToString() {
+
+    }
+
+
 }

@@ -12,12 +12,12 @@ import lombok.experimental.SuperBuilder;
 import java.time.LocalDateTime;
 
 @Getter
-@SuperBuilder
 public class UpdateTaskNameLogDTO extends EventDTO{
 
     private String beforeTaskName;
     private String afterTaskName;
 
+    @Builder(builderMethodName = "buildWithSpecificParamsNoID")
     public UpdateTaskNameLogDTO(User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, String beforeTaskName, String afterTaskName) {
         super(user, group, operationTypeEnum, operationTime);
         this.beforeTaskName = beforeTaskName;
@@ -25,6 +25,7 @@ public class UpdateTaskNameLogDTO extends EventDTO{
         setOperationStr();
     }
 
+    @Builder(builderMethodName = "buildWithOperationStringID")
     public UpdateTaskNameLogDTO(Long id, User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, String operationString) {
         super(id, user, group, operationTypeEnum, operationTime, operationString);
         setSpecificFields();

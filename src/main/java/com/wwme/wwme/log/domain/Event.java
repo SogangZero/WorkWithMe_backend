@@ -1,9 +1,11 @@
 package com.wwme.wwme.log.domain;
 
 import com.wwme.wwme.group.domain.Group;
+import com.wwme.wwme.task.domain.Task;
 import com.wwme.wwme.user.domain.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Fetch;
 
 import java.time.LocalDateTime;
 
@@ -31,13 +33,16 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT), nullable = true)
     private Group group;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Task task;
 
     private OperationType operationTypeEnum;
     private String operationString;
