@@ -189,7 +189,7 @@ public class TaskCRUDController {
                         var tag = task.getTag();
                         Long tagId = null;
                         if (tag != null)
-                            tagId = task.getId();
+                            tagId = tag.getId();
                         return new TaskListReadByGroupSendDTO.Task(
                                 task.getId(),
                                 task.getTaskName(),
@@ -199,6 +199,7 @@ public class TaskCRUDController {
                                 task.getTotalIsDone(),
                                 taskCRUDService.getIsDoneMe(user, task),
                                 taskCRUDService.getDoneUserCount(task),
+                                taskCRUDService.getTotalUserCount(task),
                                 taskCRUDService.getDoingNickname(task)
                         );
                     }
