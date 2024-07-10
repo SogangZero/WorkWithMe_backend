@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -101,7 +102,6 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             "LEFT JOIN FETCH t.userTaskList ut " +
             "WHERE t.id = :taskId")
     Optional<Task> findByTaskIdWithUserList(Long taskId);
-
 
     void deleteByGroup(Group group);
 }

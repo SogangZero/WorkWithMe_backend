@@ -9,6 +9,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Collection;
+
 @Repository
 public interface UserTaskRepository extends JpaRepository<UserTask,Long> {
     @Modifying
@@ -22,4 +26,9 @@ public interface UserTaskRepository extends JpaRepository<UserTask,Long> {
             "AND t.user != :exceptUser")
     void deleteByTaskExceptForOnePerson(@Param("task") Task task,
                                           @Param("exceptUser") User exceptUser);
+
+    @Query("SELECT ut from UserTask ut " +
+            "LEFT JOIN Task t ON ut.task=t " +
+            "WHERE DATE(t.endTime)=:endTime ")
+    Collection<UserTask> findAllByEndTime(LocalDate endTime);
 }

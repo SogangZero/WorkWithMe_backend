@@ -5,6 +5,7 @@ import com.wwme.wwme.task.domain.DTO.receiveDTO.MakeTaskDoneReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.UpdateTaskReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.sendDTO.*;
 import com.wwme.wwme.task.domain.Task;
+import com.wwme.wwme.task.domain.UserTask;
 import com.wwme.wwme.user.domain.User;
 
 import java.time.LocalDate;
@@ -99,4 +100,6 @@ public interface TaskCRUDService {
     int getDoneUserCount(Task task);
 
     String getDoingNickname(Task task);
+
+    Collection<UserTask> findAllTodayDueDateTasks();
 }

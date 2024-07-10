@@ -57,6 +57,8 @@ public class TaskCRUDController {
 
             log.info("Create New Task[{}]", task.getId());
 
+
+
             CUTaskSendDTO cuTaskSendDTO = taskDTOBinder.bindCUTaskSendDTO(task,user);
             return new ResponseEntity<>(new DataResponseDTO(cuTaskSendDTO), HttpStatus.OK);   
         } catch (Exception e) {

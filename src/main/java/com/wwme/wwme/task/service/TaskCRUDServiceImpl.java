@@ -20,6 +20,7 @@ import com.wwme.wwme.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -741,6 +742,12 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         }
 
         return task.getUserTaskList().get(0).getUser().getNickname();
+    }
+
+    @Override
+    public Collection<UserTask> findAllTodayDueDateTasks() {
+        var now = LocalDate.now();
+        return userTaskRepository.findAllByEndTime(now);
     }
 
 
