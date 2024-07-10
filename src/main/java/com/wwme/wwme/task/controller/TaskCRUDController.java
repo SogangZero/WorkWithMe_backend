@@ -188,7 +188,7 @@ public class TaskCRUDController {
                         var tag = task.getTag();
                         Long tagId = null;
                         if (tag != null)
-                            tagId = task.getId();
+                            tagId = tag.getId();
                         return new TaskListReadByGroupSendDTO.Task(
                                 task.getId(),
                                 task.getTaskName(),

@@ -676,6 +676,16 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
             endDate = LocalDateTime.of(2099,12,12,12,12,11);
         }
 
+        // contain all tags
+        boolean allTags = tagList.isEmpty();
+
+        // tag list has -1 -> give tasks  that doesn't have tag
+        boolean containNoTagTask = false;
+        if (tagList.contains(-1L)) {
+            tagList.remove(-1L);
+            containNoTagTask = true;
+        }
+
         Task lastTask;
         LocalDateTime lastEndTime = null;
         if (lastId != null) {
@@ -684,6 +694,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
             );
             lastEndTime = lastTask.getEndTime();
         }
+
         var pageable = PageRequest.of(0, 20);
         log.info("{} {} {} {}", startDate, endDate, totalIsDone, groupId);
         return taskRepository.findAllByGroupWithArguments(
@@ -695,7 +706,8 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
                 startDate,
                 endDate,
                 tagList,
-                tagList.size(),
+                allTags,
+                containNoTagTask,
                 pageable
         );
     }

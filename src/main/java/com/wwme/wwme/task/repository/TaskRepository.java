@@ -80,7 +80,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             "AND (:totalIsDone IS NULL or t.totalIsDone = :totalIsDone) " +
             "AND t.endTime >= :startDate " +
             "AND t.endTime <= :endDate " +
-            "AND ((:listSize=0 and tg.id is NULL) or tg.id in :tagList) " +
+            "AND ((:allTags=TRUE) OR (:containNoTagTask=TRUE AND tg.id IS NULL) OR tg.id in :tagList) " +
             "AND (:lastId IS NULL OR (t.endTime > :lastEndTime) OR (t.endTime = :lastEndTime AND t.id > :lastId)) " +
             "ORDER BY t.endTime asc, t.id asc"
     )
@@ -93,7 +93,8 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate,
             @Param("tagList") List<Long> tagList,
-            @Param("listSize") int listSize,
+            @Param("allTags") boolean allTags,
+            @Param("containNoTagTask") boolean containNoTagTask,
             Pageable pageable
     );
 
