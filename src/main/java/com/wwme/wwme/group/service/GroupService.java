@@ -19,4 +19,5 @@ public interface GroupService {
 
     Group getGroupByCode(String groupCode);
 
+    void deleteGroup(Group group);
 }

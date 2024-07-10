@@ -2,11 +2,13 @@ package com.wwme.wwme.schedule;
 
 import com.wwme.wwme.group.domain.Group;
 import com.wwme.wwme.group.repository.GroupRepository;
+import com.wwme.wwme.group.service.GroupService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 
@@ -16,13 +18,15 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class CronTab {
     private final GroupRepository groupRepository;
+    private final GroupService groupService;
 
+    @Transactional
     @Scheduled(cron = "${cron.remove-empty-group}")
     public void removeEmptyGroup() {
         try {
             log.info("Starting delete empty groups");
             Collection<Group> emptyGroups = groupRepository.findEmptyGroups();
-            groupRepository.deleteAll(emptyGroups);
+            emptyGroups.forEach(groupService::deleteGroup);
         }
         catch (Exception e) {
             log.error("Error at removeEmptyGroup", e);

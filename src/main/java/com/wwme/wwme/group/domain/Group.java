@@ -22,18 +22,8 @@ public class Group {
     private Long id;
     private String groupName;
 
-    @OneToMany(mappedBy = "group", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
     Collection<UserGroup> userGroupList = new ArrayList<>();
-
-
-    @OneToMany(mappedBy = "group", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    Collection<Task> tasksList;
-
-    @OneToMany(mappedBy = "group", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    Collection<GroupInvitation> groupInvitationList;
-
-    @OneToMany(mappedBy = "group", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    Collection<Tag> tagList;
 
 
     public Group(String groupName) {
