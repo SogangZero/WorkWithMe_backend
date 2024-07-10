@@ -3,9 +3,7 @@ package com.wwme.wwme.task.service;
 import com.wwme.wwme.group.domain.Group;
 import com.wwme.wwme.group.domain.UserGroup;
 import com.wwme.wwme.group.repository.GroupRepository;
-import com.wwme.wwme.task.domain.DTO.receiveDTO.CreateTaskReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.MakeTaskDoneReceiveDTO;
-import com.wwme.wwme.task.domain.DTO.receiveDTO.UpdateTaskReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.sendDTO.*;
 import com.wwme.wwme.task.domain.Tag;
 import com.wwme.wwme.task.domain.Task;
@@ -106,10 +104,9 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
     }
 
     private Tag getTagFromDB(Long tagId) {
-        Tag tag = tagRepository.findById(tagId).orElseThrow(() -> (
-                new IllegalArgumentException("Create Task Fail - Not Found Tag")
-        ));
-        return tag;
+        return tagRepository.findById(tagId).orElseThrow(() -> (
+                new IllegalArgumentException("Could not find Tag of ID: "+tagId
+                +" in function getTagFromDB")));
     }
 
     private static void checkParameterValidity(String taskName, LocalDateTime endTime, String taskType) {
@@ -176,27 +173,43 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
     @Override
     //TODO: update 한 뒤에 Task 자체의 is_done 을 확인해줘야 한다.
     public Task updateTask(Long taskId,
+                           String taskName,
                            LocalDateTime endTime,
                            String taskType,
                            Long tagId,
                            Long todoUserId,
-                           User user) {
+                           User loginUser) {
         Task task = getTaskFromDB(taskId);
-        User todoUser = getTodoUserFromDB(todoUserId);
         Tag tag = (tagId == null) ? null : getTagFromDB(tagId);
+        validateLoginUser(loginUser, task);
 
-        validateUsers(todoUserId, user, task);
+        User todoUser = null;
+        if(Objects.equals(taskType, "personal")){
+            if(todoUserId == null){
+                throw new IllegalArgumentException("The todoUser ID is null when updating to a personal task ID :"
+                + taskId + " in function updateTask");
+            }
+            validateTodoUser(todoUserId,task);
+            todoUser = getTodoUserFromDB(todoUserId);
+            updateTodoUser(task, todoUser);
+        }
+
+
 
         //업데이트
+        updateTaskName(taskName,task);
         updateTag(tag, task);
         updateEndTime(endTime, task);
         updateTaskType(taskType, task, todoUser);
-        updateTodoUser(task, todoUser);
         updateIsDoneTotal(task,todoUser);
 
 
 
         return task;
+    }
+
+    private void updateTaskName(String taskName, Task task) {
+        task.setTaskName(taskName);
     }
 
     private void updateIsDoneTotal(Task task,User todoUser) {
@@ -239,9 +252,19 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         }
     }
 
-    private static void validateUsers(Long todoUserId, User user, Task task) {
-        if (!task.getGroup().existUser(user) || !task.getGroup().existUserById(todoUserId)) {
-            throw new IllegalArgumentException("Update Task Fail - Task Group Not Matched User Groups");
+    private static void validateLoginUser(User loginUser, Task task) {
+        if (!task.getGroup().existUser(loginUser)) {
+            throw new IllegalArgumentException("The task's group of NAME : " + task.getGroup().getGroupName()
+                    +"ID : " +task.getGroup().getId() +"did not match the group of loginUser of ID: "+loginUser
+            +" in function validateUsers");
+        }
+    }
+
+    private static void validateTodoUser(Long todoUserId, Task task) {
+        if (!task.getGroup().existUserById(todoUserId)) {
+            throw new IllegalArgumentException("The task's group of NAME : " + task.getGroup().getGroupName()
+                    +"ID : " +task.getGroup().getId() +"did not match the group of todoUser of ID: "+todoUserId
+                    +" in function validateTodoUser");
         }
     }
 

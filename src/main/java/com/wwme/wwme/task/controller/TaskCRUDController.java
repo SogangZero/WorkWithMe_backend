@@ -67,17 +67,18 @@ public class TaskCRUDController {
 
     @PutMapping
     public ResponseEntity<?> updateTask(@RequestBody UpdateTaskReceiveDTO updateTaskReceiveDTO,
-                                        @Login User user) {
+                                        @Login User loginUser) {
         log.info("Update Task Controller");
         try {
             Task task = taskCRUDService.updateTask(updateTaskReceiveDTO.getTask_id(),
+                    updateTaskReceiveDTO.getTask_name(),
                     updateTaskReceiveDTO.getEnd_time(),
                     updateTaskReceiveDTO.getTask_type(),
                     updateTaskReceiveDTO.getTag_id(),
                     updateTaskReceiveDTO.getTodo_user_id(),
-                    user);
+                    loginUser);
 
-            CUTaskSendDTO cuTaskSendDTO = taskDTOBinder.bindCUTaskSendDTO(task,user);
+            CUTaskSendDTO cuTaskSendDTO = taskDTOBinder.bindCUTaskSendDTO(task,loginUser);
             return new ResponseEntity<>(new DataResponseDTO(cuTaskSendDTO), HttpStatus.OK);
         } catch (Exception e) {
             log.error("Update Task ERROR " + e.getMessage() + Arrays.toString(e.getStackTrace()));

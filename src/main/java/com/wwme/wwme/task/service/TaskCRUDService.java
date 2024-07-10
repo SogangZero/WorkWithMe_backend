@@ -31,6 +31,7 @@ public interface TaskCRUDService {
   * @return updateTaskSendDTO
   */
  public Task updateTask(Long taskId,
+                        String taskName,
                         LocalDateTime endTime,
                         String taskType,
                         Long tagId,
