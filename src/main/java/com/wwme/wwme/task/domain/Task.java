@@ -34,7 +34,7 @@ public class Task {
     private Group group;
 
     @Builder.Default
-    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL) //the userTask entity controlls the relationship, and there is a "task" field in usertask
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL) //the userTask entity controls the relationship, and there is a "task" field in usertask
     private List<UserTask> userTaskList = new ArrayList<>();
 
     public void addUserTask(UserTask userTask) {
@@ -60,7 +60,8 @@ public class Task {
 
     public void changeTaskType(String taskType) {
         if (!validateTaskType(taskType)) {
-            throw new IllegalArgumentException("Tag name error");
+            throw new IllegalArgumentException("Task Type name error : Task Type Name not valid"
+            + "in function changeTaskType");
         }
         this.taskType = taskType;
     }

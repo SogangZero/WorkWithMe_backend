@@ -7,6 +7,11 @@ import com.wwme.wwme.group.domain.UserGroup;
 import com.wwme.wwme.group.repository.GroupInvitationRepository;
 import com.wwme.wwme.group.repository.GroupRepository;
 import com.wwme.wwme.group.repository.UserGroupRepository;
+import com.wwme.wwme.task.domain.DTO.sendDTO.TaskListReadByGroupSendDTO;
+import com.wwme.wwme.task.domain.UserTask;
+import com.wwme.wwme.task.repository.TagRepository;
+import com.wwme.wwme.task.repository.TaskRepository;
+import com.wwme.wwme.task.repository.UserTaskRepository;
 import com.wwme.wwme.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,6 +30,8 @@ public class GroupServiceImpl implements GroupService {
     private final GroupRepository groupRepository;
     private final UserGroupRepository userGroupRepository;
     private final GroupInvitationRepository groupInvitationRepository;
+    private final TagRepository tagRepository;
+    private final TaskRepository taskRepository;
 
     @Override
     public Group createGroupWithUserAndColor(String groupName, User user, Long color) {
@@ -96,5 +103,14 @@ public class GroupServiceImpl implements GroupService {
         GroupInvitation groupInvitation = groupInvitationRepository.findByCode(groupCode)
                 .orElseThrow(() -> new NoSuchElementException("Couldn't find GroupInvitation with given GroupCode"));
         return groupInvitation.getGroup();
+    }
+
+    @Override
+    public void deleteGroup(Group group) {
+        userGroupRepository.deleteByGroup(group);
+        groupInvitationRepository.deleteByGroup(group);
+        tagRepository.deleteByGroup(group);
+        taskRepository.deleteByGroup(group);
+        groupRepository.delete(group);
     }
 }

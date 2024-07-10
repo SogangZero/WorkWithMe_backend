@@ -8,7 +8,6 @@ import com.wwme.wwme.login.exception.NullRefreshTokenException;
 import com.wwme.wwme.login.service.JWTUtilService;
 import com.wwme.wwme.login.service.ReissueService;
 import com.wwme.wwme.user.domain.User;
-import com.wwme.wwme.user.domain.dto.UserInfoDTO;
 import com.wwme.wwme.user.repository.UserRepository;
 import com.wwme.wwme.user.service.UserService;
 import jakarta.servlet.http.Cookie;
@@ -18,10 +17,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
+@Transactional
 @RestController
 @RequiredArgsConstructor
 public class ReissueController {
@@ -35,6 +36,7 @@ public class ReissueController {
                                      HttpServletResponse response) {
         try {
             String refreshToken = request.getHeader("refresh");
+            log.info("/reissue refresh : {}", refreshToken);
             String refresh = reissueService.validateRefreshToken(refreshToken);
             String userKey = jwtUtilService.getUserKey(refresh);
             String role = jwtUtilService.getRole(refresh);
@@ -44,7 +46,7 @@ public class ReissueController {
                     .orElseThrow(() -> new IllegalArgumentException("not exist user"));
             UserInfoReissueDTO userInfoReissue = userService.getUserInfoReissue(user);
 
-            log.info("User[{}] re-generate access and refresh token", userKey);
+            log.info("User[{}] re-generate access[{}] and refresh[{}] token ", userKey, newAccess, newRefresh);
             response.setHeader("access", newAccess);
             response.setHeader("refresh", newRefresh);
 

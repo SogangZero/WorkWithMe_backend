@@ -31,6 +31,7 @@ public interface TaskCRUDService {
   * @return updateTaskSendDTO
   */
  public Task updateTask(Long taskId,
+                        String taskName,
                         LocalDateTime endTime,
                         String taskType,
                         Long tagId,
@@ -98,5 +99,7 @@ public interface TaskCRUDService {
 
     int getDoneUserCount(Task task);
 
-    String getDoingNickname(Task task);
+   int getTotalUserCount(Task task);
+
+   String getDoingNickname(Task task);
 }

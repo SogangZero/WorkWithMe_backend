@@ -1,5 +1,6 @@
 package com.wwme.wwme.task.repository;
 
+import com.wwme.wwme.group.domain.Group;
 import com.wwme.wwme.task.domain.Task;
 import com.wwme.wwme.user.domain.User;
 import org.springframework.data.domain.Pageable;
@@ -63,6 +64,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             "LEFT JOIN FETCH t.group gp " +
             "LEFT JOIN FETCH t.tag tg " +
             "WHERE ut.user.id = :userId " +
+            "AND t.totalIsDone = false "+
             "AND ut.isDone = false " +
             "AND t.endTime >= :endTime " +
             "AND (:last_task_id IS NULL OR t.id != :last_task_id) " +
@@ -79,7 +81,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             "AND (:totalIsDone IS NULL or t.totalIsDone = :totalIsDone) " +
             "AND t.endTime >= :startDate " +
             "AND t.endTime <= :endDate " +
-            "AND ((:listSize=0 and tg.id is NULL) or tg.id in :tagList) " +
+            "AND ((:allTags=TRUE) OR (:containNoTagTask=TRUE AND tg.id IS NULL) OR tg.id in :tagList) " +
             "AND (:lastId IS NULL OR (t.endTime > :lastEndTime) OR (t.endTime = :lastEndTime AND t.id > :lastId)) " +
             "ORDER BY t.endTime asc, t.id asc"
     )
@@ -92,7 +94,8 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate,
             @Param("tagList") List<Long> tagList,
-            @Param("listSize") int listSize,
+            @Param("allTags") boolean allTags,
+            @Param("containNoTagTask") boolean containNoTagTask,
             Pageable pageable
     );
 
@@ -100,4 +103,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             "LEFT JOIN FETCH t.userTaskList ut " +
             "WHERE t.id = :taskId")
     Optional<Task> findByTaskIdWithUserList(Long taskId);
+
+
+    void deleteByGroup(Group group);
 }

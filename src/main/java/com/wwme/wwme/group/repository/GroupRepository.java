@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.Optional;
 
 
@@ -16,4 +17,9 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
             "JOIN fetch g.userGroupList ug " +
             "WHERE g.id = :groupId")
     Optional<Group> findGroupByIdLoadUserTaskList(Long groupId);
+
+
+    @Query("SELECT g FROM Group g " +
+            "WHERE g.userGroupList IS EMPTY")
+    Collection<Group> findEmptyGroups();
 }
