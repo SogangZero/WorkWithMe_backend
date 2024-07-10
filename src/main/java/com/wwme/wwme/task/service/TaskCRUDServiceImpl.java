@@ -505,13 +505,20 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         List<TaskListForDaySendDTO> taskListForDaySendDTOList = new ArrayList<>();
 
         for(Task t : taskList){
+            //fill in tag
+            ROT_tagDTO rotTagDTO = null;
+            if(t.getTag() != null){
+                rotTagDTO = ROT_tagDTO.builder()
+                        .tag_id(t.getTag().getId())
+                        .tag_name(t.getTag().getTagName())
+                        .build();
+            }
+
+
             TaskListForDaySendDTO taskListForDaySendDTO = TaskListForDaySendDTO.builder()
                     .taskId(t.getId())
                     .taskName(t.getTaskName())
-                    .tag(new ROT_tagDTO(
-                            Optional.ofNullable(t.getTag()).map(Tag::getId).orElse(null),
-                            Optional.ofNullable(t.getTag()).map(Tag::getTagName).orElse(null)
-                    ))
+                    .tag(rotTagDTO)
                     .endDate(t.getEndTime().toLocalDate())
                     .build();
 
@@ -544,6 +551,14 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
                         " in method readOneTask. Details: " + task.getGroup().getId()
         ));
 
+        //fill in tag
+        ROT_tagDTO rotTagDTO = null;
+        if(task.getTag() != null){
+            rotTagDTO = ROT_tagDTO.builder()
+                    .tag_id(task.getTag().getId())
+                    .tag_name(task.getTag().getTagName())
+                    .build();
+        }
 
 
 
@@ -552,10 +567,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
                 .task_id(task.getId())
                 .task_name(task.getTaskName())
                 .task_type(task.getTaskType())
-                .tag(new ROT_tagDTO(
-                        Optional.ofNullable(task.getTag()).map(Tag::getId).orElse(null),
-                        Optional.ofNullable(task.getTag()).map(Tag::getTagName).orElse(null)
-                        ))
+                .tag(rotTagDTO)
                 .group(new ROT_groupDTO(
                         task.getGroup().getId(),
                         task.getGroup().getGroupName(),
@@ -637,6 +649,15 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
                     .orElseThrow(()-> new NoSuchElementException("Could not find userGroup with userID: "
                             + loginUser.getId() + "In function getTaskListForUser" ));
 
+            ROT_tagDTO return_rotTagDTO = null;
+            //insert tag information
+            if(t.getTag() != null){
+                return_rotTagDTO = ROT_tagDTO.builder()
+                        .tag_id(t.getTag().getId())
+                        .tag_name(t.getTag().getTagName())
+                        .build();
+            }
+
 
 
             ReadTaskListByUserSendDTO readTaskListByUserSendDTO = ReadTaskListByUserSendDTO.builder()
@@ -645,9 +666,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
                     .task_type(t.getTaskType())
                     .start_time(t.getStartTime())
                     .end_time(t.getEndTime())
-                    .tag(new ROT_tagDTO(
-                            Optional.ofNullable(t.getTag()).map(Tag::getId).orElse(null),
-                            Optional.ofNullable(t.getTag()).map(Tag::getTagName).orElse(null)))
+                    .tag(return_rotTagDTO)
                     .group(new RTL_groupDTO(
                             t.getGroup().getId(),
                             ug.getColor(),
