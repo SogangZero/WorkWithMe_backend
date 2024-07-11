@@ -6,8 +6,6 @@ import com.wwme.wwme.login.exception.InvalidRefreshTokenException;
 import com.wwme.wwme.login.exception.JwtTokenException;
 import com.wwme.wwme.login.exception.NullRefreshTokenException;
 import com.wwme.wwme.login.repository.RefreshRepository;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
