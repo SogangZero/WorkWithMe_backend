@@ -36,7 +36,7 @@ public class ReissueController {
                                      HttpServletResponse response) {
         try {
             String refreshToken = request.getHeader("refresh");
-            log.info("/reissue refresh : {}", refreshToken);
+            log.info("/reissue[POST] refresh : {}", refreshToken);
             String refresh = reissueService.validateRefreshToken(refreshToken);
             String userKey = jwtUtilService.getUserKey(refresh);
             String role = jwtUtilService.getRole(refresh);
