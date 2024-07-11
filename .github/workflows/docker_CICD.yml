@@ -38,6 +38,7 @@ jobs:
         password: ${{secrets.SERVER_PASSWORD}}
         port: ${{secrets.SERVER_SSH_PORT}}
         script: |
+          cd ../seokmin
           docker pull ${{secrets.DOCKER_USERNAME}}/workwithme:latest
           docker stop wwme || true
           docker container rm wwme || true
