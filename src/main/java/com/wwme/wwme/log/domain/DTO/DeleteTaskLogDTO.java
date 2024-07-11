@@ -2,6 +2,7 @@ package com.wwme.wwme.log.domain.DTO;
 
 import com.wwme.wwme.group.domain.Group;
 import com.wwme.wwme.log.domain.OperationType;
+import com.wwme.wwme.task.domain.Task;
 import com.wwme.wwme.user.domain.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,15 +18,15 @@ public class DeleteTaskLogDTO extends EventDTO{
     private String deletedTaskName;
 
     @Builder(builderMethodName = "buildWithSpecificParams")
-    public DeleteTaskLogDTO(User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, String deletedTaskName) {
-        super(user, group, operationTypeEnum, operationTime);
+    public DeleteTaskLogDTO(User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, String deletedTaskName, Task task) {
+        super(user, group, operationTypeEnum, operationTime,task);
         this.deletedTaskName = deletedTaskName;
         setOperationStr();
     }
 
     @Builder(builderMethodName = "buildWithOperationStringID")
-    public DeleteTaskLogDTO(Long id, User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, String operationString, String deletedTaskName) {
-        super(id, user, group, operationTypeEnum, operationTime, operationString);
+    public DeleteTaskLogDTO(Long id, User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, String operationString, String deletedTaskName, Task task) {
+        super(id, user, group, operationTypeEnum, operationTime, operationString,task);
         this.deletedTaskName = deletedTaskName;
         setSpecificFields();
     }
