@@ -196,8 +196,31 @@ public class NotificationServiceImpl implements NotificationService {
         ;
     }
 
+    @Override
+    public void sendOnMyTaskChange(Task task, Collection<User> changedUser, User changingUser) {
+        changedUser.forEach(user -> {
+           if(!user.getNotificationSetting().getOnMyTaskChange()) {
+               return;
+           }
+
+            Map<String, String> dataMap = new HashMap<>();
+            dataMap.put("task_id", task.getId().toString());
+            var title = "할 일이 수정되었습니다.";
+            var body = "\"" + task.getTaskName() + "\"을 " +
+                    changingUser.getNickname() + "이 수정하였습니다.";
+            var registrationToken = user.getNotificationSetting().getRegistrationToken();
+            var sendJsonObject = makeSendJsonObject(title, body, dataMap, registrationToken);
+            send(sendJsonObject);
+        });
+    }
+
     private void send(JsonObject jsonObject) {
         try {
+            // don't send if token is null
+            if (jsonObject.getAsJsonObject("message").get("token").getAsString() == null) {
+                return;
+            }
+
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", "Bearer " + getAccessToken());

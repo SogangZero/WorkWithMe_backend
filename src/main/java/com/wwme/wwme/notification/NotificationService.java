@@ -37,4 +37,6 @@ public interface NotificationService {
     void sendOnGroupEntranceNotification(Group group, Collection<UserGroup> userGroups);
 
     void sendOnMyTaskCreation(Task task, User creatingUser);
+
+    void sendOnMyTaskChange(Task task, Collection<User> changedUser, User changingUser);
 }

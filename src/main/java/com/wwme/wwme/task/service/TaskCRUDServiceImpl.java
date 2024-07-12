@@ -3,6 +3,7 @@ package com.wwme.wwme.task.service;
 import com.wwme.wwme.group.domain.Group;
 import com.wwme.wwme.group.domain.UserGroup;
 import com.wwme.wwme.group.repository.GroupRepository;
+import com.wwme.wwme.notification.NotificationService;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.CreateTaskReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.MakeTaskDoneReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.UpdateTaskReceiveDTO;
@@ -26,8 +27,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.management.Notification;
 import java.time.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +43,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
     private final GroupRepository groupRepository;
     private final UserRepository userRepository;
     private final UserTaskRepository userTaskRepository;
+    private final NotificationService notificationService;
 
 
     @Override
@@ -188,6 +192,8 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
 
         validateUsers(todoUserId, user, task);
 
+        var beforeUsers = getUsersFromTask(task);
+
         //업데이트
         updateTag(tag, task);
         updateEndTime(endTime, task);
@@ -195,9 +201,22 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         updateTodoUser(task, todoUser);
         updateIsDoneTotal(task,todoUser);
 
+        var afterUsers = getUsersFromTask(task);
+        Set<User> notifyUsers = new HashSet<>();
+        beforeUsers.forEach(curUser -> {
+            if (!notifyUsers.contains(curUser)) notifyUsers.add(curUser);
+        });
+        afterUsers.forEach(curUser -> {
+            if (!notifyUsers.contains(curUser)) notifyUsers.add(curUser);
+        });
 
+        notificationService.sendOnMyTaskChange(task, notifyUsers, user);
 
         return task;
+    }
+
+    private Collection<User> getUsersFromTask(Task task) {
+        return task.getUserTaskList().stream().map(UserTask::getUser).toList();
     }
 
     private void updateIsDoneTotal(Task task,User todoUser) {
