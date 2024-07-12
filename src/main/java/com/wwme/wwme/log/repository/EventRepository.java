@@ -4,6 +4,7 @@ import com.wwme.wwme.log.domain.Event;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,10 +15,16 @@ public interface EventRepository extends JpaRepository<Event,Long> {
 
     List<Event> findByGroupId(Long groupId);
 
-    @Query("Select e from Event e WHERE " +
-            "e.group.id = :groupId " +
-            "AND e.id > :last_log_id ")
-    List<Event> findByGroupIdPaging(Long groupId, Long last_log_id, Pageable pageable);
-    List<Event> findByUserId(Long userId);
+    @Query("SELECT e FROM Event e WHERE e.group.id = :groupId AND e.id > :lastId")
+    List<Event> findByGroupIdPagingWithLastId(
+            @Param("groupId") Long groupId,
+            @Param("lastId") Long lastId,
+            Pageable pageable);
 
+    @Query("SELECT e FROM Event e WHERE e.group.id = :groupId")
+    List<Event> findByGroupIdPagingWithoutLastId(
+            @Param("groupId") Long groupId,
+            Pageable pageable);
 }
+
+

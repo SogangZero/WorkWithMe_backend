@@ -36,6 +36,8 @@ public class EventServiceImpl implements EventService {
         return eventDTO;
     }
 
+
+    @Override
     //TODO: check what happens when there is no matching group?
     public List<EventDTO> readGroupEvents(Group group) {
         groupRepository.findById(group.getId())
@@ -52,13 +54,30 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<EventDTO> readGroupEventsPaging(Group group, Long last_id) {
+    public List<EventDTO> readGroupEventsPaging(ReceiveLogDTO receiveLogDTO) {
 
-        checkGroupExistanceDB(group);
+        //check Group Id integrity
+        checkGroupExistanceDB(receiveLogDTO.getGroup_id());
 
-        Pageable pageable = PageRequest.of(0,20);
+        //List to store Event entities from DB
+        List<Event> eventList;
 
-        List<Event> eventList= eventRepository.findByGroupIdPaging(group.getId(),last_id,pageable);
+        //Pageable
+        Pageable pageable = PageRequest.of(0, 10);
+
+        if(receiveLogDTO.getLast_id() == null){ //start from first
+            eventList = eventRepository.findByGroupIdPagingWithoutLastId(
+                    receiveLogDTO.getGroup_id(),
+                    pageable
+            );
+        }else{
+            eventList = eventRepository.findByGroupIdPagingWithLastId(
+                    receiveLogDTO.getGroup_id(),
+                    receiveLogDTO.getLast_id(),
+                    pageable
+            );
+        }
+
         List<EventDTO> eventDTOList = new ArrayList<>();
         for(Event e : eventList){
             eventDTOList.add(EventDTOFactory.createEventDTO(e));
@@ -67,10 +86,10 @@ public class EventServiceImpl implements EventService {
         return eventDTOList;
     }
 
-    private void checkGroupExistanceDB(Group group){
-        groupRepository.findById(group.getId())
+    private void checkGroupExistanceDB(Long groupId){
+        groupRepository.findById(groupId)
                 .orElseThrow(()->new NoSuchElementException("Could not find group of ID: "
-                        +group.getId() + " in function readGroupEvents"));
+                        +groupId + " in function readGroupEvents"));
     }
 
 
