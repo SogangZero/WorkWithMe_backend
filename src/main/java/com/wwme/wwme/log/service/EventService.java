@@ -27,9 +27,5 @@ public interface EventService {
      * Read All events of operations conducted
      * from a specific group, paging included
      */
-    List<EventDTO> readUserEventsPaging(Group group);
-
-
-
-
+    List<EventDTO> readGroupEventsPaging(Group group, Long last_id);
 }

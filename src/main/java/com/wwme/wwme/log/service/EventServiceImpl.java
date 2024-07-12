@@ -5,7 +5,6 @@ import com.wwme.wwme.group.repository.GroupRepository;
 import com.wwme.wwme.log.domain.DTO.*;
 import com.wwme.wwme.log.domain.Event;
 import com.wwme.wwme.log.repository.EventRepository;
-import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -68,7 +67,7 @@ public class EventServiceImpl implements EventService {
         return eventDTOList;
     }
 
-    private boolean checkGroupExistanceDB(Group group){
+    private void checkGroupExistanceDB(Group group){
         groupRepository.findById(group.getId())
                 .orElseThrow(()->new NoSuchElementException("Could not find group of ID: "
                         +group.getId() + " in function readGroupEvents"));
