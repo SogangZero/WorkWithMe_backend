@@ -44,7 +44,9 @@ public class Event {
     @ManyToOne(fetch = FetchType.LAZY)
     private Task task;
 
+    @Enumerated(EnumType.STRING)
     private OperationType operationTypeEnum;
+
     private String operationString;
     private LocalDateTime operationTime;
 }

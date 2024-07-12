@@ -40,7 +40,9 @@ public abstract class EventDTO {
     private LocalDateTime operationTime;
     protected String operationString;
 
-
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     //받은 정보를 바탕으로 operationString 을 계산한다.
     public abstract void setOperationStr();
