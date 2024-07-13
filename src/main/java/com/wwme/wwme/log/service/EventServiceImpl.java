@@ -38,22 +38,6 @@ public class EventServiceImpl implements EventService {
 
 
     @Override
-    //TODO: check what happens when there is no matching group?
-    public List<EventDTO> readGroupEvents(Group group) {
-        groupRepository.findById(group.getId())
-                .orElseThrow(()->new NoSuchElementException("Could not find group of ID: "
-                +group.getId() + " in function readGroupEvents"));
-
-        List<Event> eventList= eventRepository.findByGroupId(group.getId());
-        List<EventDTO> eventDTOList = new ArrayList<>();
-        for(Event e : eventList){
-            eventDTOList.add(EventDTOFactory.createEventDTO(e));
-        }
-
-        return eventDTOList;
-    }
-
-    @Override
     public List<EventDTO> readGroupEventsPaging(ReceiveLogDTO receiveLogDTO) {
 
         //check Group Id integrity

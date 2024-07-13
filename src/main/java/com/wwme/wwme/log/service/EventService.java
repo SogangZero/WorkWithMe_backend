@@ -15,12 +15,6 @@ public interface EventService {
      */
     EventDTO createEvent(EventDTO eventDTO);
 
-    /**
-     * @param group
-     * Read All events of operations conducted
-     * from a specific group
-     */
-    List<EventDTO> readGroupEvents(Group group);
 
 
     /**

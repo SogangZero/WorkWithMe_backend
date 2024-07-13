@@ -3,6 +3,9 @@ package com.wwme.wwme.task.service;
 import com.wwme.wwme.group.domain.Group;
 import com.wwme.wwme.group.domain.UserGroup;
 import com.wwme.wwme.group.repository.GroupRepository;
+import com.wwme.wwme.log.domain.DTO.*;
+import com.wwme.wwme.log.domain.OperationType;
+import com.wwme.wwme.log.service.EventService;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.MakeTaskDoneReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.sendDTO.*;
 import com.wwme.wwme.task.domain.Tag;
@@ -37,6 +40,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
     private final GroupRepository groupRepository;
     private final UserRepository userRepository;
     private final UserTaskRepository userTaskRepository;
+    private final EventService eventService;
 
 
     @Override
@@ -46,7 +50,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
                            Long tagId,
                            Long groupId,
                            Long todoUserId,
-                           User user) throws IllegalArgumentException{
+                           User loginUser) throws IllegalArgumentException{
 
         if(endTime == null){
             endTime = LocalDateTime.of(2099,12,12,12,12,12);
@@ -65,7 +69,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
             checkGroupIncludeTag(tag, group);
         }
 
-        checkUsersInSameGroup(taskType, user, group, todoUser);
+        checkUsersInSameGroup(taskType, loginUser, group, todoUser);
 
         //엔티티 구성
         Task taskEntity = Task.builder()
@@ -82,8 +86,20 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         //userTask 추가
         addUserTaskByTaskType(taskType, group, taskEntity, todoUser);
         //DB에 추가
-        log.info("Before return to Controller : Task Create");
-        return taskRepository.save(taskEntity);
+        Task newTask = taskRepository.save(taskEntity);
+
+        //log 추가 로직
+        CreateTaskLogDTO createTaskLogDTO = CreateTaskLogDTO.buildWithSpecificParamsNoID()
+                .task(newTask)
+                .newTaskName(newTask.getTaskName())
+                .user(taskType.equals("personal") ? todoUser : null)
+                .operationTime(LocalDateTime.now())
+                .operationTypeEnum(OperationType.CREATE_TASK)
+                .build();
+        eventService.createEvent(createTaskLogDTO);
+
+
+        return newTask;
     }
 
     private User getTodoUserForPersonalTask(String taskType, Long todoUserId) {
@@ -195,12 +211,11 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         }
 
 
-
         //업데이트
-        updateTaskName(taskName,task);
-        updateTag(tag, task);
-        updateEndTime(endTime, task);
-        updateTaskType(taskType, task, todoUser);
+        updateTaskName(taskName,task,loginUser);
+        updateTag(tag, task,loginUser);
+        updateEndTime(endTime, task, loginUser);
+        updateTaskType(taskType, task, todoUser, loginUser);
         updateIsDoneTotal(task,todoUser);
 
 
@@ -208,8 +223,25 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         return task;
     }
 
-    private void updateTaskName(String taskName, Task task) {
-        task.setTaskName(taskName);
+    private UpdateTaskNameLogDTO updateTaskName(String taskName, Task task,User loginUser) {
+
+        if(!taskName.equals(task.getTaskName())){
+            UpdateTaskNameLogDTO updateTaskNameLogDTO = UpdateTaskNameLogDTO.buildWithSpecificParamsNoID()
+                    .operationTypeEnum(OperationType.UPDATE_TASK_NAME)
+                    .task(task)
+                    .user(loginUser)
+                    .operationTime(LocalDateTime.now())
+                    .beforeTaskName(task.getTaskName())
+                    .afterTaskName(taskName)
+                    .group(task.getGroup())
+                    .build();
+            task.setTaskName(taskName);
+            return updateTaskNameLogDTO;
+        }else{
+            return null;
+        }
+
+
     }
 
     private void updateIsDoneTotal(Task task,User todoUser) {
@@ -281,32 +313,97 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         }
     }
 
-    private void updateTaskType(String taskType, Task task, User todoUser) {
+    private UpdateTaskTypeLogDTO updateTaskType(String taskType, Task task, User todoUser, User loginUser) {
+
+        String originTaskType = task.getTaskType();
         log.info("original task type : "+task.getTaskType());
         log.info("changing task type : "+taskType);
-        if (taskType != null && !task.getTaskType().equals(taskType)) {
+        if (taskType != null && !task.getTaskType().equals(taskType)) { //changes taskType
             changeTaskType(taskType, task, todoUser);
-        }
 
+            return UpdateTaskTypeLogDTO.buildWithSpecificParamsNoID()
+                    .operationTypeEnum(OperationType.UPDATE_TASK_TYPE)
+                    .operationTime(LocalDateTime.now())
+                    .task(task)
+                    .user(loginUser)
+                    .beforeTaskType(originTaskType)
+                    .afterTaskType(taskType)
+                    .group(task.getGroup())
+                    .build();
+        }else{
+            return null;
+        }
     }
 
-    private static void updateEndTime(LocalDateTime endTime, Task task) {
+    private static UpdateTaskDueDateLogDTO updateEndTime(LocalDateTime endTime, Task task, User loginUser) {
         if (endTime != null && !task.getEndTime().equals(endTime)) {
+            LocalDateTime originEndTime = task.getEndTime();
             if (endTime.isBefore(LocalDateTime.now())) {
                 throw new IllegalArgumentException("Update Task Fail - EndTime is before now");
             }
             task.changeEndTime(endTime);
+
+            return UpdateTaskDueDateLogDTO.buildWithSpecificParamsNoID()
+                    .operationTypeEnum(OperationType.UPDATE_TASK_DUE_DATE)
+                    .operationTime(LocalDateTime.now())
+                    .task(task)
+                    .user(loginUser)
+                    .group(task.getGroup())
+                    .previousDueDate(originEndTime)
+                    .updatedDueDate(endTime)
+                    .build();
+        }else{
+            return null;
         }
     }
 
-    private static void updateTag(Tag tag, Task task) {
+    private EventDTO updateTag(Tag tag, Task task, User loginUser) {
         if(tag == null){
             task.changeTag(null);
         }else if (!tag.equals(task.getTag())) {
-            if (!task.validateTagIdInGroup(tag)) {
+            task.changeTag(tag);
+        }
+
+        if(isTagUpdateScenario(task, tag)){
+            Tag prevTag = task.getTag();
+
+            if (!task.validateTagInGroup(tag)) {
                 throw new IllegalArgumentException("Update Task Fail - Tag Not Matched Group");
             }
             task.changeTag(tag);
+
+            //Logging feature
+            if(tag != null){
+                return UpdateTaskChangeTagDTO.buildWithSpecificParamsNoID()
+                        .task(task)
+                        .user(loginUser)
+                        .group(task.getGroup())
+                        .operationTypeEnum(OperationType.UPDATE_TASK_CHANGE_TAG)
+                        .operationTime(LocalDateTime.now())
+                        .updateTagName(tag.getTagName())
+                        .previousTagName(prevTag.getTagName())
+                        .build();
+            }else{//Tag is null --> update task delete tag
+                return UpdateTaskDeleteTagDTO.buildWithSpecificParamsNoID()
+                        .task(task)
+                        .user(loginUser)
+                        .group(task.getGroup())
+                        .operationTypeEnum(OperationType.UPDATE_TASK_DELETE_TAG)
+                        .operationTime(LocalDateTime.now())
+                        .deletedTag(prevTag)
+                        .build();
+            }
+
+        }else{
+            return null;
+        }
+
+    }
+    private boolean isTagUpdateScenario(Task task, Tag tag){
+        if(task.getTag() == null){
+            return tag == null;
+        }else{
+            return task.getTag().equals(tag);
         }
     }
 
@@ -322,7 +419,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         ));
     }
 
-    private void changeTaskType(String taskType, Task task, User todoUser) {
+    private UpdateTaskTypeLogDTO changeTaskType(String taskType, Task task, User todoUser) {
         if (!task.validateTaskType(taskType)) {
             throw new IllegalArgumentException("Update Task Fail - TaskType is Invalid");
         }

@@ -42,7 +42,7 @@ public class TaskCRUDController {
 
     @PostMapping
     public ResponseEntity<?> createTask(@RequestBody CreateTaskReceiveDTO createTaskReceiveDTO,
-                                        @Login User user) {
+                                        @Login User loginUser) {
         log.info("Create Task Controller");
         log.info("Test Log createTask");
         try {
@@ -53,11 +53,11 @@ public class TaskCRUDController {
                     createTaskReceiveDTO.getTag_id(),
                     createTaskReceiveDTO.getGroup_id(),
                     createTaskReceiveDTO.getTodo_user_id(),
-                    user);
+                    loginUser);
 
             log.info("Create New Task[{}]", task.getId());
 
-            CUTaskSendDTO cuTaskSendDTO = taskDTOBinder.bindCUTaskSendDTO(task,user);
+            CUTaskSendDTO cuTaskSendDTO = taskDTOBinder.bindCUTaskSendDTO(task,loginUser);
             return new ResponseEntity<>(new DataResponseDTO(cuTaskSendDTO), HttpStatus.OK);   
         } catch (Exception e) {
             log.error("Create New Task ERROR " + e.getMessage());
