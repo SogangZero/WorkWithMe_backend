@@ -26,6 +26,7 @@ public class Tag {
     @ManyToOne(fetch = FetchType.LAZY)
     private Group group;
 
+    @Builder.Default
     @OneToMany(mappedBy = "tag", cascade = CascadeType.PERSIST, orphanRemoval = false)
     private List<Task> taskList = new ArrayList<>();
 

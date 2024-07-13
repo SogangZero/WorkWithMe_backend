@@ -1,5 +1,6 @@
 package com.wwme.wwme.user.domain;
 
+import com.wwme.wwme.notification.NotificationSetting;
 import com.wwme.wwme.group.domain.UserGroup;
 import com.wwme.wwme.task.domain.UserTask;
 import jakarta.persistence.*;
@@ -29,6 +30,9 @@ public class User {
     private String role;
 
     private Long profileImageId; //added profile photo info
+
+    @Embedded
+    private NotificationSetting notificationSetting;
 
     //Cascade : 부모 (one side) 가 없어지면 자식도 모두 사라진다.
     @Builder.Default

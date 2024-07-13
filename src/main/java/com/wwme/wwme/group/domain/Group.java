@@ -22,6 +22,7 @@ public class Group {
     private Long id;
     private String groupName;
 
+    @Builder.Default
     @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
     Collection<UserGroup> userGroupList = new ArrayList<>();
 
