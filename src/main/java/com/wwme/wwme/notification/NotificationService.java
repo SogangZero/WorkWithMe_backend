@@ -29,8 +29,6 @@ public interface NotificationService {
             long userId
     );
 
-    void sendTest();
-
     void sendDueDateNotification(Task task, User user);
 
 
@@ -39,4 +37,6 @@ public interface NotificationService {
     void sendOnMyTaskCreation(Task task, User creatingUser);
 
     void sendOnMyTaskChange(Task task, Collection<User> changedUser, User changingUser);
+
+    Collection<NotificationHistory> getNotificationHistoryOfUser(User user, Long lastId);
 }

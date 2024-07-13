@@ -9,6 +9,8 @@ import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -20,10 +22,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -37,9 +37,11 @@ public class NotificationServiceImpl implements NotificationService {
 
     private final String[] SCOPES = {"https://www.googleapis.com/auth/firebase.messaging"};
     private final UserRepository userRepository;
+    private final NotificationHistoryRepository notificationHistoryRepository;
 
-    public NotificationServiceImpl(UserRepository userRepository) {
+    public NotificationServiceImpl(UserRepository userRepository, NotificationHistoryRepository notificationHistoryRepository) {
         this.userRepository = userRepository;
+        this.notificationHistoryRepository = notificationHistoryRepository;
     }
 
     private InputStream getStream() {
@@ -76,10 +78,6 @@ public class NotificationServiceImpl implements NotificationService {
         userRepository.updateNotificationSetting(onDueDate, onMyTaskCreation, onMyTaskChange, onGroupEntrance, userId);
     }
 
-    @Override
-    public void sendTest() {
-        send(makeSendJsonObject("title", "body", new HashMap<>(), "a"));
-    }
 
     @Override
     public void sendDueDateNotification(Task task, User user) {
@@ -97,6 +95,8 @@ public class NotificationServiceImpl implements NotificationService {
         var registrationToken = user.getNotificationSetting().getRegistrationToken();
 
         var sendJsonObject = makeSendJsonObject(title, body, dataMap, registrationToken);
+        recordNotification(title, body, user,
+                NotificationType.DUE_DATE, task.getId(), null);
         send(sendJsonObject);
     }
 
@@ -105,9 +105,12 @@ public class NotificationServiceImpl implements NotificationService {
         Map<String, String> dataMap = new HashMap<>();
         dataMap.put("group_id", group.getId().toString());
 
-        String titleBody = group.getGroupName() + "에" + newUser.getNickname() + "이 들어왔습니다!";
+        String title = group.getGroupName() + "에" + newUser.getNickname() + "이 들어왔습니다!";
+        String body = title;
 
-        var sendJsonObject = makeSendJsonObject(titleBody, titleBody, dataMap, registrationToken);
+        var sendJsonObject = makeSendJsonObject(title, body, dataMap, registrationToken);
+        recordNotification(title, body, newUser,
+                NotificationType.GROUP_ENTRANCE, null, group.getId());
         send(sendJsonObject);
     }
 
@@ -141,6 +144,8 @@ public class NotificationServiceImpl implements NotificationService {
             var registrationToken = notifiedUser.getNotificationSetting().getRegistrationToken();
 
             var sendJsonObject = makeSendJsonObject(title, body, dataMap, registrationToken);
+            recordNotification(title, body, notifiedUser,
+                    NotificationType.TASK_CREATION, task.getId(), null);
             send(sendJsonObject);
         });
     }
@@ -161,6 +166,8 @@ public class NotificationServiceImpl implements NotificationService {
                     creatingUser.getNickname() + "이 만들었습니다.";
             var registrationToken = notifiedUser.getNotificationSetting().getRegistrationToken();
             var sendJsonObject = makeSendJsonObject(title, body, dataMap, registrationToken);
+            recordNotification(title, body, notifiedUser,
+                    NotificationType.TASK_CREATION, task.getId(), null);
             send(sendJsonObject);
         });
 
@@ -182,6 +189,8 @@ public class NotificationServiceImpl implements NotificationService {
                     creatingUser.getNickname() + "이 만들었습니다.";
             var registrationToken = notifiedUser.getNotificationSetting().getRegistrationToken();
             var sendJsonObject = makeSendJsonObject(title, body, dataMap, registrationToken);
+            recordNotification(title, body, notifiedUser,
+                    NotificationType.TASK_CREATION, task.getId(), null);
             send(sendJsonObject);
         });
     }
@@ -199,9 +208,9 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public void sendOnMyTaskChange(Task task, Collection<User> changedUser, User changingUser) {
         changedUser.forEach(user -> {
-           if(!user.getNotificationSetting().getOnMyTaskChange()) {
-               return;
-           }
+            if (!user.getNotificationSetting().getOnMyTaskChange()) {
+                return;
+            }
 
             Map<String, String> dataMap = new HashMap<>();
             dataMap.put("task_id", task.getId().toString());
@@ -210,8 +219,31 @@ public class NotificationServiceImpl implements NotificationService {
                     changingUser.getNickname() + "이 수정하였습니다.";
             var registrationToken = user.getNotificationSetting().getRegistrationToken();
             var sendJsonObject = makeSendJsonObject(title, body, dataMap, registrationToken);
+            recordNotification(title, body, user,
+                    NotificationType.TASK_CHANGE, task.getId(), null);
             send(sendJsonObject);
         });
+    }
+
+    @Override
+    public List<NotificationHistory> getNotificationHistoryOfUser(User user, Long lastId) {
+        Pageable pageRequest = PageRequest.of(0, 20);
+        return notificationHistoryRepository.findAllByUserAndLastId(user, lastId, pageRequest);
+    }
+
+    private void recordNotification(String title, String body, User user,
+                                    NotificationType type, Long taskId, Long groupId) {
+        NotificationHistory notification = NotificationHistory.builder()
+                .notificationTitle(title)
+                .notificationBody(body)
+                .notificationTime(LocalDateTime.now())
+                .type(type)
+                .taskId(taskId)
+                .groupId(groupId)
+                .user(user)
+                .build();
+
+        notificationHistoryRepository.save(notification);
     }
 
     private void send(JsonObject jsonObject) {

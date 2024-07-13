@@ -3,6 +3,7 @@ package com.wwme.wwme.notification;
 
 import com.google.api.client.json.Json;
 import com.google.gson.JsonObject;
+import com.wwme.wwme.group.DTO.DataWrapDTO;
 import com.wwme.wwme.login.aop.Login;
 import com.wwme.wwme.notification.DTO.NotificationSettingUpdateRequestDTO;
 import com.wwme.wwme.notification.DTO.SetRegistrationTokenDTO;
@@ -16,6 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/notification")
@@ -27,7 +30,7 @@ public class NotificationController {
     ResponseEntity<?> setUserFcmRegistrationToken(
             @RequestBody SetRegistrationTokenDTO requestDTO,
             @Login User user
-            ) {
+    ) {
         try {
             String registrationToken = requestDTO.getRegistrationToken();
             log.info("Update registration token: {}", registrationToken);
@@ -35,8 +38,7 @@ public class NotificationController {
             notificationService.updateRegistrationToken(registrationToken, user);
 
             return new ResponseEntity<>(HttpStatus.OK);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             log.error("Error in updating registration token ", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -57,18 +59,36 @@ public class NotificationController {
                     user
             );
             return new ResponseEntity<>(HttpStatus.OK);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             log.error("Error in updating notification setting", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
+    @GetMapping
+    ResponseEntity<?> notificationHistoryListReadOfUser(
+            @RequestParam(value = "last_id", required = false) Long lastId,
+            @Login User user
+    ) {
+        try {
+            Collection<NotificationHistory> notifications =
+                    notificationService.getNotificationHistoryOfUser(user, lastId);
 
-    private final NotificationSchedule notificationSchedule;
-    @GetMapping("test")
-    void test() {
-        //notificationSchedule.sendOnDueDateNotifications();
-        //notificationService.sendTest();
+            var responseDTO = new NotificationHistoryListDTO();
+            notifications.forEach(notification -> {
+                var notificationDTO = NotificationHistoryListDTO.NotificationHistoryDTO.builder()
+                        .title(notification.getNotificationTitle())
+                        .body(notification.getNotificationBody())
+                        .type(notification.getType().toString())
+                        .taskId(notification.getTaskId())
+                        .groupId(notification.getGroupId())
+                        .build();
+                responseDTO.add(notificationDTO);
+            });
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("Error in reading notification history", e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

@@ -3,6 +3,7 @@ package com.wwme.wwme.task.controller;
 import com.wwme.wwme.group.DTO.DataWrapDTO;
 import com.wwme.wwme.group.DTO.ErrorWrapDTO;
 import com.wwme.wwme.login.aop.Login;
+import com.wwme.wwme.notification.NotificationService;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.CreateTaskReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.MakeTaskDoneReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.UpdateTaskReceiveDTO;
@@ -38,6 +39,7 @@ public class TaskCRUDController {
     private final TaskCRUDService taskCRUDService;
     private final TaskDTOBinder taskDTOBinder;
     private final UserService userService;
+    private final NotificationService notificationService;
 
 
     @PostMapping
@@ -57,7 +59,7 @@ public class TaskCRUDController {
 
             log.info("Create New Task[{}]", task.getId());
 
-
+            notificationService.sendOnMyTaskCreation(task, user);
 
             CUTaskSendDTO cuTaskSendDTO = taskDTOBinder.bindCUTaskSendDTO(task,user);
             return new ResponseEntity<>(new DataResponseDTO(cuTaskSendDTO), HttpStatus.OK);   

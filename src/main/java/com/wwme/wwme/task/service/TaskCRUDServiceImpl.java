@@ -90,6 +90,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         addUserTaskByTaskType(taskType, group, taskEntity, todoUser);
         //DB에 추가
         log.info("Before return to Controller : Task Create");
+
         return taskRepository.save(taskEntity);
     }
 

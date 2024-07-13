@@ -40,7 +40,7 @@ public class UserGroupServiceImpl implements UserGroupService {
     @Override
     public UserGroup addUserToGroupWithColor(Group group, User user, Long color) {
         if (userGroupRepository.findByUserAndGroup(user, group).isPresent()) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("User is already in group");
         }
 
         UserGroup userGroup = new UserGroup();
