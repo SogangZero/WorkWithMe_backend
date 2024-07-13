@@ -221,7 +221,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
             if (!notifyUsers.contains(curUser)) notifyUsers.add(curUser);
         });
 
-        notificationService.sendOnMyTaskChange(task, notifyUsers, user);
+        notificationService.sendOnMyTaskChange(task, notifyUsers, loginUser);
 
         return task;
     }
