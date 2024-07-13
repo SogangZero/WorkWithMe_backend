@@ -32,6 +32,7 @@ public interface TaskCRUDService {
   * @return updateTaskSendDTO
   */
  public Task updateTask(Long taskId,
+                        String taskName,
                         LocalDateTime endTime,
                         String taskType,
                         Long tagId,
@@ -98,6 +99,8 @@ public interface TaskCRUDService {
     boolean getIsDoneMe(User user, Task task);
 
     int getDoneUserCount(Task task);
+
+    int getTotalUserCount(Task task);
 
     String getDoingNickname(Task task);
 

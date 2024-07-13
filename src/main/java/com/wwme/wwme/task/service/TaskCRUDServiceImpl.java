@@ -6,7 +6,6 @@ import com.wwme.wwme.group.repository.GroupRepository;
 import com.wwme.wwme.notification.NotificationService;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.CreateTaskReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.MakeTaskDoneReceiveDTO;
-import com.wwme.wwme.task.domain.DTO.receiveDTO.UpdateTaskReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.sendDTO.*;
 import com.wwme.wwme.task.domain.Tag;
 import com.wwme.wwme.task.domain.Task;
@@ -112,10 +111,9 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
     }
 
     private Tag getTagFromDB(Long tagId) {
-        Tag tag = tagRepository.findById(tagId).orElseThrow(() -> (
-                new IllegalArgumentException("Create Task Fail - Not Found Tag")
-        ));
-        return tag;
+        return tagRepository.findById(tagId).orElseThrow(() -> (
+                new IllegalArgumentException("Could not find Tag of ID: "+tagId
+                +" in function getTagFromDB")));
     }
 
     private static void checkParameterValidity(String taskName, LocalDateTime endTime, String taskType) {
@@ -182,24 +180,36 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
     @Override
     //TODO: update 한 뒤에 Task 자체의 is_done 을 확인해줘야 한다.
     public Task updateTask(Long taskId,
+                           String taskName,
                            LocalDateTime endTime,
                            String taskType,
                            Long tagId,
                            Long todoUserId,
-                           User user) {
+                           User loginUser) {
         Task task = getTaskFromDB(taskId);
-        User todoUser = getTodoUserFromDB(todoUserId);
         Tag tag = (tagId == null) ? null : getTagFromDB(tagId);
+        validateLoginUser(loginUser, task);
 
-        validateUsers(todoUserId, user, task);
+        User todoUser = null;
+        if(Objects.equals(taskType, "personal")){
+            if(todoUserId == null){
+                throw new IllegalArgumentException("The todoUser ID is null when updating to a personal task ID :"
+                + taskId + " in function updateTask");
+            }
+            validateTodoUser(todoUserId,task);
+            todoUser = getTodoUserFromDB(todoUserId);
+            updateTodoUser(task, todoUser);
+        }
+
+
 
         var beforeUsers = getUsersFromTask(task);
 
         //업데이트
+        updateTaskName(taskName,task);
         updateTag(tag, task);
         updateEndTime(endTime, task);
         updateTaskType(taskType, task, todoUser);
-        updateTodoUser(task, todoUser);
         updateIsDoneTotal(task,todoUser);
 
         var afterUsers = getUsersFromTask(task);
@@ -214,6 +224,10 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         notificationService.sendOnMyTaskChange(task, notifyUsers, user);
 
         return task;
+    }
+
+    private void updateTaskName(String taskName, Task task) {
+        task.setTaskName(taskName);
     }
 
     private Collection<User> getUsersFromTask(Task task) {
@@ -260,9 +274,19 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         }
     }
 
-    private static void validateUsers(Long todoUserId, User user, Task task) {
-        if (!task.getGroup().existUser(user) || !task.getGroup().existUserById(todoUserId)) {
-            throw new IllegalArgumentException("Update Task Fail - Task Group Not Matched User Groups");
+    private static void validateLoginUser(User loginUser, Task task) {
+        if (!task.getGroup().existUser(loginUser)) {
+            throw new IllegalArgumentException("The task's group of NAME : " + task.getGroup().getGroupName()
+                    +"ID : " +task.getGroup().getId() +"did not match the group of loginUser of ID: "+loginUser
+            +" in function validateUsers");
+        }
+    }
+
+    private static void validateTodoUser(Long todoUserId, Task task) {
+        if (!task.getGroup().existUserById(todoUserId)) {
+            throw new IllegalArgumentException("The task's group of NAME : " + task.getGroup().getGroupName()
+                    +"ID : " +task.getGroup().getId() +"did not match the group of todoUser of ID: "+todoUserId
+                    +" in function validateTodoUser");
         }
     }
 
@@ -503,13 +527,20 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         List<TaskListForDaySendDTO> taskListForDaySendDTOList = new ArrayList<>();
 
         for(Task t : taskList){
+            //fill in tag
+            ROT_tagDTO rotTagDTO = null;
+            if(t.getTag() != null){
+                rotTagDTO = ROT_tagDTO.builder()
+                        .tag_id(t.getTag().getId())
+                        .tag_name(t.getTag().getTagName())
+                        .build();
+            }
+
+
             TaskListForDaySendDTO taskListForDaySendDTO = TaskListForDaySendDTO.builder()
                     .taskId(t.getId())
                     .taskName(t.getTaskName())
-                    .tag(new ROT_tagDTO(
-                            Optional.ofNullable(t.getTag()).map(Tag::getId).orElse(null),
-                            Optional.ofNullable(t.getTag()).map(Tag::getTagName).orElse(null)
-                    ))
+                    .tag(rotTagDTO)
                     .endDate(t.getEndTime().toLocalDate())
                     .build();
 
@@ -542,6 +573,14 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
                         " in method readOneTask. Details: " + task.getGroup().getId()
         ));
 
+        //fill in tag
+        ROT_tagDTO rotTagDTO = null;
+        if(task.getTag() != null){
+            rotTagDTO = ROT_tagDTO.builder()
+                    .tag_id(task.getTag().getId())
+                    .tag_name(task.getTag().getTagName())
+                    .build();
+        }
 
 
 
@@ -550,10 +589,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
                 .task_id(task.getId())
                 .task_name(task.getTaskName())
                 .task_type(task.getTaskType())
-                .tag(new ROT_tagDTO(
-                        Optional.ofNullable(task.getTag()).map(Tag::getId).orElse(null),
-                        Optional.ofNullable(task.getTag()).map(Tag::getTagName).orElse(null)
-                        ))
+                .tag(rotTagDTO)
                 .group(new ROT_groupDTO(
                         task.getGroup().getId(),
                         task.getGroup().getGroupName(),
@@ -635,6 +671,15 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
                     .orElseThrow(()-> new NoSuchElementException("Could not find userGroup with userID: "
                             + loginUser.getId() + "In function getTaskListForUser" ));
 
+            ROT_tagDTO return_rotTagDTO = null;
+            //insert tag information
+            if(t.getTag() != null){
+                return_rotTagDTO = ROT_tagDTO.builder()
+                        .tag_id(t.getTag().getId())
+                        .tag_name(t.getTag().getTagName())
+                        .build();
+            }
+
 
 
             ReadTaskListByUserSendDTO readTaskListByUserSendDTO = ReadTaskListByUserSendDTO.builder()
@@ -643,9 +688,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
                     .task_type(t.getTaskType())
                     .start_time(t.getStartTime())
                     .end_time(t.getEndTime())
-                    .tag(new ROT_tagDTO(
-                            Optional.ofNullable(t.getTag()).map(Tag::getId).orElse(null),
-                            Optional.ofNullable(t.getTag()).map(Tag::getTagName).orElse(null)))
+                    .tag(return_rotTagDTO)
                     .group(new RTL_groupDTO(
                             t.getGroup().getId(),
                             ug.getColor(),
@@ -697,6 +740,16 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
             endDate = LocalDateTime.of(2099,12,12,12,12,11);
         }
 
+        // contain all tags
+        boolean allTags = tagList.isEmpty();
+
+        // tag list has -1 -> give tasks  that doesn't have tag
+        boolean containNoTagTask = false;
+        if (tagList.contains(-1L)) {
+            tagList.remove(-1L);
+            containNoTagTask = true;
+        }
+
         Task lastTask;
         LocalDateTime lastEndTime = null;
         if (lastId != null) {
@@ -705,6 +758,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
             );
             lastEndTime = lastTask.getEndTime();
         }
+
         var pageable = PageRequest.of(0, 20);
         log.info("{} {} {} {}", startDate, endDate, totalIsDone, groupId);
         return taskRepository.findAllByGroupWithArguments(
@@ -716,7 +770,8 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
                 startDate,
                 endDate,
                 tagList,
-                tagList.size(),
+                allTags,
+                containNoTagTask,
                 pageable
         );
     }
@@ -752,6 +807,11 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
             if (userTask.getIsDone()) sum++;
         }
         return sum;
+    }
+
+    @Override
+    public int getTotalUserCount(Task task) {
+        return task.getUserTaskList().size();
     }
 
     @Override
