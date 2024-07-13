@@ -3,6 +3,8 @@ package com.wwme.wwme.task.service;
 import com.wwme.wwme.group.domain.Group;
 import com.wwme.wwme.group.domain.UserGroup;
 import com.wwme.wwme.group.repository.GroupRepository;
+import com.wwme.wwme.notification.NotificationService;
+import com.wwme.wwme.task.domain.DTO.receiveDTO.CreateTaskReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.MakeTaskDoneReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.sendDTO.*;
 import com.wwme.wwme.task.domain.Tag;
@@ -18,13 +20,16 @@ import com.wwme.wwme.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.management.Notification;
 import java.time.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +42,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
     private final GroupRepository groupRepository;
     private final UserRepository userRepository;
     private final UserTaskRepository userTaskRepository;
+    private final NotificationService notificationService;
 
 
     @Override
@@ -83,6 +89,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         addUserTaskByTaskType(taskType, group, taskEntity, todoUser);
         //DB에 추가
         log.info("Before return to Controller : Task Create");
+
         return taskRepository.save(taskEntity);
     }
 
@@ -196,6 +203,8 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
 
 
 
+        var beforeUsers = getUsersFromTask(task);
+
         //업데이트
         updateTaskName(taskName,task);
         updateTag(tag, task);
@@ -203,13 +212,26 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         updateTaskType(taskType, task, todoUser);
         updateIsDoneTotal(task,todoUser);
 
+        var afterUsers = getUsersFromTask(task);
+        Set<User> notifyUsers = new HashSet<>();
+        beforeUsers.forEach(curUser -> {
+            if (!notifyUsers.contains(curUser)) notifyUsers.add(curUser);
+        });
+        afterUsers.forEach(curUser -> {
+            if (!notifyUsers.contains(curUser)) notifyUsers.add(curUser);
+        });
 
+        notificationService.sendOnMyTaskChange(task, notifyUsers, loginUser);
 
         return task;
     }
 
     private void updateTaskName(String taskName, Task task) {
         task.setTaskName(taskName);
+    }
+
+    private Collection<User> getUsersFromTask(Task task) {
+        return task.getUserTaskList().stream().map(UserTask::getUser).toList();
     }
 
     private void updateIsDoneTotal(Task task,User todoUser) {
@@ -800,6 +822,12 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         }
 
         return task.getUserTaskList().get(0).getUser().getNickname();
+    }
+
+    @Override
+    public Collection<UserTask> findAllTodayDueDateTasks() {
+        var now = LocalDate.now();
+        return userTaskRepository.findAllByEndTime(now);
     }
 
 
