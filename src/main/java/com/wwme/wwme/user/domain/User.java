@@ -1,5 +1,6 @@
 package com.wwme.wwme.user.domain;
 
+import com.wwme.wwme.notification.NotificationHistory;
 import com.wwme.wwme.notification.NotificationSetting;
 import com.wwme.wwme.group.domain.UserGroup;
 import com.wwme.wwme.task.domain.UserTask;
@@ -31,8 +32,9 @@ public class User {
 
     private Long profileImageId; //added profile photo info
 
+    @Builder.Default
     @Embedded
-    private NotificationSetting notificationSetting;
+    private NotificationSetting notificationSetting = new NotificationSetting();
 
     //Cascade : 부모 (one side) 가 없어지면 자식도 모두 사라진다.
     @Builder.Default
@@ -41,6 +43,9 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     Collection<UserGroup> userGroup;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    List<NotificationHistory> notificationHistoryList;
 
     public User(String nickname) {
         this.nickname = nickname;
