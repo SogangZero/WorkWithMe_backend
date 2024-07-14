@@ -419,10 +419,11 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         ));
     }
 
-    private UpdateTaskTypeLogDTO changeTaskType(String taskType, Task task, User todoUser) {
+    private void changeTaskType(String taskType, Task task, User todoUser) {
         if (!task.validateTaskType(taskType)) {
             throw new IllegalArgumentException("Update Task Fail - TaskType is Invalid");
         }
+
         //personal -> group : personal 이외의 group에 속한 유저에 대해 UserTask 추가
         if (task.getTaskType().equals("personal") && taskType.equals("group")) {
             User existUser = task.getUserTaskList().get(0).getUser();
