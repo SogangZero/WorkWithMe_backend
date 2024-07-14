@@ -13,9 +13,9 @@ import java.util.Objects;
 @Getter
 @Setter
 @ToString
+@Builder
 @RequiredArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -26,6 +26,7 @@ public class Tag {
     @ManyToOne(fetch = FetchType.LAZY)
     private Group group;
 
+    @Builder.Default
     @OneToMany(mappedBy = "tag", cascade = CascadeType.PERSIST, orphanRemoval = false)
     private List<Task> taskList = new ArrayList<>();
 

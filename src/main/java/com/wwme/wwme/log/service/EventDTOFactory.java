@@ -2,73 +2,102 @@ package com.wwme.wwme.log.service;
 
 import com.wwme.wwme.log.domain.DTO.*;
 import com.wwme.wwme.log.domain.Event;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class EventDTOFactory {
     public static EventDTO createEventDTO(Event event){
         switch (event.getOperationTypeEnum()){
             case CREATE_TASK:
-                return CreateTaskLogDTO.buildWithOperationStringID()
+                CreateTaskLogDTO createTaskLogDTO = CreateTaskLogDTO.buildWithOperationStringID()
                         .id(event.getId())
                         .user(event.getUser())
+                        .task(event.getTask())
                         .operationTime(event.getOperationTime())
                         .operationString(event.getOperationString())
                         .operationTypeEnum(event.getOperationTypeEnum())
                         .group(event.getGroup())
                         .build();
+                log.info(createTaskLogDTO.toString());
+                createTaskLogDTO.setSpecificFields();
+                return createTaskLogDTO;
             case DELETE_TASK:
-                return DeleteTaskLogDTO.buildWithOperationStringID()
+                DeleteTaskLogDTO deleteTaskLogDTO = DeleteTaskLogDTO.buildWithOperationStringID()
                         .id(event.getId())
                         .user(event.getUser())
+                        .task(event.getTask())
                         .operationTime(event.getOperationTime())
                         .operationString(event.getOperationString())
                         .operationTypeEnum(event.getOperationTypeEnum())
                         .group(event.getGroup())
                         .build();
+                deleteTaskLogDTO.setSpecificFields();
+                return deleteTaskLogDTO;
             case UPDATE_TASK_CHANGE_TAG:
-                return UpdateTaskChangeTagDTO.buildWithOperationStringID()
+                UpdateTaskChangeTagDTO updateTaskChangeTagDTO = UpdateTaskChangeTagDTO.buildWithOperationStringID()
                         .id(event.getId())
                         .user(event.getUser())
+                        .task(event.getTask())
                         .operationTime(event.getOperationTime())
                         .operationString(event.getOperationString())
                         .operationTypeEnum(event.getOperationTypeEnum())
                         .group(event.getGroup())
                         .build();
+                updateTaskChangeTagDTO.setSpecificFields();
+
+                return updateTaskChangeTagDTO;
             case UPDATE_TASK_DELETE_TAG:
-                return UpdateTaskDeleteTagDTO.buildWithOperationStringID()
+                UpdateTaskDeleteTagDTO updateTaskDeleteTagDTO = UpdateTaskDeleteTagDTO.buildWithOperationStringID()
                         .id(event.getId())
                         .user(event.getUser())
+                        .task(event.getTask())
                         .operationTime(event.getOperationTime())
                         .operationString(event.getOperationString())
                         .operationTypeEnum(event.getOperationTypeEnum())
                         .group(event.getGroup())
                         .build();
+                updateTaskDeleteTagDTO.setSpecificFields();
+
+                return updateTaskDeleteTagDTO;
             case UPDATE_TASK_DUE_DATE:
-                return UpdateTaskDueDateLogDTO.buildWithOperationStringID()
+                UpdateTaskDueDateLogDTO updateTaskDueDateLogDTO = UpdateTaskDueDateLogDTO.buildWithOperationStringID()
                         .id(event.getId())
                         .user(event.getUser())
+                        .task(event.getTask())
                         .operationTime(event.getOperationTime())
                         .operationString(event.getOperationString())
                         .operationTypeEnum(event.getOperationTypeEnum())
                         .group(event.getGroup())
                         .build();
+                updateTaskDueDateLogDTO.setSpecificFields();
+
+                return updateTaskDueDateLogDTO;
             case UPDATE_TASK_NAME:
-                return UpdateTaskNameLogDTO.buildWithOperationStringID()
+                UpdateTaskNameLogDTO updateTaskNameLogDTO = UpdateTaskNameLogDTO.buildWithOperationStringID()
                         .id(event.getId())
                         .user(event.getUser())
+                        .task(event.getTask())
                         .operationTime(event.getOperationTime())
                         .operationString(event.getOperationString())
                         .operationTypeEnum(event.getOperationTypeEnum())
                         .group(event.getGroup())
                         .build();
+                updateTaskNameLogDTO.setSpecificFields();
+
+                return updateTaskNameLogDTO;
             case UPDATE_TASK_TYPE:
-                return UpdateTaskTypeLogDTO.buildWithOperationStringID()
+                UpdateTaskTypeLogDTO updateTaskTypeLogDTO = UpdateTaskTypeLogDTO.buildWithOperationStringID()
                         .id(event.getId())
                         .user(event.getUser())
+                        .task(event.getTask())
                         .operationTime(event.getOperationTime())
                         .operationString(event.getOperationString())
                         .operationTypeEnum(event.getOperationTypeEnum())
                         .group(event.getGroup())
                         .build();
+                updateTaskTypeLogDTO.setSpecificFields();
+
+                return updateTaskTypeLogDTO;
             default:
                 throw new IllegalArgumentException("Unknown Operation ENUM : " + event.getOperationTypeEnum()+
                 " In function createEventDTO");
@@ -83,6 +112,7 @@ public class EventDTOFactory {
                 .operationString(eventDTO.getOperationString())
                 .user(eventDTO.getUser())
                 .group(eventDTO.getGroup())
+                .task(eventDTO.getTask())
                 .operationTime(eventDTO.getOperationTime())
                 .operationTypeEnum(eventDTO.getOperationTypeEnum())
                 .build();

@@ -92,9 +92,10 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         CreateTaskLogDTO createTaskLogDTO = CreateTaskLogDTO.buildWithSpecificParamsNoID()
                 .task(newTask)
                 .newTaskName(newTask.getTaskName())
-                .user(taskType.equals("personal") ? todoUser : null)
+                .user(loginUser)
                 .operationTime(LocalDateTime.now())
                 .operationTypeEnum(OperationType.CREATE_TASK)
+                .group(group)
                 .build();
         eventService.createEvent(createTaskLogDTO);
 

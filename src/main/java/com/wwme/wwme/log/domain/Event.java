@@ -12,9 +12,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@ToString
 @Builder
 @Entity
+@Table(name = "event_table")
 public class Event {
 
     @Builder
@@ -26,8 +26,18 @@ public class Event {
         this.operationTime = operationTime;
     }
 
-
-
+    @Override
+    public String toString() {
+        return "Event{" +
+                "id=" + id +
+                ", user=" + user.getNickname() +
+                ", group=" + group.getGroupName()    +
+                ", task=" + task.getTaskName() +
+                ", operationTypeEnum=" + operationTypeEnum +
+                ", operationString='" + operationString + '\'' +
+                ", operationTime=" + operationTime +
+                '}';
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -38,7 +48,6 @@ public class Event {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT), nullable = true)
     private Group group;
 
     @ManyToOne(fetch = FetchType.LAZY)

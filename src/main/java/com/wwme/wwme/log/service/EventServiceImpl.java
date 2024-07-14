@@ -7,6 +7,7 @@ import com.wwme.wwme.log.domain.Event;
 import com.wwme.wwme.log.repository.EventRepository;
 import com.wwme.wwme.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EventServiceImpl implements EventService {
 
     private final EventRepository eventRepository;
@@ -29,8 +31,11 @@ public class EventServiceImpl implements EventService {
                 .operationString(eventDTO.getOperationString())
                 .operationTypeEnum(eventDTO.getOperationTypeEnum())
                 .operationTime(eventDTO.getOperationTime())
+                .group(eventDTO.getGroup())
+                .task(eventDTO.getTask())
                 .build();
         Event savedEvent = eventRepository.save(event);
+        log.info("saved event OperationString : "+event.getOperationString());
 
         EventDTO returnEventDTO = EventDTOFactory.createEventDTO(savedEvent);
         return eventDTO;
@@ -62,10 +67,15 @@ public class EventServiceImpl implements EventService {
             );
         }
 
+
+
         List<EventDTO> eventDTOList = new ArrayList<>();
+        //operation String exists until here.
         for(Event e : eventList){
+            log.info(e.toString());
             eventDTOList.add(EventDTOFactory.createEventDTO(e));
         }
+
 
         return eventDTOList;
     }
