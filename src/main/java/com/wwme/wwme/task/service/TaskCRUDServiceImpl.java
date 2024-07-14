@@ -210,15 +210,18 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
             updateTodoUser(task, todoUser);
         }
 
+        List<EventDTO> eventDTOList = new ArrayList<>();
 
-        //업데이트
-        updateTaskName(taskName,task,loginUser);
-        updateTag(tag, task,loginUser);
-        updateEndTime(endTime, task, loginUser);
-        updateTaskType(taskType, task, todoUser, loginUser);
+        //업데이트 + 로그
+        eventDTOList.add(updateTaskName(taskName,task,loginUser));
+        eventDTOList.add(updateTag(tag,task,loginUser));
+        eventDTOList.add(updateEndTime(endTime, task, loginUser));
+        eventDTOList.add(updateTaskType(taskType, task, todoUser, loginUser));
         updateIsDoneTotal(task,todoUser);
 
-
+        eventDTOList.stream()
+                .filter(Objects::nonNull)
+                .forEach(eventService::createEvent);
 
         return task;
     }
