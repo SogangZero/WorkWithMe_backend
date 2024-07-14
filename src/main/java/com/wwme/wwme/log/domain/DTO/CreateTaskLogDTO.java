@@ -15,14 +15,16 @@ import java.time.LocalDateTime;
 public class CreateTaskLogDTO extends EventDTO{
     private String newTaskName;
 
-    @Builder(builderMethodName = "buildWithSpecificParamsNoID")
+    @Builder(builderMethodName = "buildWithSpecificParamsNoID",
+    builderClassName = "SpecificParamsNoID")
     public CreateTaskLogDTO(User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, String newTaskName, Task task) {
         super(user, group, operationTypeEnum, operationTime, task);
         this.newTaskName = newTaskName;
         setOperationStr();
     }
 
-    @Builder(builderMethodName = "buildWithOperationStringID") //buildWithOperationStringID
+    @Builder(builderMethodName = "buildWithOperationStringID",
+    builderClassName = "OperationStringID") //buildWithOperationStringID
     public CreateTaskLogDTO(Long id, User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, String operationString, Task task) {
         super(id, user, group, operationTypeEnum, operationTime, operationString, task);
         setSpecificFields();

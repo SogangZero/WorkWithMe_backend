@@ -362,12 +362,6 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
     }
 
     private EventDTO updateTag(Tag tag, Task task, User loginUser) {
-        if(tag == null){
-            task.changeTag(null);
-        }else if (!tag.equals(task.getTag())) {
-            task.changeTag(tag);
-        }
-
         if(isTagUpdateScenario(task, tag)){
             Tag prevTag = task.getTag();
 
@@ -405,7 +399,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
     }
     private boolean isTagUpdateScenario(Task task, Tag tag){
         if(task.getTag() == null){
-            return tag == null;
+            return tag != null;
         }else{
             return task.getTag().equals(tag);
         }
