@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -28,10 +29,11 @@ public class TaskDTOBinder {
 
 
 
-    public CUTaskSendDTO bindCUTaskSendDTO(Task task, User loginUser) {
+    public CUTaskSendDTO bindCUTaskSendDTO(Task task, User loginUser,Long todoUserId) {
         //checking is_done_total
+
         boolean task_is_done_total = setAndReturnIsDoneTotal(task);
-        boolean task_is_done_personal = setAndReturnIsDonePersonal(task, loginUser);
+        boolean task_is_done_personal = Objects.equals(loginUser.getId(), todoUserId) && setAndReturnIsDonePersonal(task, loginUser);
 
         //checking group color for individual
         Group group = groupRepository.findGroupByIdLoadUserTaskList(task.getGroup().getId()).orElseThrow(
