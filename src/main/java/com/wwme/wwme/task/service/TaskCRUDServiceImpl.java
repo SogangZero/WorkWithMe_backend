@@ -117,6 +117,8 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
     }
 
     private static void checkParameterValidity(String taskName, LocalDateTime endTime, String taskType) {
+        LocalDateTime checkEndTime = LocalDateTime.of(endTime.getYear(),endTime.getMonthValue(),endTime.getDayOfMonth(),23,59,59);
+
         if (taskName == null || taskName.isEmpty()) {
             throw new IllegalArgumentException("Create Task Fail - No content of TaskName");
         }
@@ -315,7 +317,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
     private static void updateEndTime(LocalDateTime endTime, Task task) {
         if (endTime != null && !task.getEndTime().equals(endTime)) {
             if (endTime.isBefore(LocalDateTime.now())) {
-                throw new IllegalArgumentException("Update Task Fail - EndTime is before now");
+                throw new IllegalArgumentException("Update Task Fail - EndTime is before now in function updateEndTime");
             }
             task.changeEndTime(endTime);
         }
