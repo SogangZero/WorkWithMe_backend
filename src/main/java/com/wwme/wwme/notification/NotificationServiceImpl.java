@@ -246,6 +246,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     private void send(JsonObject jsonObject) {
         try {
+            log.info("Send notification: {}", jsonObject);
             // don't send if token is null
             if (jsonObject.getAsJsonObject("message").get("token").getAsString() == null) {
                 return;
@@ -259,7 +260,7 @@ public class NotificationServiceImpl implements NotificationService {
             String URI = "https://fcm.googleapis.com/v1/projects/" + projectId + "/messages:send";
             HttpEntity<String> httpEntity = new HttpEntity<>(jsonObject.toString(), headers);
             var result = restTemplate.postForEntity(URI, httpEntity, String.class);
-            log.info("Message result: {}", result);
+            log.info("Notification result: {}", result);
         } catch (Exception e) {
             log.error("Error in alarm send. ", e);
         }
