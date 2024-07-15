@@ -24,6 +24,7 @@ public class UpdateTaskDueDateLogDTO extends EventDTO{
         this.updatedDueDate = updatedDueDate;
         this.currentTaskName = task.getTaskName();
         setOperationStr();
+        this.isTaskLog = true;
     }
 
     @Builder(builderMethodName = "buildWithOperationStringID",
@@ -34,6 +35,7 @@ public class UpdateTaskDueDateLogDTO extends EventDTO{
                                    Task task, String currentTaskName) {
         super(id, user, group, operationTypeEnum, operationTime, operationString,task, currentTaskName);
         setSpecificFields();
+        this.isTaskLog = true;
     }
 
     @Override
