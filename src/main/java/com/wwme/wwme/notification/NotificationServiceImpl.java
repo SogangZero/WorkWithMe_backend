@@ -56,28 +56,6 @@ public class NotificationServiceImpl implements NotificationService {
         return googleCredentials.getAccessToken().getTokenValue();
     }
 
-    @Override
-    public void updateRegistrationToken(String registrationToken, User user) {
-        updateRegistrationToken(registrationToken, user.getId());
-    }
-
-    @Override
-    public void updateRegistrationToken(String registrationToken, Long userId) {
-        userRepository.updateRegistrationToken(registrationToken, userId);
-    }
-
-    @Override
-    public void updateNotificationSetting(boolean onDueDate, boolean onMyTaskCreation,
-                                          boolean onMyTaskChange, boolean onGroupEntrance, User user) {
-        updateNotificationSetting(onDueDate, onMyTaskCreation, onMyTaskChange, onGroupEntrance, user.getId());
-    }
-
-    @Override
-    public void updateNotificationSetting(boolean onDueDate, boolean onMyTaskCreation,
-                                          boolean onMyTaskChange, boolean onGroupEntrance, long userId) {
-        userRepository.updateNotificationSetting(onDueDate, onMyTaskCreation, onMyTaskChange, onGroupEntrance, userId);
-    }
-
 
     @Override
     public void sendDueDateNotification(Task task, User user) {
