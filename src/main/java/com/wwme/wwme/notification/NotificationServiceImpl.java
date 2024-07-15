@@ -18,9 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -44,8 +42,8 @@ public class NotificationServiceImpl implements NotificationService {
         this.notificationHistoryRepository = notificationHistoryRepository;
     }
 
-    private InputStream getStream() {
-        return new ByteArrayInputStream(rawFcmJson.getBytes(StandardCharsets.UTF_8));
+    private InputStream getStream() throws FileNotFoundException {
+        return new FileInputStream("service-account.json");
     }
 
     private String getAccessToken() throws IOException {
@@ -65,6 +63,7 @@ public class NotificationServiceImpl implements NotificationService {
         }
 
         Map<String, String> dataMap = new HashMap<>();
+        dataMap.put("type", NotificationType.DUE_DATE.toString());
         dataMap.put("task_id", task.getId().toString());
 
         String title = "임박한 할 일이 있어요!";
@@ -81,9 +80,10 @@ public class NotificationServiceImpl implements NotificationService {
 
     private void sendOneOnGroupEntranceNotification(Group group, User newUser, String registrationToken) {
         Map<String, String> dataMap = new HashMap<>();
+        dataMap.put("type", NotificationType.GROUP_ENTRANCE.toString());
         dataMap.put("group_id", group.getId().toString());
 
-        String title = group.getGroupName() + "에" + newUser.getNickname() + "이 들어왔습니다!";
+        String title = group.getGroupName() + "에 " + newUser.getNickname() + "님이 들어왔습니다!";
         String body = title;
 
         var sendJsonObject = makeSendJsonObject(title, body, dataMap, registrationToken);
@@ -115,10 +115,11 @@ public class NotificationServiceImpl implements NotificationService {
             }
 
             Map<String, String> dataMap = new HashMap<>();
+            dataMap.put("type", NotificationType.TASK_CREATION.toString());
             dataMap.put("task_id", task.getId().toString());
             var title = "아무나 할 수 있는 일이 생겼습니다.";
             var body = "\"" + task.getTaskName() + "\"을 " +
-                    creatingUser.getNickname() + "이 만들었습니다.";
+                    creatingUser.getNickname() + "님이 만들었습니다.";
             var registrationToken = notifiedUser.getNotificationSetting().getRegistrationToken();
 
             var sendJsonObject = makeSendJsonObject(title, body, dataMap, registrationToken);
@@ -138,6 +139,7 @@ public class NotificationServiceImpl implements NotificationService {
             }
 
             Map<String, String> dataMap = new HashMap<>();
+            dataMap.put("type", NotificationType.TASK_CREATION.toString());
             dataMap.put("task_id", task.getId().toString());
             var title = "모두 해야 하는 일이 생겼습니다.";
             var body = "\"" + task.getTaskName() + "\"을 " +
@@ -161,10 +163,11 @@ public class NotificationServiceImpl implements NotificationService {
             }
 
             Map<String, String> dataMap = new HashMap<>();
+            dataMap.put("type", NotificationType.TASK_CREATION.toString());
             dataMap.put("task_id", task.getId().toString());
             var title = "할 일이 생겼습니다.";
             var body = "\"" + task.getTaskName() + "\"을 " +
-                    creatingUser.getNickname() + "이 만들었습니다.";
+                    creatingUser.getNickname() + " 님이 만들었습니다.";
             var registrationToken = notifiedUser.getNotificationSetting().getRegistrationToken();
             var sendJsonObject = makeSendJsonObject(title, body, dataMap, registrationToken);
             recordNotification(title, body, notifiedUser,
@@ -191,10 +194,11 @@ public class NotificationServiceImpl implements NotificationService {
             }
 
             Map<String, String> dataMap = new HashMap<>();
+            dataMap.put("type", NotificationType.TASK_CHANGE.toString());
             dataMap.put("task_id", task.getId().toString());
             var title = "할 일이 수정되었습니다.";
-            var body = "\"" + task.getTaskName() + "\"을 " +
-                    changingUser.getNickname() + "이 수정하였습니다.";
+            var body = changingUser.getNickname() + "님이 "
+                    + "\"" + task.getTaskName() + "\"을 수정하였습니다.";
             var registrationToken = user.getNotificationSetting().getRegistrationToken();
             var sendJsonObject = makeSendJsonObject(title, body, dataMap, registrationToken);
             recordNotification(title, body, user,
@@ -226,6 +230,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     private void send(JsonObject jsonObject) {
         try {
+            log.info("Send notification: {}", jsonObject);
             // don't send if token is null
             if (jsonObject.getAsJsonObject("message").get("token").getAsString() == null) {
                 return;
@@ -238,7 +243,8 @@ public class NotificationServiceImpl implements NotificationService {
 
             String URI = "https://fcm.googleapis.com/v1/projects/" + projectId + "/messages:send";
             HttpEntity<String> httpEntity = new HttpEntity<>(jsonObject.toString(), headers);
-            restTemplate.postForEntity(URI, httpEntity, String.class);
+            var result = restTemplate.postForEntity(URI, httpEntity, String.class);
+            log.info("Notification result: {}", result);
         } catch (Exception e) {
             log.error("Error in alarm send. ", e);
         }
@@ -268,7 +274,7 @@ public class NotificationServiceImpl implements NotificationService {
         message.addProperty("token", receiveRegistrationToken);
 
         JsonObject sendJsonObject = new JsonObject();
-        sendJsonObject.addProperty("validateOnly", true);
+        sendJsonObject.addProperty("validateOnly", false);
         sendJsonObject.add("message", message);
 
         return sendJsonObject;

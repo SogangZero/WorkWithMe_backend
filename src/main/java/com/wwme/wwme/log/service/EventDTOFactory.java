@@ -1,6 +1,9 @@
 package com.wwme.wwme.log.service;
 
 import com.wwme.wwme.log.domain.DTO.*;
+import com.wwme.wwme.log.domain.DTO.tag.CreateTagLogDTO;
+import com.wwme.wwme.log.domain.DTO.tag.DeleteTagLogDTO;
+import com.wwme.wwme.log.domain.DTO.tag.UpdateTagNameLogDTO;
 import com.wwme.wwme.log.domain.Event;
 import lombok.extern.slf4j.Slf4j;
 
@@ -105,6 +108,42 @@ public class EventDTOFactory {
                 updateTaskTypeLogDTO.setSpecificFields();
 
                 return updateTaskTypeLogDTO;
+            case CREATE_TAG:
+                CreateTagLogDTO createTagLogDTO = CreateTagLogDTO.buildWithOperationStringID()
+                        .id(event.getId())
+                        .user(event.getUser())
+                        .task(event.getTask())
+                        .operationTime(event.getOperationTime())
+                        .operationString(event.getOperationString())
+                        .operationTypeEnum(event.getOperationTypeEnum())
+                        .group(event.getGroup())
+                        .currentTaskName(event.getCurrentTaskName())
+                        .build();
+                return createTagLogDTO;
+            case DELETE_TAG:
+                DeleteTagLogDTO deleteTagLogDTO = DeleteTagLogDTO.buildWithOperationStringID()
+                        .id(event.getId())
+                        .user(event.getUser())
+                        .task(event.getTask())
+                        .operationTime(event.getOperationTime())
+                        .operationString(event.getOperationString())
+                        .operationTypeEnum(event.getOperationTypeEnum())
+                        .group(event.getGroup())
+                        .currentTaskName(event.getCurrentTaskName())
+                        .build();
+                return deleteTagLogDTO;
+            case UPDATE_TAG_NAME:
+                UpdateTagNameLogDTO updateTagNameLogDTO = UpdateTagNameLogDTO.buildWithOperationStringID()
+                        .id(event.getId())
+                        .user(event.getUser())
+                        .task(event.getTask())
+                        .operationTime(event.getOperationTime())
+                        .operationString(event.getOperationString())
+                        .operationTypeEnum(event.getOperationTypeEnum())
+                        .group(event.getGroup())
+                        .currentTaskName(event.getCurrentTaskName())
+                        .build();
+                return updateTagNameLogDTO;
             default:
                 throw new IllegalArgumentException("Unknown Operation ENUM : " + event.getOperationTypeEnum()+
                 " In function createEventDTO");
