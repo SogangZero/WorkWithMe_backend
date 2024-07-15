@@ -15,4 +15,5 @@ public class ReturnLogDTO {
     private Long task_id;
     private String log_text;
     private LocalDateTime log_time;
+    private boolean is_task_log;
 }

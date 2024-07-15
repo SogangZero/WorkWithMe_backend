@@ -24,6 +24,7 @@ public class DeleteTaskLogDTO extends EventDTO{
         this.deletedTaskName = deletedTaskName;
         this.currentTaskName = deletedTaskName;
         setOperationStr();
+        this.isTaskLog = true;
     }
 
     @Builder(builderMethodName = "buildWithOperationStringID",
@@ -35,6 +36,7 @@ public class DeleteTaskLogDTO extends EventDTO{
         super(id, user, group, operationTypeEnum, operationTime, operationString,task, currentTaskName);
         this.deletedTaskName = deletedTaskName;
         setSpecificFields();
+        this.isTaskLog = true;
     }
 
     @Override

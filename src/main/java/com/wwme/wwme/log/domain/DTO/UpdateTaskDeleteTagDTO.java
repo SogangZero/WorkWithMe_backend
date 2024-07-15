@@ -22,6 +22,7 @@ public class UpdateTaskDeleteTagDTO extends EventDTO{
         this.deletedTag = deletedTag;
         this.currentTaskName = task.getTaskName();
         setOperationStr();
+        this.isTaskLog = true;
     }
 
     @Builder(builderMethodName = "buildWithOperationStringID",
@@ -31,6 +32,7 @@ public class UpdateTaskDeleteTagDTO extends EventDTO{
                                   Task task, String currentTaskName) {
         super(id, user, group, operationTypeEnum, operationTime, operationString,task, currentTaskName);
         setSpecificFields();
+        this.isTaskLog = true;
     }
 
     @Override
