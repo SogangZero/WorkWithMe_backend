@@ -4,12 +4,15 @@ import com.wwme.wwme.group.DTO.DataWrapDTO;
 import com.wwme.wwme.group.DTO.ErrorWrapDTO;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.CreateTagReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.UpdateTagReceiveDTO;
+import com.wwme.wwme.task.domain.DTO.sendDTO.CreateTagSendDTO;
+import com.wwme.wwme.task.domain.DTO.sendDTO.DataResponseDTO;
 import com.wwme.wwme.task.domain.DTO.sendDTO.TagListReadSendDTO;
 import com.wwme.wwme.task.domain.Tag;
 import com.wwme.wwme.task.service.TagCRUDServiceImpl;
 import com.wwme.wwme.task.service.TaskCRUDService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -33,8 +36,8 @@ public class TagController {
     @PostMapping
     public ResponseEntity<?> createTag(@RequestBody CreateTagReceiveDTO createTagReceiveDTO){
         try {
-            Tag tag = tagCRUDServiceImpl.createTag(createTagReceiveDTO);
-            return ResponseEntity.ok().build(); //TODO: what to send when data is null?
+            CreateTagSendDTO createTagSendDTO = tagCRUDServiceImpl.createTag(createTagReceiveDTO);
+            return new ResponseEntity<>(new DataResponseDTO(createTagSendDTO), HttpStatus.OK); //TODO: what to send when data is null?
         } catch (Exception e) {
             ErrorWrapDTO errorWrapDTO = new ErrorWrapDTO(e.getMessage());
             log.error(e.getMessage());

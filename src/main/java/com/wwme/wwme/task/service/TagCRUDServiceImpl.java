@@ -4,6 +4,7 @@ import com.wwme.wwme.group.domain.Group;
 import com.wwme.wwme.group.repository.GroupRepository;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.CreateTagReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.UpdateTagReceiveDTO;
+import com.wwme.wwme.task.domain.DTO.sendDTO.CreateTagSendDTO;
 import com.wwme.wwme.task.domain.DTO.sendDTO.TagListReadSendDTO;
 import com.wwme.wwme.task.domain.Tag;
 import com.wwme.wwme.task.domain.Task;
@@ -29,7 +30,7 @@ public class TagCRUDServiceImpl implements TagService {
     private final TaskRepository taskRepository;
 
     @Override //TODO: is this check algorithm for group necessary?
-    public Tag createTag(CreateTagReceiveDTO createTagReceiveDTO){
+    public CreateTagSendDTO createTag(CreateTagReceiveDTO createTagReceiveDTO){
         Tag tag = new Tag();
 
         if(createTagReceiveDTO.getTag_name() == null || createTagReceiveDTO.getTag_name().isBlank()){
@@ -44,7 +45,14 @@ public class TagCRUDServiceImpl implements TagService {
         tag.setGroup(group);
         tag.setTagName(createTagReceiveDTO.getTag_name());
 
-        return tagRepository.save(tag);
+        Tag newTag = tagRepository.save(tag);
+
+        return CreateTagSendDTO.builder()
+                .tag_id(newTag.getId())
+                .tag_name(newTag.getTagName())
+                .build();
+
+
     }
 
     @Override
