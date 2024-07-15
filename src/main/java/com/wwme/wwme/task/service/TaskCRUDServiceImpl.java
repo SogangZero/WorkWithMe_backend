@@ -620,6 +620,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         readOneTaskSendDTO.setIs_done_count(is_done_count);
         readOneTaskSendDTO.setIs_done_total(task.getTotalIsDone());
         readOneTaskSendDTO.setIs_done_personal(is_done_personal);
+        readOneTaskSendDTO.setIs_mine(isMyTask(task, loginUser));
 
 
 

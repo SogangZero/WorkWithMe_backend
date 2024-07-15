@@ -28,6 +28,7 @@ public class ReadOneTaskSendDTO {
     //added 0620
     private Boolean is_done_personal;
     private Boolean is_done_total;
+    private Boolean is_mine;
     private ROT_groupDTO group;
     private ROT_tagDTO tag;
 
