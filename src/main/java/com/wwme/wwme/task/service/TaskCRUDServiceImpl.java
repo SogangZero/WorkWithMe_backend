@@ -5,6 +5,9 @@ import com.wwme.wwme.group.domain.UserGroup;
 import com.wwme.wwme.group.repository.GroupRepository;
 import com.wwme.wwme.notification.NotificationService;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.CreateTaskReceiveDTO;
+import com.wwme.wwme.log.domain.DTO.*;
+import com.wwme.wwme.log.domain.OperationType;
+import com.wwme.wwme.log.service.EventService;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.MakeTaskDoneReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.sendDTO.*;
 import com.wwme.wwme.task.domain.Tag;
@@ -43,6 +46,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
     private final UserRepository userRepository;
     private final UserTaskRepository userTaskRepository;
     private final NotificationService notificationService;
+    private final EventService eventService;
 
 
     @Override
@@ -52,7 +56,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
                            Long tagId,
                            Long groupId,
                            Long todoUserId,
-                           User user) throws IllegalArgumentException{
+                           User loginUser) throws IllegalArgumentException{
 
         if(endTime == null){
             endTime = LocalDateTime.of(2099,12,12,12,12,12);
@@ -71,7 +75,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
             checkGroupIncludeTag(tag, group);
         }
 
-        checkUsersInSameGroup(taskType, user, group, todoUser);
+        checkUsersInSameGroup(taskType, loginUser, group, todoUser);
 
         //엔티티 구성
         Task taskEntity = Task.builder()
@@ -88,9 +92,21 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         //userTask 추가
         addUserTaskByTaskType(taskType, group, taskEntity, todoUser);
         //DB에 추가
-        log.info("Before return to Controller : Task Create");
+        Task newTask = taskRepository.save(taskEntity);
 
-        return taskRepository.save(taskEntity);
+        //log 추가 로직
+        CreateTaskLogDTO createTaskLogDTO = CreateTaskLogDTO.buildWithSpecificParamsNoID()
+                .task(newTask)
+                .newTaskName(newTask.getTaskName())
+                .user(loginUser)
+                .operationTime(LocalDateTime.now())
+                .operationTypeEnum(OperationType.CREATE_TASK)
+                .group(group)
+                .build();
+        eventService.createEvent(createTaskLogDTO);
+
+
+        return newTask;
     }
 
     private User getTodoUserForPersonalTask(String taskType, Long todoUserId) {
@@ -117,6 +133,8 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
     }
 
     private static void checkParameterValidity(String taskName, LocalDateTime endTime, String taskType) {
+        LocalDateTime checkEndTime = LocalDateTime.of(endTime.getYear(),endTime.getMonthValue(),endTime.getDayOfMonth(),23,59,59);
+
         if (taskName == null || taskName.isEmpty()) {
             throw new IllegalArgumentException("Create Task Fail - No content of TaskName");
         }
@@ -201,16 +219,16 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
             updateTodoUser(task, todoUser);
         }
 
-
+        List<EventDTO> eventDTOList = new ArrayList<>();
 
         var beforeUsers = getUsersFromTask(task);
 
-        //업데이트
-        updateTaskName(taskName,task);
-        updateTag(tag, task);
-        updateEndTime(endTime, task);
-        updateTaskType(taskType, task, todoUser);
-        updateIsDoneTotal(task,todoUser);
+        //업데이트 + 로그
+        eventDTOList.add(updateTaskName(taskName,task,loginUser));
+        eventDTOList.add(updateTag(tag,task,loginUser));
+        eventDTOList.add(updateEndTime(endTime, task, loginUser));
+        eventDTOList.add(updateTaskType(taskType, task, todoUser, loginUser));
+
 
         var afterUsers = getUsersFromTask(task);
         Set<User> notifyUsers = new HashSet<>();
@@ -222,12 +240,32 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         });
 
         notificationService.sendOnMyTaskChange(task, notifyUsers, loginUser);
+        eventDTOList.stream()
+                .filter(Objects::nonNull)
+                .forEach(eventService::createEvent);
 
         return task;
     }
 
-    private void updateTaskName(String taskName, Task task) {
-        task.setTaskName(taskName);
+    private UpdateTaskNameLogDTO updateTaskName(String taskName, Task task,User loginUser) {
+
+        if(!taskName.equals(task.getTaskName())){
+            UpdateTaskNameLogDTO updateTaskNameLogDTO = UpdateTaskNameLogDTO.buildWithSpecificParamsNoID()
+                    .operationTypeEnum(OperationType.UPDATE_TASK_NAME)
+                    .task(task)
+                    .user(loginUser)
+                    .operationTime(LocalDateTime.now())
+                    .beforeTaskName(task.getTaskName())
+                    .afterTaskName(taskName)
+                    .group(task.getGroup())
+                    .build();
+            task.setTaskName(taskName);
+            return updateTaskNameLogDTO;
+        }else{
+            return null;
+        }
+
+
     }
 
     private Collection<User> getUsersFromTask(Task task) {
@@ -303,32 +341,91 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         }
     }
 
-    private void updateTaskType(String taskType, Task task, User todoUser) {
+    private UpdateTaskTypeLogDTO updateTaskType(String taskType, Task task, User todoUser, User loginUser) {
+
+        String originTaskType = task.getTaskType();
         log.info("original task type : "+task.getTaskType());
         log.info("changing task type : "+taskType);
-        if (taskType != null && !task.getTaskType().equals(taskType)) {
+        if (taskType != null && !task.getTaskType().equals(taskType)) { //changes taskType
             changeTaskType(taskType, task, todoUser);
-        }
 
+            return UpdateTaskTypeLogDTO.buildWithSpecificParamsNoID()
+                    .operationTypeEnum(OperationType.UPDATE_TASK_TYPE)
+                    .operationTime(LocalDateTime.now())
+                    .task(task)
+                    .user(loginUser)
+                    .beforeTaskType(originTaskType)
+                    .afterTaskType(taskType)
+                    .group(task.getGroup())
+                    .build();
+        }else{
+            return null;
+        }
     }
 
-    private static void updateEndTime(LocalDateTime endTime, Task task) {
+    private static UpdateTaskDueDateLogDTO updateEndTime(LocalDateTime endTime, Task task, User loginUser) {
         if (endTime != null && !task.getEndTime().equals(endTime)) {
+            LocalDateTime originEndTime = task.getEndTime();
             if (endTime.isBefore(LocalDateTime.now())) {
-                throw new IllegalArgumentException("Update Task Fail - EndTime is before now");
+                throw new IllegalArgumentException("Update Task Fail - EndTime is before now in function updateEndTime");
             }
             task.changeEndTime(endTime);
+
+            return UpdateTaskDueDateLogDTO.buildWithSpecificParamsNoID()
+                    .operationTypeEnum(OperationType.UPDATE_TASK_DUE_DATE)
+                    .operationTime(LocalDateTime.now())
+                    .task(task)
+                    .user(loginUser)
+                    .group(task.getGroup())
+                    .previousDueDate(originEndTime)
+                    .updatedDueDate(endTime)
+                    .build();
+        }else{
+            return null;
         }
     }
 
-    private static void updateTag(Tag tag, Task task) {
-        if(tag == null){
-            task.changeTag(null);
-        }else if (!tag.equals(task.getTag())) {
-            if (!task.validateTagIdInGroup(tag)) {
+    private EventDTO updateTag(Tag tag, Task task, User loginUser) {
+        if(isTagUpdateScenario(task, tag)){
+            Tag prevTag = task.getTag();
+
+            if (!task.validateTagInGroup(tag)) {
                 throw new IllegalArgumentException("Update Task Fail - Tag Not Matched Group");
             }
             task.changeTag(tag);
+
+            //Logging feature
+            if(tag != null){
+                return UpdateTaskChangeTagDTO.buildWithSpecificParamsNoID()
+                        .task(task)
+                        .user(loginUser)
+                        .group(task.getGroup())
+                        .operationTypeEnum(OperationType.UPDATE_TASK_CHANGE_TAG)
+                        .operationTime(LocalDateTime.now())
+                        .updateTagName(tag.getTagName())
+                        .previousTagName(prevTag.getTagName())
+                        .build();
+            }else{//Tag is null --> update task delete tag
+                return UpdateTaskDeleteTagDTO.buildWithSpecificParamsNoID()
+                        .task(task)
+                        .user(loginUser)
+                        .group(task.getGroup())
+                        .operationTypeEnum(OperationType.UPDATE_TASK_DELETE_TAG)
+                        .operationTime(LocalDateTime.now())
+                        .deletedTag(prevTag)
+                        .build();
+            }
+
+        }else{
+            return null;
+        }
+
+    }
+    private boolean isTagUpdateScenario(Task task, Tag tag){
+        if(task.getTag() == null){
+            return tag != null;
+        }else{
+            return task.getTag().equals(tag);
         }
     }
 
@@ -348,6 +445,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         if (!task.validateTaskType(taskType)) {
             throw new IllegalArgumentException("Update Task Fail - TaskType is Invalid");
         }
+
         //personal -> group : personal 이외의 group에 속한 유저에 대해 UserTask 추가
         if (task.getTaskType().equals("personal") && taskType.equals("group")) {
             User existUser = task.getUserTaskList().get(0).getUser();
@@ -778,13 +876,27 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
 
 
     @Override
-    public void deleteTask(Long taskId) {
-        if(taskRepository.findById(taskId).isEmpty()) {
-            throw new NoSuchElementException("Could not find Task with ID: "+taskId
-            +"in function deleteTask");
-        }
+    public void deleteTask(Long taskId, User loginUser) {
+
+        Task task = taskRepository.findById(taskId).orElseThrow(()-> new NoSuchElementException("Could" +
+                "not find task with ID : "+ taskId + "in function deleteTask"));
+
         log.info("Task With Id ["+taskId+"] exists in DB");
+
+        //create log DTO
+        DeleteTaskLogDTO deleteTaskLogDTO = DeleteTaskLogDTO
+                .buildWithSpecificParams()
+                .task(null)
+                .group(task.getGroup())
+                .user(loginUser)
+                .operationTime(LocalDateTime.now())
+                .operationTypeEnum(OperationType.DELETE_TASK)
+                .deletedTaskName(task.getTaskName())
+                .build();
+
+
         taskRepository.deleteById(taskId);
+        eventService.createEvent(deleteTaskLogDTO);
     }
 
     @Override
