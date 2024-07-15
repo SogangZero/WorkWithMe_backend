@@ -13,9 +13,9 @@ import java.util.Objects;
 @Getter
 @Setter
 @ToString
+@Builder
 @RequiredArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

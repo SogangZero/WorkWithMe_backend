@@ -66,8 +66,13 @@ public class Task {
         this.taskType = taskType;
     }
 
-    public boolean validateTagIdInGroup(Tag tag) {
-        return this.getGroup().equals(tag.getGroup());
+    public boolean validateTagInGroup(Tag tag) {
+        if(tag != null){
+            return this.getGroup().equals(tag.getGroup());
+        }else{
+            return true;
+        }
+
     }
 
 //    public Boolean isDonePersonal() {

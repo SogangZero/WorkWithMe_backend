@@ -44,7 +44,7 @@ public class TaskCRUDController {
 
     @PostMapping
     public ResponseEntity<?> createTask(@RequestBody CreateTaskReceiveDTO createTaskReceiveDTO,
-                                        @Login User user) {
+                                        @Login User loginUser) {
         log.info("Create Task Controller");
         log.info("Test Log createTask");
         try {
@@ -55,14 +55,14 @@ public class TaskCRUDController {
                     createTaskReceiveDTO.getTag_id(),
                     createTaskReceiveDTO.getGroup_id(),
                     createTaskReceiveDTO.getTodo_user_id(),
-                    user);
+                    loginUser);
 
             log.info("Create New Task[{}]", task.getId());
 
-            notificationService.sendOnMyTaskCreation(task, user);
+            notificationService.sendOnMyTaskCreation(task, loginUser);
 
-            CUTaskSendDTO cuTaskSendDTO = taskDTOBinder.bindCUTaskSendDTO(task,user);
-            return new ResponseEntity<>(new DataResponseDTO(cuTaskSendDTO), HttpStatus.OK);   
+            CUTaskSendDTO cuTaskSendDTO = taskDTOBinder.bindCUTaskSendDTO(task,loginUser, createTaskReceiveDTO.getTodo_user_id());
+            return new ResponseEntity<>(new DataResponseDTO(cuTaskSendDTO), HttpStatus.OK);
         } catch (Exception e) {
             log.error("Create New Task ERROR " + e.getMessage());
             return new ResponseEntity<>(new ErrorResponseDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
@@ -82,7 +82,7 @@ public class TaskCRUDController {
                     updateTaskReceiveDTO.getTodo_user_id(),
                     loginUser);
 
-            CUTaskSendDTO cuTaskSendDTO = taskDTOBinder.bindCUTaskSendDTO(task,loginUser);
+            CUTaskSendDTO cuTaskSendDTO = taskDTOBinder.bindCUTaskSendDTO(task,loginUser,updateTaskReceiveDTO.getTodo_user_id());
             return new ResponseEntity<>(new DataResponseDTO(cuTaskSendDTO), HttpStatus.OK);
         } catch (Exception e) {
             log.error("Update Task ERROR " + e.getMessage() + Arrays.toString(e.getStackTrace()));
@@ -225,10 +225,11 @@ public class TaskCRUDController {
     }
 
     @DeleteMapping
-    public ResponseEntity<?> deleteTask(@RequestParam("task_id") Long task_id) {
+    public ResponseEntity<?> deleteTask(@RequestParam("task_id") Long task_id,
+                                        @Login User loginUser) {
         try {
             log.info("Task Id : "+task_id);
-            taskCRUDService.deleteTask(task_id);
+            taskCRUDService.deleteTask(task_id, loginUser);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             log.error(e.getMessage());

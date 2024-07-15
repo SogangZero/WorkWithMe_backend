@@ -73,8 +73,10 @@ public class TaskDTOBinderTest {
     @Test
     @DisplayName("bindCUTaskSendDTO - Task를 CUTaskSendDTO로 변환")
     void bindCUTaskSendDTOTest() {
+
         //when
-        CUTaskSendDTO dto = taskDTOBinder.bindCUTaskSendDTO(task,user);
+        Long todoUserId = 1L;
+        CUTaskSendDTO dto = taskDTOBinder.bindCUTaskSendDTO(task,user,todoUserId);
 
         //then
         assertThat(dto.getTask_id()).isEqualTo(task.getId());
