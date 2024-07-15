@@ -18,9 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -44,8 +42,8 @@ public class NotificationServiceImpl implements NotificationService {
         this.notificationHistoryRepository = notificationHistoryRepository;
     }
 
-    private InputStream getStream() {
-        return new ByteArrayInputStream(rawFcmJson.getBytes(StandardCharsets.UTF_8));
+    private InputStream getStream() throws FileNotFoundException {
+        return new FileInputStream("service-account.json");
     }
 
     private String getAccessToken() throws IOException {
