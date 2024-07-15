@@ -290,7 +290,7 @@ public class NotificationServiceImpl implements NotificationService {
         message.addProperty("token", receiveRegistrationToken);
 
         JsonObject sendJsonObject = new JsonObject();
-        sendJsonObject.addProperty("validateOnly", true);
+        sendJsonObject.addProperty("validateOnly", false);
         sendJsonObject.add("message", message);
 
         return sendJsonObject;
