@@ -367,8 +367,11 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
     private static UpdateTaskDueDateLogDTO updateEndTime(LocalDateTime endTime, Task task, User loginUser) {
         if (endTime != null && !task.getEndTime().equals(endTime)) {
             LocalDateTime originEndTime = task.getEndTime();
-            if (endTime.isBefore(LocalDateTime.now())) {
-                throw new IllegalArgumentException("Update Task Fail - EndTime is before now in function updateEndTime");
+            if (endTime.isBefore(setToStartOfDay(task.getStartTime()))) {
+                log.info(endTime.toString());
+                log.info(setToStartOfDay(task.getStartTime()).toString());
+
+                throw new IllegalArgumentException("Update Task Fail - The Changed Endtime is before startTime in function updateEndTime");
             }
             task.changeEndTime(endTime);
 
@@ -384,6 +387,16 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         }else{
             return null;
         }
+    }
+
+    private static LocalDateTime setToEndOfDay(LocalDateTime localDateTime){
+        return LocalDateTime.of(localDateTime.getYear(),localDateTime.getMonthValue(),localDateTime.getDayOfMonth(),
+                11,59,59);
+    }
+
+    private static LocalDateTime setToStartOfDay(LocalDateTime localDateTime){
+        return LocalDateTime.of(localDateTime.getYear(),localDateTime.getMonthValue(),localDateTime.getDayOfMonth(),
+                0,0,0);
     }
 
     private EventDTO updateTag(Tag tag, Task task, User loginUser) {
