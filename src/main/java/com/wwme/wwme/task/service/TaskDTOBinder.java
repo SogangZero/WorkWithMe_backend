@@ -55,7 +55,7 @@ public class TaskDTOBinder {
                 .task_id(task.getId())
                 .task_name(task.getTaskName())
                 .group(cuTaskGroupDTO)
-                .tag(bindTagInfo(task.getTag()))
+                .tag(task.getTag() != null ? bindTagInfo(task.getTag()) : null)
                 .is_done_count(task.countDoneUser())
                 .is_done_personal(task_is_done_personal)
                 .is_done_total(task_is_done_total)
