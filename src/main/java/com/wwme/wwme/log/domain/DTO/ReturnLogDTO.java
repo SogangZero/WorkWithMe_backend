@@ -1,6 +1,7 @@
 package com.wwme.wwme.log.domain.DTO;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,5 +16,7 @@ public class ReturnLogDTO {
     private Long task_id;
     private String log_text;
     private LocalDateTime log_time;
-    private boolean is_task_log;
+
+    @JsonProperty(namespace = "is_task_log")
+    private Boolean is_task_log;
 }
