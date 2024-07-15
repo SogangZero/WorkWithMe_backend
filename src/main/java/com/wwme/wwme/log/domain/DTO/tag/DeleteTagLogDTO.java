@@ -23,6 +23,7 @@ public class DeleteTagLogDTO extends EventDTO {
                            String currentTaskName) {
         super(id, user, group, operationTypeEnum, operationTime, operationString, task, currentTaskName);
         setSpecificFields();
+        this.isTaskLog = false;
     }
 
     @Builder(builderMethodName = "buildWithSpecificParamsNoID",
@@ -32,6 +33,7 @@ public class DeleteTagLogDTO extends EventDTO {
         super(user, group, operationTypeEnum, operationTime, task);
         this.deletedTagName = deletedTagName;
         setOperationStr();
+        this.isTaskLog = false;
     }
 
     @Override

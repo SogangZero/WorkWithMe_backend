@@ -26,6 +26,7 @@ public class CreateTagLogDTO extends EventDTO {
         super(id, user, group, operationTypeEnum, operationTime, operationString, task, currentTaskName);
         this.createTagName = createTagName;
         this.setSpecificFields();
+        this.isTaskLog = false;
     }
 
     @Builder(builderMethodName = "buildWithSpecificParamsNoID",
@@ -37,6 +38,7 @@ public class CreateTagLogDTO extends EventDTO {
         this.createTagName = createTagName;
         setOperationStr();
         log.info("Create Tag Log DTO's enum : " + this.getOperationTypeEnum());
+        this.isTaskLog = false;
 
     }
 
