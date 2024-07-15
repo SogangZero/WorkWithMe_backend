@@ -85,6 +85,7 @@ public class NotificationServiceImpl implements NotificationService {
         }
 
         Map<String, String> dataMap = new HashMap<>();
+        dataMap.put("type", NotificationType.DUE_DATE.toString());
         dataMap.put("task_id", task.getId().toString());
 
         String title = "임박한 할 일이 있어요!";
@@ -101,6 +102,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     private void sendOneOnGroupEntranceNotification(Group group, User newUser, String registrationToken) {
         Map<String, String> dataMap = new HashMap<>();
+        dataMap.put("type", NotificationType.GROUP_ENTRANCE.toString());
         dataMap.put("group_id", group.getId().toString());
 
         String title = group.getGroupName() + "에" + newUser.getNickname() + "이 들어왔습니다!";
@@ -135,6 +137,7 @@ public class NotificationServiceImpl implements NotificationService {
             }
 
             Map<String, String> dataMap = new HashMap<>();
+            dataMap.put("type", NotificationType.TASK_CREATION.toString());
             dataMap.put("task_id", task.getId().toString());
             var title = "아무나 할 수 있는 일이 생겼습니다.";
             var body = "\"" + task.getTaskName() + "\"을 " +
@@ -158,6 +161,7 @@ public class NotificationServiceImpl implements NotificationService {
             }
 
             Map<String, String> dataMap = new HashMap<>();
+            dataMap.put("type", NotificationType.TASK_CREATION.toString());
             dataMap.put("task_id", task.getId().toString());
             var title = "모두 해야 하는 일이 생겼습니다.";
             var body = "\"" + task.getTaskName() + "\"을 " +
@@ -181,6 +185,7 @@ public class NotificationServiceImpl implements NotificationService {
             }
 
             Map<String, String> dataMap = new HashMap<>();
+            dataMap.put("type", NotificationType.TASK_CREATION.toString());
             dataMap.put("task_id", task.getId().toString());
             var title = "할 일이 생겼습니다.";
             var body = "\"" + task.getTaskName() + "\"을 " +
@@ -211,6 +216,7 @@ public class NotificationServiceImpl implements NotificationService {
             }
 
             Map<String, String> dataMap = new HashMap<>();
+            dataMap.put("type", NotificationType.TASK_CHANGE.toString());
             dataMap.put("task_id", task.getId().toString());
             var title = "할 일이 수정되었습니다.";
             var body = "\"" + task.getTaskName() + "\"을 " +
