@@ -194,6 +194,7 @@ public class TaskCRUDController {
                         Long tagId = null;
                         if (tag != null)
                             tagId = tag.getId();
+                        var isMine = taskCRUDService.isMyTask(task, user);
                         return new TaskListReadByGroupSendDTO.Task(
                                 task.getId(),
                                 task.getTaskName(),
@@ -202,6 +203,7 @@ public class TaskCRUDController {
                                 tagId,
                                 task.getTotalIsDone(),
                                 taskCRUDService.getIsDoneMe(user, task),
+                                isMine,
                                 taskCRUDService.getDoneUserCount(task),
                                 taskCRUDService.getTotalUserCount(task),
                                 taskCRUDService.getDoingNickname(task)

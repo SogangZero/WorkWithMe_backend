@@ -105,4 +105,6 @@ public interface TaskCRUDService {
     String getDoingNickname(Task task);
 
     Collection<UserTask> findAllTodayDueDateTasks();
+
+   boolean isMyTask(Task task, User user);
 }

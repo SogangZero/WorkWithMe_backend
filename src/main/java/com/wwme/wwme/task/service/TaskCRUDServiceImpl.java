@@ -4,7 +4,6 @@ import com.wwme.wwme.group.domain.Group;
 import com.wwme.wwme.group.domain.UserGroup;
 import com.wwme.wwme.group.repository.GroupRepository;
 import com.wwme.wwme.notification.NotificationService;
-import com.wwme.wwme.task.domain.DTO.receiveDTO.CreateTaskReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.MakeTaskDoneReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.sendDTO.*;
 import com.wwme.wwme.task.domain.Tag;
@@ -20,16 +19,13 @@ import com.wwme.wwme.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.management.Notification;
 import java.time.*;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -830,6 +826,16 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         return userTaskRepository.findAllByEndTime(now);
     }
 
+    @Override
+    public boolean isMyTask(Task task, User user) {
+        for (UserTask userTask : task.getUserTaskList()) {
+            boolean taskIsMine = userTask.getUser().equals(user);
+            if (taskIsMine) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     //friend functions.
     private static void fillUserListForReadOneTaskSendDTO(ReadOneTaskSendDTO readOneTaskSendDTO, Task task){
