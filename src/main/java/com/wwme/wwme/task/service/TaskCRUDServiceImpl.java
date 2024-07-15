@@ -402,6 +402,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
     private EventDTO updateTag(Tag tag, Task task, User loginUser) {
         if(isTagUpdateScenario(task, tag)){
             Tag prevTag = task.getTag();
+            String prevTagName = (prevTag != null) ? prevTag.getTagName() : "해당 없음";
 
             if (!task.validateTagInGroup(tag)) {
                 throw new IllegalArgumentException("Update Task Fail - Tag Not Matched Group");
@@ -417,7 +418,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
                         .operationTypeEnum(OperationType.UPDATE_TASK_CHANGE_TAG)
                         .operationTime(LocalDateTime.now())
                         .updateTagName(tag.getTagName())
-                        .previousTagName(prevTag.getTagName())
+                        .previousTagName(prevTagName)
                         .build();
             }else{//Tag is null --> update task delete tag
                 return UpdateTaskDeleteTagDTO.buildWithSpecificParamsNoID()
