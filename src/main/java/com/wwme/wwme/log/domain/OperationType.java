@@ -10,7 +10,10 @@ public enum OperationType {
     UPDATE_TASK_TYPE("UpdateTaskType"),
     UPDATE_TASK_DUE_DATE("UpdateTaskDueDate"),
     UPDATE_TASK_CHANGE_TAG("UpdateTaskChangeTag"),
-    UPDATE_TASK_DELETE_TAG("UpdateTaskDeleteTag");
+    UPDATE_TASK_DELETE_TAG("UpdateTaskDeleteTag"),
+    CREATE_TAG("CreateTag"),
+    UPDATE_TAG_NAME("UpdateTagName"),
+    DELETE_TAG("DeleteTag");
 
     private final String logStr;
 

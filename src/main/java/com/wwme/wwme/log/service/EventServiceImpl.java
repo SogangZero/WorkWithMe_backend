@@ -35,6 +35,8 @@ public class EventServiceImpl implements EventService {
                 .task(eventDTO.getTask())
                 .currentTaskName(eventDTO.getCurrentTaskName())
                 .build();
+
+        log.info("Before Saving Event of ENUM: " + event.getOperationTypeEnum());
         Event savedEvent = eventRepository.save(event);
         log.info("saved event OperationString : "+event.getOperationString());
 

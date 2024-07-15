@@ -2,6 +2,7 @@ package com.wwme.wwme.task.controller;
 
 import com.wwme.wwme.group.DTO.DataWrapDTO;
 import com.wwme.wwme.group.DTO.ErrorWrapDTO;
+import com.wwme.wwme.login.aop.Login;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.CreateTagReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.UpdateTagReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.sendDTO.CreateTagSendDTO;
@@ -10,6 +11,8 @@ import com.wwme.wwme.task.domain.DTO.sendDTO.TagListReadSendDTO;
 import com.wwme.wwme.task.domain.Tag;
 import com.wwme.wwme.task.service.TagCRUDServiceImpl;
 import com.wwme.wwme.task.service.TaskCRUDService;
+import com.wwme.wwme.user.domain.User;
+import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,9 +37,9 @@ public class TagController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createTag(@RequestBody CreateTagReceiveDTO createTagReceiveDTO){
+    public ResponseEntity<?> createTag(@RequestBody CreateTagReceiveDTO createTagReceiveDTO, @Login User loginUser){
         try {
-            CreateTagSendDTO createTagSendDTO = tagCRUDServiceImpl.createTag(createTagReceiveDTO);
+            CreateTagSendDTO createTagSendDTO = tagCRUDServiceImpl.createTag(createTagReceiveDTO, loginUser);
             return new ResponseEntity<>(new DataResponseDTO(createTagSendDTO), HttpStatus.OK); //TODO: what to send when data is null?
         } catch (Exception e) {
             ErrorWrapDTO errorWrapDTO = new ErrorWrapDTO(e.getMessage());
@@ -46,9 +49,10 @@ public class TagController {
     }
 
     @PutMapping
-    public ResponseEntity<?> updateTag(@RequestBody UpdateTagReceiveDTO updateTagReceiveDTO){
+    public ResponseEntity<?> updateTag(@RequestBody UpdateTagReceiveDTO updateTagReceiveDTO,
+                                       @Login User loginUser){
         try {
-            tagCRUDServiceImpl.updateTag(updateTagReceiveDTO);
+            tagCRUDServiceImpl.updateTag(updateTagReceiveDTO, loginUser);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             ErrorWrapDTO errorWrapDTO = new ErrorWrapDTO(e.getMessage());
@@ -69,9 +73,10 @@ public class TagController {
     }
 
     @DeleteMapping
-    public ResponseEntity<?> deleteTag(@RequestParam Long tag_id){
+    public ResponseEntity<?> deleteTag(@RequestParam Long tag_id,
+                                       @Login User loginUser){
         try {
-            tagCRUDServiceImpl.deleteTag(tag_id);
+            tagCRUDServiceImpl.deleteTag(tag_id, loginUser);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             ErrorWrapDTO errorWrapDTO = new ErrorWrapDTO(e.getMessage());
