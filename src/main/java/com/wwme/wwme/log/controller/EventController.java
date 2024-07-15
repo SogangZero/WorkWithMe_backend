@@ -44,6 +44,7 @@ public class EventController {
                         .log_id(eventDTO.getId())
                         .log_text(eventDTO.convertToString())
                         .task_id( eventDTO.getTask() == null ? null : eventDTO.getTask().getId())
+                        .log_time(eventDTO.getOperationTime())
                         .build());
             }
             return ResponseEntity.ok(new DataWrapDTO(returnLogDTOList));
