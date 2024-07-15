@@ -237,6 +237,8 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         });
 
         notificationService.sendOnMyTaskChange(task, notifyUsers, loginUser);
+
+
         eventDTOList.stream()
                 .filter(Objects::nonNull)
                 .forEach(eventService::createEvent);
@@ -245,6 +247,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
     }
 
     private UpdateTaskNameLogDTO updateTaskName(String taskName, Task task,User loginUser) {
+
 
         if(!taskName.equals(task.getTaskName())){
             UpdateTaskNameLogDTO updateTaskNameLogDTO = UpdateTaskNameLogDTO.buildWithSpecificParamsNoID()
