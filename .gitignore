@@ -40,3 +40,5 @@ out/
 /src/main/resources/application.properties
 /src/test/resources/application.yaml
 /src/main/resources/application.yaml
+
+service-account.json
