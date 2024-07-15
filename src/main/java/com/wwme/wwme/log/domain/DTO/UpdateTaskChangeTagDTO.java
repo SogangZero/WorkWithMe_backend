@@ -19,17 +19,22 @@ public class UpdateTaskChangeTagDTO extends EventDTO{
 
     @Builder(builderMethodName = "buildWithSpecificParamsNoID",
     builderClassName = "UpdateTaskChangeTagSpecificParamsNoID")
-    public UpdateTaskChangeTagDTO(User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, String previousTagName, String updateTagName, Task task) {
+    public UpdateTaskChangeTagDTO(User user, Group group, OperationType operationTypeEnum,
+                                  LocalDateTime operationTime, String previousTagName,
+                                  String updateTagName, Task task) {
         super(user, group, operationTypeEnum, operationTime, task);
         this.previousTagName = previousTagName;
         this.updateTagName = updateTagName;
+        this.currentTaskName = task.getTaskName();
         setOperationStr();
     }
 
     @Builder(builderMethodName = "buildWithOperationStringID",
     builderClassName = "UpdateTaskChangeTagOperationStringID")
-    public UpdateTaskChangeTagDTO(Long id, User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, String operationString, Task task) {
-        super(id, user, group, operationTypeEnum, operationTime, operationString,task);
+    public UpdateTaskChangeTagDTO(Long id, User user, Group group,
+                                  OperationType operationTypeEnum, LocalDateTime operationTime,
+                                  String operationString, Task task, String currentTaskName) {
+        super(id, user, group, operationTypeEnum, operationTime, operationString,task, currentTaskName);
         setSpecificFields();
     }
 
@@ -51,7 +56,7 @@ public class UpdateTaskChangeTagDTO extends EventDTO{
     public String convertToString() {
         return String.format("\"%s\" 님께서과제 \"%s\" 의 Tag 를 \"%s\" 에서 \"%s\" 로 변경하였습니다.",
                 this.getUser().getNickname(),
-                this.getTask().getTaskName(),
+                this.getCurrentTaskName(),
                 this.getPreviousTagName(),
                 this.getUpdateTagName());
     }

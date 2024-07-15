@@ -19,11 +19,13 @@ public class Event {
 
     @Builder
     public Event(User user, OperationType operationTypeEnum,
-                 String operationString, LocalDateTime operationTime) {
+                 String operationString, LocalDateTime operationTime,
+                 String currentTaskName) {
         this.user = user;
         this.operationTypeEnum = operationTypeEnum;
         this.operationString = operationString;
         this.operationTime = operationTime;
+        this.currentTaskName = currentTaskName;
     }
 
     @Id
@@ -45,4 +47,10 @@ public class Event {
 
     private String operationString;
     private LocalDateTime operationTime;
+
+    //added 0715
+    //DB 에서 받을 때는 currentTaskName,
+    //내가 생성할 때에는 dto 마다 다름
+    private String currentTaskName;
+
 }

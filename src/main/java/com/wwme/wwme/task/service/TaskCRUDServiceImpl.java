@@ -91,7 +91,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         //DB에 추가
         Task newTask = taskRepository.save(taskEntity);
 
-        //log 추가 로직
+        //log 추가 로직 (after creating task)
         CreateTaskLogDTO createTaskLogDTO = CreateTaskLogDTO.buildWithSpecificParamsNoID()
                 .task(newTask)
                 .newTaskName(newTask.getTaskName())
@@ -100,6 +100,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
                 .operationTypeEnum(OperationType.CREATE_TASK)
                 .group(group)
                 .build();
+
         eventService.createEvent(createTaskLogDTO);
 
 

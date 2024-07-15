@@ -24,13 +24,17 @@ public class UpdateTaskTypeLogDTO extends EventDTO{
         super(user, group, operationTypeEnum, operationTime,task);
         this.beforeTaskType = beforeTaskType;
         this.afterTaskType = afterTaskType;
+        this.currentTaskName = task.getTaskName();
         setOperationStr();
     }
 
     @Builder(builderMethodName = "buildWithOperationStringID",
     builderClassName = "UpdateTaskTypeOperationStringID")
-    public UpdateTaskTypeLogDTO(Long id, User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, String operationString, Task task) {
-        super(id, user, group, operationTypeEnum, operationTime, operationString,task);
+    public UpdateTaskTypeLogDTO(Long id, User user,
+                                Group group, OperationType operationTypeEnum,
+                                LocalDateTime operationTime, String operationString,
+                                Task task, String currentTaskName) {
+        super(id, user, group, operationTypeEnum, operationTime, operationString,task,currentTaskName);
         setSpecificFields();
     }
 
@@ -50,7 +54,7 @@ public class UpdateTaskTypeLogDTO extends EventDTO{
     public String convertToString() {
         return String.format("\"%s\" 님께서 과제 \"%s\" 의 Type 이 \"%s\" 에서 \"%s\" 로 변경하였습니다.",
                 this.getUser().getNickname(),
-                this.getTask().getTaskName(),
+                this.getCurrentTaskName(),
                 this.getBeforeTaskType(),
                 this.getAfterTaskType());
     }

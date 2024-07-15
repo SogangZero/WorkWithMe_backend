@@ -17,6 +17,7 @@ public class EventDTOFactory {
                         .operationString(event.getOperationString())
                         .operationTypeEnum(event.getOperationTypeEnum())
                         .group(event.getGroup())
+                        .currentTaskName(event.getCurrentTaskName())
                         .build();
                 log.info(createTaskLogDTO.toString());
                 createTaskLogDTO.setSpecificFields();
@@ -30,6 +31,7 @@ public class EventDTOFactory {
                         .operationString(event.getOperationString())
                         .operationTypeEnum(event.getOperationTypeEnum())
                         .group(event.getGroup())
+                        .currentTaskName(event.getCurrentTaskName())
                         .build();
                 deleteTaskLogDTO.setSpecificFields();
                 return deleteTaskLogDTO;
@@ -42,6 +44,7 @@ public class EventDTOFactory {
                         .operationString(event.getOperationString())
                         .operationTypeEnum(event.getOperationTypeEnum())
                         .group(event.getGroup())
+                        .currentTaskName(event.getCurrentTaskName())
                         .build();
                 updateTaskChangeTagDTO.setSpecificFields();
 
@@ -55,6 +58,7 @@ public class EventDTOFactory {
                         .operationString(event.getOperationString())
                         .operationTypeEnum(event.getOperationTypeEnum())
                         .group(event.getGroup())
+                        .currentTaskName(event.getCurrentTaskName())
                         .build();
                 updateTaskDeleteTagDTO.setSpecificFields();
 
@@ -68,6 +72,7 @@ public class EventDTOFactory {
                         .operationString(event.getOperationString())
                         .operationTypeEnum(event.getOperationTypeEnum())
                         .group(event.getGroup())
+                        .currentTaskName(event.getCurrentTaskName())
                         .build();
                 updateTaskDueDateLogDTO.setSpecificFields();
 
@@ -81,6 +86,7 @@ public class EventDTOFactory {
                         .operationString(event.getOperationString())
                         .operationTypeEnum(event.getOperationTypeEnum())
                         .group(event.getGroup())
+                        .currentTaskName(event.getCurrentTaskName())
                         .build();
                 updateTaskNameLogDTO.setSpecificFields();
 
@@ -94,6 +100,7 @@ public class EventDTOFactory {
                         .operationString(event.getOperationString())
                         .operationTypeEnum(event.getOperationTypeEnum())
                         .group(event.getGroup())
+                        .currentTaskName(event.getCurrentTaskName())
                         .build();
                 updateTaskTypeLogDTO.setSpecificFields();
 
@@ -106,15 +113,4 @@ public class EventDTOFactory {
 
     }
 
-    public static Event createEventEntity(EventDTO eventDTO){
-        return Event.builder()
-                .id(eventDTO.getId())
-                .operationString(eventDTO.getOperationString())
-                .user(eventDTO.getUser())
-                .group(eventDTO.getGroup())
-                .task(eventDTO.getTask())
-                .operationTime(eventDTO.getOperationTime())
-                .operationTypeEnum(eventDTO.getOperationTypeEnum())
-                .build();
-    }
 }

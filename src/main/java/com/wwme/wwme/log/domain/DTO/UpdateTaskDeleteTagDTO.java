@@ -20,13 +20,16 @@ public class UpdateTaskDeleteTagDTO extends EventDTO{
     public UpdateTaskDeleteTagDTO(User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, Tag deletedTag, Task task) {
         super(user, group, operationTypeEnum, operationTime,task);
         this.deletedTag = deletedTag;
+        this.currentTaskName = task.getTaskName();
         setOperationStr();
     }
 
     @Builder(builderMethodName = "buildWithOperationStringID",
             builderClassName = "UpdateTaskDeleteTagOperationStringID")
-    public UpdateTaskDeleteTagDTO(Long id, User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, String operationString, Task task) {
-        super(id, user, group, operationTypeEnum, operationTime, operationString,task);
+    public UpdateTaskDeleteTagDTO(Long id, User user, Group group, OperationType operationTypeEnum,
+                                  LocalDateTime operationTime, String operationString,
+                                  Task task, String currentTaskName) {
+        super(id, user, group, operationTypeEnum, operationTime, operationString,task, currentTaskName);
         setSpecificFields();
     }
 
@@ -44,7 +47,7 @@ public class UpdateTaskDeleteTagDTO extends EventDTO{
     public String convertToString() {
         return String.format("\"%s\" 님께서 과제 \"%s\" 의 Tag \"%s\" 를 삭제하였습니다..",
                 this.getUser().getNickname(),
-                this.getTask().getTaskName(),
+                this.getCurrentTaskName(),
                 this.getDeletedTag());
     }
 

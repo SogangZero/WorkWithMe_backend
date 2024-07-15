@@ -22,13 +22,17 @@ public class DeleteTaskLogDTO extends EventDTO{
     public DeleteTaskLogDTO(User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, String deletedTaskName, Task task) {
         super(user, group, operationTypeEnum, operationTime,task);
         this.deletedTaskName = deletedTaskName;
+        this.currentTaskName = deletedTaskName;
         setOperationStr();
     }
 
     @Builder(builderMethodName = "buildWithOperationStringID",
     builderClassName = "DeleteTaskOperationStringID")
-    public DeleteTaskLogDTO(Long id, User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, String operationString, String deletedTaskName, Task task) {
-        super(id, user, group, operationTypeEnum, operationTime, operationString,task);
+    public DeleteTaskLogDTO(Long id, User user, Group group,
+                            OperationType operationTypeEnum,
+                            LocalDateTime operationTime, String operationString,
+                            String deletedTaskName, Task task, String currentTaskName) {
+        super(id, user, group, operationTypeEnum, operationTime, operationString,task, currentTaskName);
         this.deletedTaskName = deletedTaskName;
         setSpecificFields();
     }
@@ -45,7 +49,7 @@ public class DeleteTaskLogDTO extends EventDTO{
 
     @Override
     public String convertToString() {
-        return "\"" + this.getUser().getNickname() + "\" 님이 " + "\"" + this.getDeletedTaskName() +"\""
+        return "\"" + this.getUser().getNickname() + "\" 님이 " + "\"" + this.getCurrentTaskName() +"\""
                 + "과제를 삭제하였습니다.";
     }
 }

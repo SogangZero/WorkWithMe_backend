@@ -20,13 +20,21 @@ public class CreateTaskLogDTO extends EventDTO{
     public CreateTaskLogDTO(User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, String newTaskName, Task task) {
         super(user, group, operationTypeEnum, operationTime, task);
         this.newTaskName = newTaskName;
+        this.currentTaskName = newTaskName;
         setOperationStr();
     }
 
     @Builder(builderMethodName = "buildWithOperationStringID",
     builderClassName = "CreateTaskOperationStringID") //buildWithOperationStringID
-    public CreateTaskLogDTO(Long id, User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, String operationString, Task task) {
-        super(id, user, group, operationTypeEnum, operationTime, operationString, task);
+    public CreateTaskLogDTO(Long id, User user, Group group,
+                            OperationType operationTypeEnum,
+                            LocalDateTime operationTime,
+                            String operationString,
+                            Task task,
+                            String currentTaskName) {
+        super(id, user, group, operationTypeEnum,
+                operationTime, operationString, task,
+                currentTaskName);
         setSpecificFields();
     }
 
@@ -54,7 +62,7 @@ public class CreateTaskLogDTO extends EventDTO{
         log.info(this.getUser().getNickname());
         log.info(this.getNewTaskName());
 
-        return "\"" + this.getUser().getNickname() + "\" 님이 " + "\"" + this.getNewTaskName() +"\""
+        return "\"" + this.getUser().getNickname() + "\" 님이 " + "\"" + this.getCurrentTaskName() +"\""
                 + "과제를 생성하였습니다.";
 
     }

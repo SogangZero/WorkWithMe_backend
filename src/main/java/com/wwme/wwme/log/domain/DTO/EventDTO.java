@@ -13,7 +13,13 @@ import java.time.LocalDateTime;
 @Setter
 public abstract class EventDTO {
 
-    public EventDTO(Long id, User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, String operationString, Task task) {
+    public EventDTO(Long id, User user,
+                    Group group,
+                    OperationType operationTypeEnum,
+                    LocalDateTime operationTime,
+                    String operationString,
+                    Task task,
+                    String currentTaskName) {
         this.id = id;
         this.user = user;
         this.group = group;
@@ -21,6 +27,7 @@ public abstract class EventDTO {
         this.operationTime = operationTime;
         this.operationString = operationString;
         this.task = task;
+        this.currentTaskName = currentTaskName;
     }
 
     public EventDTO(User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, Task task) {
@@ -38,6 +45,8 @@ public abstract class EventDTO {
     protected OperationType operationTypeEnum;
     protected LocalDateTime operationTime;
     protected String operationString;
+    //added 0715
+    protected String currentTaskName;
 
 
     //받은 정보를 바탕으로 operationString 을 계산한다.

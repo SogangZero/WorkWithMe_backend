@@ -33,6 +33,7 @@ public class EventServiceImpl implements EventService {
                 .operationTime(eventDTO.getOperationTime())
                 .group(eventDTO.getGroup())
                 .task(eventDTO.getTask())
+                .currentTaskName(eventDTO.getCurrentTaskName())
                 .build();
         Event savedEvent = eventRepository.save(event);
         log.info("saved event OperationString : "+event.getOperationString());
