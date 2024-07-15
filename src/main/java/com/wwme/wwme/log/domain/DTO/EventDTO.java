@@ -47,6 +47,8 @@ public abstract class EventDTO {
     protected String operationString;
     //added 0715
     protected String currentTaskName;
+    //added 0715
+    protected boolean isTaskLog;
 
 
     //받은 정보를 바탕으로 operationString 을 계산한다.

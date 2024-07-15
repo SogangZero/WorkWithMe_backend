@@ -23,6 +23,7 @@ public class UpdateTagNameLogDTO extends EventDTO {
                                Task task, String currentTaskName) {
         super(id, user, group, operationTypeEnum, operationTime, operationString, task, currentTaskName);
         this.setSpecificFields();
+        this.isTaskLog = false;
     }
 
 
@@ -36,6 +37,7 @@ public class UpdateTagNameLogDTO extends EventDTO {
         this.prevTagName = prevTagName;
         this.changedTagName = changedTagName;
         this.setOperationStr();
+        this.isTaskLog = false;
     }
 
     @Override

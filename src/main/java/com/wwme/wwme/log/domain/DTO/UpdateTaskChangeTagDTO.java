@@ -27,6 +27,7 @@ public class UpdateTaskChangeTagDTO extends EventDTO{
         this.updateTagName = updateTagName;
         this.currentTaskName = task.getTaskName();
         setOperationStr();
+        this.isTaskLog = true;
     }
 
     @Builder(builderMethodName = "buildWithOperationStringID",
@@ -36,6 +37,7 @@ public class UpdateTaskChangeTagDTO extends EventDTO{
                                   String operationString, Task task, String currentTaskName) {
         super(id, user, group, operationTypeEnum, operationTime, operationString,task, currentTaskName);
         setSpecificFields();
+        this.isTaskLog = true;
     }
 
 
