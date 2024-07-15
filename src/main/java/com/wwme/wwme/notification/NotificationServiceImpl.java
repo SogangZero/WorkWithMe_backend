@@ -258,7 +258,8 @@ public class NotificationServiceImpl implements NotificationService {
 
             String URI = "https://fcm.googleapis.com/v1/projects/" + projectId + "/messages:send";
             HttpEntity<String> httpEntity = new HttpEntity<>(jsonObject.toString(), headers);
-            restTemplate.postForEntity(URI, httpEntity, String.class);
+            var result = restTemplate.postForEntity(URI, httpEntity, String.class);
+            log.info("Message result: {}", result);
         } catch (Exception e) {
             log.error("Error in alarm send. ", e);
         }
