@@ -3,6 +3,7 @@ package com.wwme.wwme.task.controller;
 import com.wwme.wwme.group.DTO.DataWrapDTO;
 import com.wwme.wwme.group.DTO.ErrorWrapDTO;
 import com.wwme.wwme.login.aop.Login;
+import com.wwme.wwme.notification.NotificationService;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.CreateTaskReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.MakeTaskDoneReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.UpdateTaskReceiveDTO;
@@ -38,6 +39,7 @@ public class TaskCRUDController {
     private final TaskCRUDService taskCRUDService;
     private final TaskDTOBinder taskDTOBinder;
     private final UserService userService;
+    private final NotificationService notificationService;
 
 
     @PostMapping
@@ -58,7 +60,10 @@ public class TaskCRUDController {
             log.info("Create New Task[{}]", task.getId());
 
             CUTaskSendDTO cuTaskSendDTO = taskDTOBinder.bindCUTaskSendDTO(task,loginUser);
-            return new ResponseEntity<>(new DataResponseDTO(cuTaskSendDTO), HttpStatus.OK);   
+            notificationService.sendOnMyTaskCreation(task, user);
+
+            CUTaskSendDTO cuTaskSendDTO = taskDTOBinder.bindCUTaskSendDTO(task,user, createTaskReceiveDTO.getTodo_user_id());
+            return new ResponseEntity<>(new DataResponseDTO(cuTaskSendDTO), HttpStatus.OK);
         } catch (Exception e) {
             log.error("Create New Task ERROR " + e.getMessage());
             return new ResponseEntity<>(new ErrorResponseDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
@@ -78,7 +83,7 @@ public class TaskCRUDController {
                     updateTaskReceiveDTO.getTodo_user_id(),
                     loginUser);
 
-            CUTaskSendDTO cuTaskSendDTO = taskDTOBinder.bindCUTaskSendDTO(task,loginUser);
+            CUTaskSendDTO cuTaskSendDTO = taskDTOBinder.bindCUTaskSendDTO(task,loginUser,updateTaskReceiveDTO.getTodo_user_id());
             return new ResponseEntity<>(new DataResponseDTO(cuTaskSendDTO), HttpStatus.OK);
         } catch (Exception e) {
             log.error("Update Task ERROR " + e.getMessage() + Arrays.toString(e.getStackTrace()));

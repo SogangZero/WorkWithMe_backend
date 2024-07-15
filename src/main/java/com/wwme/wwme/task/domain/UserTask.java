@@ -7,7 +7,6 @@ import lombok.*;
 @Entity
 @Getter
 @Setter
-@ToString
 @Builder
 @RequiredArgsConstructor
 @AllArgsConstructor
@@ -26,4 +25,15 @@ public class UserTask {
     Task task;
 
     Boolean isDone;
+
+
+    @Override
+    public String toString() {
+        return "UserTask{" +
+                "id=" + id +
+                ", user=" + user.getId() +
+                ", task=" + task.getId() +
+                ", isDone=" + isDone +
+                '}';
+    }
 }

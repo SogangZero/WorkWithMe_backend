@@ -3,6 +3,8 @@ package com.wwme.wwme.task.service;
 import com.wwme.wwme.group.domain.Group;
 import com.wwme.wwme.group.domain.UserGroup;
 import com.wwme.wwme.group.repository.GroupRepository;
+import com.wwme.wwme.notification.NotificationService;
+import com.wwme.wwme.task.domain.DTO.receiveDTO.CreateTaskReceiveDTO;
 import com.wwme.wwme.log.domain.DTO.*;
 import com.wwme.wwme.log.domain.OperationType;
 import com.wwme.wwme.log.service.EventService;
@@ -21,13 +23,16 @@ import com.wwme.wwme.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.management.Notification;
 import java.time.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +45,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
     private final GroupRepository groupRepository;
     private final UserRepository userRepository;
     private final UserTaskRepository userTaskRepository;
+    private final NotificationService notificationService;
     private final EventService eventService;
 
 
@@ -127,6 +133,8 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
     }
 
     private static void checkParameterValidity(String taskName, LocalDateTime endTime, String taskType) {
+        LocalDateTime checkEndTime = LocalDateTime.of(endTime.getYear(),endTime.getMonthValue(),endTime.getDayOfMonth(),23,59,59);
+
         if (taskName == null || taskName.isEmpty()) {
             throw new IllegalArgumentException("Create Task Fail - No content of TaskName");
         }
@@ -218,8 +226,26 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         eventDTOList.add(updateTag(tag,task,loginUser));
         eventDTOList.add(updateEndTime(endTime, task, loginUser));
         eventDTOList.add(updateTaskType(taskType, task, todoUser, loginUser));
+
+        var beforeUsers = getUsersFromTask(task);
+
+        //업데이트
+        updateTaskName(taskName,task);
+        updateTag(tag, task);
+        updateEndTime(endTime, task);
+        updateTaskType(taskType, task, todoUser);
         updateIsDoneTotal(task,todoUser);
 
+        var afterUsers = getUsersFromTask(task);
+        Set<User> notifyUsers = new HashSet<>();
+        beforeUsers.forEach(curUser -> {
+            if (!notifyUsers.contains(curUser)) notifyUsers.add(curUser);
+        });
+        afterUsers.forEach(curUser -> {
+            if (!notifyUsers.contains(curUser)) notifyUsers.add(curUser);
+        });
+
+        notificationService.sendOnMyTaskChange(task, notifyUsers, loginUser);
         eventDTOList.stream()
                 .filter(Objects::nonNull)
                 .forEach(eventService::createEvent);
@@ -246,6 +272,10 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         }
 
 
+    }
+
+    private Collection<User> getUsersFromTask(Task task) {
+        return task.getUserTaskList().stream().map(UserTask::getUser).toList();
     }
 
     private void updateIsDoneTotal(Task task,User todoUser) {
@@ -343,7 +373,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         if (endTime != null && !task.getEndTime().equals(endTime)) {
             LocalDateTime originEndTime = task.getEndTime();
             if (endTime.isBefore(LocalDateTime.now())) {
-                throw new IllegalArgumentException("Update Task Fail - EndTime is before now");
+                throw new IllegalArgumentException("Update Task Fail - EndTime is before now in function updateEndTime");
             }
             task.changeEndTime(endTime);
 
@@ -910,6 +940,12 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         }
 
         return task.getUserTaskList().get(0).getUser().getNickname();
+    }
+
+    @Override
+    public Collection<UserTask> findAllTodayDueDateTasks() {
+        var now = LocalDate.now();
+        return userTaskRepository.findAllByEndTime(now);
     }
 
 

@@ -8,6 +8,7 @@ import com.wwme.wwme.group.service.GroupInvitationService;
 import com.wwme.wwme.group.service.GroupService;
 import com.wwme.wwme.group.service.UserGroupService;
 import com.wwme.wwme.login.aop.Login;
+import com.wwme.wwme.notification.NotificationService;
 import com.wwme.wwme.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,7 @@ public class GroupController {
     private final UserGroupService userGroupService;
     private final GroupInvitationService groupInvitationService;
     private final GroupDtoConverter converter;
+    private final NotificationService notificationService;
 
     /**
      * POST /group <br>
@@ -197,6 +199,7 @@ public class GroupController {
                     user,
                     requestDTO.getGroupColor()
             );
+            notificationService.sendOnGroupEntranceNotification(group, group.getUserGroupList());
 
             var responseDTO = new InvitationAcceptResponseSuccessDTO();
             responseDTO.setGroupId(group.getId());
