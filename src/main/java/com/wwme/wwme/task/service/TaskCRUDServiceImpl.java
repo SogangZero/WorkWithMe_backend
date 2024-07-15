@@ -23,16 +23,13 @@ import com.wwme.wwme.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.management.Notification;
 import java.time.*;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -722,6 +719,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         readOneTaskSendDTO.setIs_done_count(is_done_count);
         readOneTaskSendDTO.setIs_done_total(task.getTotalIsDone());
         readOneTaskSendDTO.setIs_done_personal(is_done_personal);
+        readOneTaskSendDTO.setIs_mine(isMyTask(task, loginUser));
 
 
 
@@ -942,6 +940,16 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         return userTaskRepository.findAllByEndTime(now);
     }
 
+    @Override
+    public boolean isMyTask(Task task, User user) {
+        for (UserTask userTask : task.getUserTaskList()) {
+            boolean taskIsMine = userTask.getUser().equals(user);
+            if (taskIsMine) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     //friend functions.
     private static void fillUserListForReadOneTaskSendDTO(ReadOneTaskSendDTO readOneTaskSendDTO, Task task){

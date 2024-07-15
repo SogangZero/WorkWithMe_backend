@@ -38,6 +38,9 @@ public class TaskListReadByGroupSendDTO {
         @JsonProperty("is_done_me")
         private Boolean isDoneMe;
 
+        @JsonProperty("is_mine")
+        private Boolean isMine;
+
         @JsonProperty("done_user_count")
         private Integer doneUserCount;
 
