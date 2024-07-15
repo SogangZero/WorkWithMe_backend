@@ -221,20 +221,14 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
 
         List<EventDTO> eventDTOList = new ArrayList<>();
 
+        var beforeUsers = getUsersFromTask(task);
+
         //업데이트 + 로그
         eventDTOList.add(updateTaskName(taskName,task,loginUser));
         eventDTOList.add(updateTag(tag,task,loginUser));
         eventDTOList.add(updateEndTime(endTime, task, loginUser));
         eventDTOList.add(updateTaskType(taskType, task, todoUser, loginUser));
 
-        var beforeUsers = getUsersFromTask(task);
-
-        //업데이트
-        updateTaskName(taskName,task);
-        updateTag(tag, task);
-        updateEndTime(endTime, task);
-        updateTaskType(taskType, task, todoUser);
-        updateIsDoneTotal(task,todoUser);
 
         var afterUsers = getUsersFromTask(task);
         Set<User> notifyUsers = new HashSet<>();

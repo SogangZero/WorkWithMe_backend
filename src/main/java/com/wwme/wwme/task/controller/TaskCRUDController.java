@@ -59,10 +59,9 @@ public class TaskCRUDController {
 
             log.info("Create New Task[{}]", task.getId());
 
-            CUTaskSendDTO cuTaskSendDTO = taskDTOBinder.bindCUTaskSendDTO(task,loginUser);
-            notificationService.sendOnMyTaskCreation(task, user);
+            notificationService.sendOnMyTaskCreation(task, loginUser);
 
-            CUTaskSendDTO cuTaskSendDTO = taskDTOBinder.bindCUTaskSendDTO(task,user, createTaskReceiveDTO.getTodo_user_id());
+            CUTaskSendDTO cuTaskSendDTO = taskDTOBinder.bindCUTaskSendDTO(task,loginUser, createTaskReceiveDTO.getTodo_user_id());
             return new ResponseEntity<>(new DataResponseDTO(cuTaskSendDTO), HttpStatus.OK);
         } catch (Exception e) {
             log.error("Create New Task ERROR " + e.getMessage());
