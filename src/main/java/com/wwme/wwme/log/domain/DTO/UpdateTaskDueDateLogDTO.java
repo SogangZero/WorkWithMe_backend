@@ -16,7 +16,8 @@ public class UpdateTaskDueDateLogDTO extends EventDTO{
     LocalDateTime previousDueDate;
     LocalDateTime updatedDueDate;
 
-    @Builder(builderMethodName = "buildWithSpecificParamsNoID")
+    @Builder(builderMethodName = "buildWithSpecificParamsNoID"
+    ,builderClassName = "UpdateTaskDueDateSpecificParamsNoId")
     public UpdateTaskDueDateLogDTO(User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, LocalDateTime previousDueDate, LocalDateTime updatedDueDate, Task task) {
         super(user, group, operationTypeEnum, operationTime,task);
         this.previousDueDate = previousDueDate;
@@ -24,7 +25,8 @@ public class UpdateTaskDueDateLogDTO extends EventDTO{
         setOperationStr();
     }
 
-    @Builder(builderMethodName = "buildWithOperationStringID")
+    @Builder(builderMethodName = "buildWithOperationStringID",
+    builderClassName = "UpdateTaskDueDateOperationStringNoID")
     public UpdateTaskDueDateLogDTO(Long id, User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, String operationString, Task task) {
         super(id, user, group, operationTypeEnum, operationTime, operationString,task);
         setSpecificFields();

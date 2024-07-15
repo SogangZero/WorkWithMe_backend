@@ -852,13 +852,27 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
 
 
     @Override
-    public void deleteTask(Long taskId) {
-        if(taskRepository.findById(taskId).isEmpty()) {
-            throw new NoSuchElementException("Could not find Task with ID: "+taskId
-            +"in function deleteTask");
-        }
+    public void deleteTask(Long taskId, User loginUser) {
+
+        Task task = taskRepository.findById(taskId).orElseThrow(()-> new NoSuchElementException("Could" +
+                "not find task with ID : "+ taskId + "in function deleteTask"));
+
         log.info("Task With Id ["+taskId+"] exists in DB");
+
+        //create log DTO
+        DeleteTaskLogDTO deleteTaskLogDTO = DeleteTaskLogDTO
+                .buildWithSpecificParams()
+                .task(null)
+                .group(task.getGroup())
+                .user(loginUser)
+                .operationTime(LocalDateTime.now())
+                .operationTypeEnum(OperationType.DELETE_TASK)
+                .deletedTaskName(task.getTaskName())
+                .build();
+
+
         taskRepository.deleteById(taskId);
+        eventService.createEvent(deleteTaskLogDTO);
     }
 
     @Override

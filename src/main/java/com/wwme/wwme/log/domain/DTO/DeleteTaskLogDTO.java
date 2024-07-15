@@ -17,14 +17,16 @@ public class DeleteTaskLogDTO extends EventDTO{
 
     private String deletedTaskName;
 
-    @Builder(builderMethodName = "buildWithSpecificParams")
+    @Builder(builderMethodName = "buildWithSpecificParams",
+    builderClassName = "DeleteTaskSpecificParamsNoID")
     public DeleteTaskLogDTO(User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, String deletedTaskName, Task task) {
         super(user, group, operationTypeEnum, operationTime,task);
         this.deletedTaskName = deletedTaskName;
         setOperationStr();
     }
 
-    @Builder(builderMethodName = "buildWithOperationStringID")
+    @Builder(builderMethodName = "buildWithOperationStringID",
+    builderClassName = "DeleteTaskOperationStringID")
     public DeleteTaskLogDTO(Long id, User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, String operationString, String deletedTaskName, Task task) {
         super(id, user, group, operationTypeEnum, operationTime, operationString,task);
         this.deletedTaskName = deletedTaskName;

@@ -18,7 +18,8 @@ public class UpdateTaskTypeLogDTO extends EventDTO{
     private String beforeTaskType;
     private String afterTaskType;
 
-    @Builder(builderMethodName = "buildWithSpecificParamsNoID")
+    @Builder(builderMethodName = "buildWithSpecificParamsNoID",
+    builderClassName = "UpdateTaskTypeSpecificParamsNoID")
     public UpdateTaskTypeLogDTO(User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, String beforeTaskType, String afterTaskType, Task task) {
         super(user, group, operationTypeEnum, operationTime,task);
         this.beforeTaskType = beforeTaskType;
@@ -26,7 +27,8 @@ public class UpdateTaskTypeLogDTO extends EventDTO{
         setOperationStr();
     }
 
-    @Builder(builderMethodName = "buildWithOperationStringID")
+    @Builder(builderMethodName = "buildWithOperationStringID",
+    builderClassName = "UpdateTaskTypeOperationStringID")
     public UpdateTaskTypeLogDTO(Long id, User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, String operationString, Task task) {
         super(id, user, group, operationTypeEnum, operationTime, operationString,task);
         setSpecificFields();

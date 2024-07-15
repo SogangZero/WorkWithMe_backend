@@ -17,7 +17,8 @@ public class UpdateTaskChangeTagDTO extends EventDTO{
     private String previousTagName;
     private String updateTagName;
 
-    @Builder(builderMethodName = "buildWithSpecificParamsNoID")
+    @Builder(builderMethodName = "buildWithSpecificParamsNoID",
+    builderClassName = "UpdateTaskChangeTagSpecificParamsNoID")
     public UpdateTaskChangeTagDTO(User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, String previousTagName, String updateTagName, Task task) {
         super(user, group, operationTypeEnum, operationTime, task);
         this.previousTagName = previousTagName;
@@ -25,7 +26,8 @@ public class UpdateTaskChangeTagDTO extends EventDTO{
         setOperationStr();
     }
 
-    @Builder(builderMethodName = "buildWithOperationStringID")
+    @Builder(builderMethodName = "buildWithOperationStringID",
+    builderClassName = "UpdateTaskChangeTagOperationStringID")
     public UpdateTaskChangeTagDTO(Long id, User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, String operationString, Task task) {
         super(id, user, group, operationTypeEnum, operationTime, operationString,task);
         setSpecificFields();

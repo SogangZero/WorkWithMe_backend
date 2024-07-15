@@ -26,19 +26,6 @@ public class Event {
         this.operationTime = operationTime;
     }
 
-    @Override
-    public String toString() {
-        return "Event{" +
-                "id=" + id +
-                ", user=" + user.getNickname() +
-                ", group=" + group.getGroupName()    +
-                ", task=" + task.getTaskName() +
-                ", operationTypeEnum=" + operationTypeEnum +
-                ", operationString='" + operationString + '\'' +
-                ", operationTime=" + operationTime +
-                '}';
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;

@@ -219,10 +219,11 @@ public class TaskCRUDController {
     }
 
     @DeleteMapping
-    public ResponseEntity<?> deleteTask(@RequestParam("task_id") Long task_id) {
+    public ResponseEntity<?> deleteTask(@RequestParam("task_id") Long task_id,
+                                        @Login User loginUser) {
         try {
             log.info("Task Id : "+task_id);
-            taskCRUDService.deleteTask(task_id);
+            taskCRUDService.deleteTask(task_id, loginUser);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             log.error(e.getMessage());

@@ -15,14 +15,16 @@ import java.time.LocalDateTime;
 @Getter
 public class UpdateTaskDeleteTagDTO extends EventDTO{
     private Tag deletedTag;
-    @Builder(builderMethodName = "buildWithSpecificParamsNoID")
+    @Builder(builderMethodName = "buildWithSpecificParamsNoID",
+            builderClassName = "UpdateTaskDeleteTagSpecificParamsNoID")
     public UpdateTaskDeleteTagDTO(User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, Tag deletedTag, Task task) {
         super(user, group, operationTypeEnum, operationTime,task);
         this.deletedTag = deletedTag;
         setOperationStr();
     }
 
-    @Builder(builderMethodName = "buildWithOperationStringID")
+    @Builder(builderMethodName = "buildWithOperationStringID",
+            builderClassName = "UpdateTaskDeleteTagOperationStringID")
     public UpdateTaskDeleteTagDTO(Long id, User user, Group group, OperationType operationTypeEnum, LocalDateTime operationTime, String operationString, Task task) {
         super(id, user, group, operationTypeEnum, operationTime, operationString,task);
         setSpecificFields();

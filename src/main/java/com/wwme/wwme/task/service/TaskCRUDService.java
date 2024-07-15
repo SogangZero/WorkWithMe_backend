@@ -93,7 +93,7 @@ public interface TaskCRUDService {
      * delete task identified by "task_id"
      * @param taskId
      */
-    void deleteTask(Long taskId);
+    void deleteTask(Long taskId, User loginUser);
 
     boolean getIsDoneMe(User user, Task task);
 
