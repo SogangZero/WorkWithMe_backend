@@ -1,4 +1,4 @@
-package com.wwme.wwme.notification;
+package com.wwme.wwme.notification.DTO;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class NotificationHistoryListDTO {
+public class NotificationHistoryListResponseDTO {
     @JsonProperty("data")
     List<NotificationHistoryDTO> data = new ArrayList<>();
 
