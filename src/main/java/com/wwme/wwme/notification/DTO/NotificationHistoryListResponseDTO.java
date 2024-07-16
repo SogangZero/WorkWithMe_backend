@@ -3,18 +3,15 @@ package com.wwme.wwme.notification.DTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
+@Builder
 public class NotificationHistoryListResponseDTO {
     @JsonProperty("data")
-    List<NotificationHistoryDTO> data = new ArrayList<>();
-
-    public void add(NotificationHistoryDTO dto) {
-        data.add(dto);
-    }
+    List<NotificationHistoryDTO> data;
 
     @Builder
     public static class NotificationHistoryDTO {

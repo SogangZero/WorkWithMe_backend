@@ -3,12 +3,18 @@ package com.wwme.wwme.notification.service;
 import com.wwme.wwme.notification.DTO.NotificationHistoryListResponseDTO;
 import com.wwme.wwme.notification.domain.NotificationHistory;
 
+import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Converter for converting domain objects to DTOs.
+ * Used in notification package.
+ */
 public class NotificationDtoConverter {
     public NotificationHistoryListResponseDTO convert(List<NotificationHistory> notifications) {
-        var responseDTO = new NotificationHistoryListResponseDTO();
+        List<NotificationHistoryListResponseDTO.NotificationHistoryDTO> notificationDTOList = new ArrayList<>();
         notifications.forEach(notification -> {
+            // map each notification to dto
             var notificationDTO = NotificationHistoryListResponseDTO.NotificationHistoryDTO.builder()
                     .title(notification.getNotificationTitle())
                     .body(notification.getNotificationBody())
@@ -16,8 +22,10 @@ public class NotificationDtoConverter {
                     .taskId(notification.getTaskId())
                     .groupId(notification.getGroupId())
                     .build();
-            responseDTO.add(notificationDTO);
+            notificationDTOList.add(notificationDTO);
         });
-        return responseDTO;
+        return NotificationHistoryListResponseDTO.builder()
+                .data(notificationDTOList)
+                .build();
     }
 }
