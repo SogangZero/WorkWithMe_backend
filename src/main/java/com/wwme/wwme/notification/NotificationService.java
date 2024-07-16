@@ -9,25 +9,6 @@ import com.wwme.wwme.user.domain.User;
 import java.util.Collection;
 
 public interface NotificationService {
-    void updateRegistrationToken(String registrationToken, User user);
-
-    void updateRegistrationToken(String registrationToken, Long userId);
-
-    void updateNotificationSetting(
-            boolean onDueDate,
-            boolean onMyTaskCreation,
-            boolean onMyTaskChange,
-            boolean onGroupEntrance,
-            User user
-    );
-
-    void updateNotificationSetting(
-            boolean onDueDate,
-            boolean onMyTaskCreation,
-            boolean onMyTaskChange,
-            boolean onGroupEntrance,
-            long userId
-    );
 
     void sendDueDateNotification(Task task, User user);
 

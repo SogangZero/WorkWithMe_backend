@@ -250,33 +250,5 @@ public class NotificationServiceImpl implements NotificationService {
         }
     }
 
-    private JsonObject makeNotificationJsonObject(String title, String body) {
-        JsonObject notification = new JsonObject();
-        notification.addProperty("title", title);
-        notification.addProperty("body", body);
 
-        return notification;
-    }
-
-    private JsonObject makeDataJsonObject(Map<String, String> dataMap) {
-        JsonObject data = new JsonObject();
-        dataMap.forEach(data::addProperty);
-        return data;
-    }
-
-    private JsonObject makeSendJsonObject(String title, String body, Map<String, String> dataMap, String receiveRegistrationToken) {
-        JsonObject notification = makeNotificationJsonObject(title, body);
-        JsonObject data = makeDataJsonObject(dataMap);
-        JsonObject message = new JsonObject();
-        message.addProperty("name", "1");
-        message.add("notification", notification);
-        message.add("data", data);
-        message.addProperty("token", receiveRegistrationToken);
-
-        JsonObject sendJsonObject = new JsonObject();
-        sendJsonObject.addProperty("validateOnly", false);
-        sendJsonObject.add("message", message);
-
-        return sendJsonObject;
-    }
 }
