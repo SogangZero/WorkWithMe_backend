@@ -105,7 +105,7 @@ public class NotificationServiceImpl implements NotificationService {
         dataMap.put("type", NotificationType.GROUP_ENTRANCE.toString());
         dataMap.put("group_id", group.getId().toString());
 
-        String title = group.getGroupName() + "에" + newUser.getNickname() + "이 들어왔습니다!";
+        String title = group.getGroupName() + "에 " + newUser.getNickname() + "님이 들어왔습니다!";
         String body = title;
 
         var sendJsonObject = makeSendJsonObject(title, body, dataMap, registrationToken);
@@ -141,7 +141,7 @@ public class NotificationServiceImpl implements NotificationService {
             dataMap.put("task_id", task.getId().toString());
             var title = "아무나 할 수 있는 일이 생겼습니다.";
             var body = "\"" + task.getTaskName() + "\"을 " +
-                    creatingUser.getNickname() + "이 만들었습니다.";
+                    creatingUser.getNickname() + "님이 만들었습니다.";
             var registrationToken = notifiedUser.getNotificationSetting().getRegistrationToken();
 
             var sendJsonObject = makeSendJsonObject(title, body, dataMap, registrationToken);
@@ -189,7 +189,7 @@ public class NotificationServiceImpl implements NotificationService {
             dataMap.put("task_id", task.getId().toString());
             var title = "할 일이 생겼습니다.";
             var body = "\"" + task.getTaskName() + "\"을 " +
-                    creatingUser.getNickname() + "이 만들었습니다.";
+                    creatingUser.getNickname() + " 님이 만들었습니다.";
             var registrationToken = notifiedUser.getNotificationSetting().getRegistrationToken();
             var sendJsonObject = makeSendJsonObject(title, body, dataMap, registrationToken);
             recordNotification(title, body, notifiedUser,
@@ -219,8 +219,8 @@ public class NotificationServiceImpl implements NotificationService {
             dataMap.put("type", NotificationType.TASK_CHANGE.toString());
             dataMap.put("task_id", task.getId().toString());
             var title = "할 일이 수정되었습니다.";
-            var body = "\"" + task.getTaskName() + "\"을 " +
-                    changingUser.getNickname() + "이 수정하였습니다.";
+            var body = changingUser.getNickname() + "님이 "
+                    + "\"" + task.getTaskName() + "\"을 수정하였습니다.";
             var registrationToken = user.getNotificationSetting().getRegistrationToken();
             var sendJsonObject = makeSendJsonObject(title, body, dataMap, registrationToken);
             recordNotification(title, body, user,
