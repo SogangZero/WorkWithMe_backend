@@ -28,9 +28,6 @@ import java.util.*;
 @Service
 @Transactional
 public class NotificationServiceImpl implements NotificationService {
-    @Value("${notification.fcm_secrets}")
-    private String rawFcmJson;
-
     @Value("${notification.project_id}")
     private String projectId;
 
