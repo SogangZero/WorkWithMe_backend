@@ -1,4 +1,4 @@
-package com.wwme.wwme.notification;
+package com.wwme.wwme.notification.domain;
 
 import jakarta.persistence.Embeddable;
 import lombok.Getter;

@@ -1,7 +1,7 @@
 package com.wwme.wwme.user.domain;
 
-import com.wwme.wwme.notification.NotificationHistory;
-import com.wwme.wwme.notification.NotificationSetting;
+import com.wwme.wwme.notification.domain.NotificationHistory;
+import com.wwme.wwme.notification.domain.NotificationSetting;
 import com.wwme.wwme.group.domain.UserGroup;
 import com.wwme.wwme.task.domain.UserTask;
 import jakarta.persistence.*;

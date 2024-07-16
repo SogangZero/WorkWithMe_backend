@@ -1,7 +1,7 @@
 package com.wwme.wwme.notification.service;
 
 import com.wwme.wwme.notification.DTO.NotificationHistoryListResponseDTO;
-import com.wwme.wwme.notification.NotificationHistory;
+import com.wwme.wwme.notification.domain.NotificationHistory;
 
 import java.util.List;
 

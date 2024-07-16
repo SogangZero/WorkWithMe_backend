@@ -1,5 +1,6 @@
 package com.wwme.wwme.notification;
 
+import com.wwme.wwme.notification.domain.NotificationHistory;
 import com.wwme.wwme.user.domain.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

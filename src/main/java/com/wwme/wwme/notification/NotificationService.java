@@ -1,8 +1,8 @@
 package com.wwme.wwme.notification;
 
-import com.google.gson.JsonObject;
 import com.wwme.wwme.group.domain.Group;
 import com.wwme.wwme.group.domain.UserGroup;
+import com.wwme.wwme.notification.domain.NotificationHistory;
 import com.wwme.wwme.task.domain.Task;
 import com.wwme.wwme.user.domain.User;
 

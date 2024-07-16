@@ -2,9 +2,8 @@ package com.wwme.wwme.notification;
 
 
 import com.wwme.wwme.login.aop.Login;
-import com.wwme.wwme.notification.DTO.NotificationHistoryListResponseDTO;
 import com.wwme.wwme.notification.DTO.NotificationSettingUpdateRequestDTO;
-import com.wwme.wwme.notification.DTO.SetRegistrationTokenDTO;
+import com.wwme.wwme.notification.DTO.SetRegistrationTokenRequestDTO;
 import com.wwme.wwme.notification.service.NotificationDtoConverter;
 import com.wwme.wwme.notification.service.NotificationHistoryService;
 import com.wwme.wwme.notification.service.NotificationSettingService;
@@ -15,21 +14,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/notification")
 @Slf4j
 public class NotificationController {
-    private final NotificationService notificationService;
     private final NotificationSettingService notificationSettingService;
     private final NotificationHistoryService notificationHistoryService;
     private final NotificationDtoConverter dtoConverter;
 
     @PostMapping("/token")
     ResponseEntity<?> setUserFcmRegistrationToken(
-            @RequestBody SetRegistrationTokenDTO requestDTO,
+            @RequestBody SetRegistrationTokenRequestDTO requestDTO,
             @Login User user
     ) {
         log.info("""
@@ -47,7 +43,7 @@ public class NotificationController {
         }
     }
 
-    @PutMapping("setting")
+    @PutMapping("/setting")
     ResponseEntity<?> updateNotificationSetting(
             @RequestBody NotificationSettingUpdateRequestDTO requestDTO,
             @Login User user

@@ -1,6 +1,6 @@
 package com.wwme.wwme.notification.service;
 
-import com.wwme.wwme.notification.NotificationHistory;
+import com.wwme.wwme.notification.domain.NotificationHistory;
 
 import com.wwme.wwme.notification.NotificationHistoryRepository;
 import com.wwme.wwme.user.domain.User;
