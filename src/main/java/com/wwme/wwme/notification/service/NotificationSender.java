@@ -12,8 +12,6 @@ import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -39,10 +37,13 @@ public class NotificationSender {
     private final String[] SCOPES = {"https://www.googleapis.com/auth/firebase.messaging"};
     private final UserRepository userRepository;
     private final NotificationHistoryRepository notificationHistoryRepository;
+    private final NotificationSerializer serializer;
 
-    public NotificationSender(UserRepository userRepository, NotificationHistoryRepository notificationHistoryRepository) {
+    public NotificationSender(UserRepository userRepository, NotificationHistoryRepository notificationHistoryRepository,
+                              NotificationSerializer serializer) {
         this.userRepository = userRepository;
         this.notificationHistoryRepository = notificationHistoryRepository;
+        this.serializer = serializer;
     }
 
     private InputStream getStream() throws FileNotFoundException {
@@ -73,7 +74,7 @@ public class NotificationSender {
 
         var registrationToken = user.getNotificationSetting().getRegistrationToken();
 
-        var sendJsonObject = makeSendJsonObject(title, body, dataMap, registrationToken);
+        var sendJsonObject = serializer.makeSendJsonObject(title, body, dataMap, registrationToken);
         recordNotification(title, body, user,
                 NotificationType.DUE_DATE, task.getId(), null);
         send(sendJsonObject);
@@ -88,7 +89,7 @@ public class NotificationSender {
         String title = group.getGroupName() + "에 " + newUser.getNickname() + "님이 들어왔습니다!";
         String body = title;
 
-        var sendJsonObject = makeSendJsonObject(title, body, dataMap, registrationToken);
+        var sendJsonObject = serializer.makeSendJsonObject(title, body, dataMap, registrationToken);
         recordNotification(title, body, newUser,
                 NotificationType.GROUP_ENTRANCE, null, group.getId());
         send(sendJsonObject);
@@ -123,7 +124,7 @@ public class NotificationSender {
                     creatingUser.getNickname() + "님이 만들었습니다.";
             var registrationToken = notifiedUser.getNotificationSetting().getRegistrationToken();
 
-            var sendJsonObject = makeSendJsonObject(title, body, dataMap, registrationToken);
+            var sendJsonObject = serializer.makeSendJsonObject(title, body, dataMap, registrationToken);
             recordNotification(title, body, notifiedUser,
                     NotificationType.TASK_CREATION, task.getId(), null);
             send(sendJsonObject);
@@ -146,7 +147,7 @@ public class NotificationSender {
             var body = "\"" + task.getTaskName() + "\"을 " +
                     creatingUser.getNickname() + "이 만들었습니다.";
             var registrationToken = notifiedUser.getNotificationSetting().getRegistrationToken();
-            var sendJsonObject = makeSendJsonObject(title, body, dataMap, registrationToken);
+            var sendJsonObject = serializer.makeSendJsonObject(title, body, dataMap, registrationToken);
             recordNotification(title, body, notifiedUser,
                     NotificationType.TASK_CREATION, task.getId(), null);
             send(sendJsonObject);
@@ -170,7 +171,7 @@ public class NotificationSender {
             var body = "\"" + task.getTaskName() + "\"을 " +
                     creatingUser.getNickname() + " 님이 만들었습니다.";
             var registrationToken = notifiedUser.getNotificationSetting().getRegistrationToken();
-            var sendJsonObject = makeSendJsonObject(title, body, dataMap, registrationToken);
+            var sendJsonObject = serializer.makeSendJsonObject(title, body, dataMap, registrationToken);
             recordNotification(title, body, notifiedUser,
                     NotificationType.TASK_CREATION, task.getId(), null);
             send(sendJsonObject);
@@ -199,16 +200,11 @@ public class NotificationSender {
             var body = changingUser.getNickname() + "님이 "
                     + "\"" + task.getTaskName() + "\"을 수정하였습니다.";
             var registrationToken = user.getNotificationSetting().getRegistrationToken();
-            var sendJsonObject = makeSendJsonObject(title, body, dataMap, registrationToken);
+            var sendJsonObject = serializer.makeSendJsonObject(title, body, dataMap, registrationToken);
             recordNotification(title, body, user,
                     NotificationType.TASK_CHANGE, task.getId(), null);
             send(sendJsonObject);
         });
-    }
-
-    public List<NotificationHistory> getNotificationHistoryOfUser(User user, Long lastId) {
-        Pageable pageRequest = PageRequest.of(0, 20);
-        return notificationHistoryRepository.findAllByUserAndLastId(user, lastId, pageRequest);
     }
 
     private void recordNotification(String title, String body, User user,
