@@ -70,7 +70,7 @@ public class NotificationSender {
         dataMap.put("task_id", task.getId().toString());
 
         String title = "임박한 할 일이 있어요!";
-        String body = "\"" + task.getTaskName() + "\"" + "이 " + "오늘까지인데 아직 끝나지 않았습니다!";
+        String body = "\"" + task.getTaskName() + "\"이 아직 끝나지 않았습니다!";
 
         var registrationToken = user.getNotificationSetting().getRegistrationToken();
 
@@ -86,7 +86,8 @@ public class NotificationSender {
         dataMap.put("type", NotificationType.GROUP_ENTRANCE.toString());
         dataMap.put("group_id", group.getId().toString());
 
-        String title = group.getGroupName() + "에 " + newUser.getNickname() + "님이 들어왔습니다!";
+        String title = "\"" +  newUser.getNickname() + "\"" + "님이 "
+                + group.getGroupName() + "에 들어왔습니다.";
         String body = title;
 
         var sendJsonObject = serializer.makeSendJsonObject(title, body, dataMap, registrationToken);
@@ -120,8 +121,8 @@ public class NotificationSender {
             dataMap.put("type", NotificationType.TASK_CREATION.toString());
             dataMap.put("task_id", task.getId().toString());
             var title = "아무나 할 수 있는 일이 생겼습니다.";
-            var body = "\"" + task.getTaskName() + "\"을 " +
-                    creatingUser.getNickname() + "님이 만들었습니다.";
+            var body = "\"" + creatingUser.getNickname() + "\"님이 \"" +
+                    task.getTaskName() + "\"을 만들었습니다.";
             var registrationToken = notifiedUser.getNotificationSetting().getRegistrationToken();
 
             var sendJsonObject = serializer.makeSendJsonObject(title, body, dataMap, registrationToken);
@@ -144,8 +145,8 @@ public class NotificationSender {
             dataMap.put("type", NotificationType.TASK_CREATION.toString());
             dataMap.put("task_id", task.getId().toString());
             var title = "모두 해야 하는 일이 생겼습니다.";
-            var body = "\"" + task.getTaskName() + "\"을 " +
-                    creatingUser.getNickname() + "이 만들었습니다.";
+            var body = "\"" + creatingUser.getNickname() + "\"님이 \"" +
+                    task.getTaskName() + "\"을 만들었습니다.";
             var registrationToken = notifiedUser.getNotificationSetting().getRegistrationToken();
             var sendJsonObject = serializer.makeSendJsonObject(title, body, dataMap, registrationToken);
             recordNotification(title, body, notifiedUser,
@@ -168,8 +169,8 @@ public class NotificationSender {
             dataMap.put("type", NotificationType.TASK_CREATION.toString());
             dataMap.put("task_id", task.getId().toString());
             var title = "할 일이 생겼습니다.";
-            var body = "\"" + task.getTaskName() + "\"을 " +
-                    creatingUser.getNickname() + " 님이 만들었습니다.";
+            var body = "\"" + creatingUser.getNickname() + "\"님이 \"" +
+                    task.getTaskName() + "\"을 만들었습니다.";
             var registrationToken = notifiedUser.getNotificationSetting().getRegistrationToken();
             var sendJsonObject = serializer.makeSendJsonObject(title, body, dataMap, registrationToken);
             recordNotification(title, body, notifiedUser,
@@ -197,8 +198,8 @@ public class NotificationSender {
             dataMap.put("type", NotificationType.TASK_CHANGE.toString());
             dataMap.put("task_id", task.getId().toString());
             var title = "할 일이 수정되었습니다.";
-            var body = changingUser.getNickname() + "님이 "
-                    + "\"" + task.getTaskName() + "\"을 수정하였습니다.";
+            var body = "\"" + changingUser.getNickname() + "\"님이 \"" +
+                    task.getTaskName() + "\"을 수정하였습니다..";
             var registrationToken = user.getNotificationSetting().getRegistrationToken();
             var sendJsonObject = serializer.makeSendJsonObject(title, body, dataMap, registrationToken);
             recordNotification(title, body, user,
