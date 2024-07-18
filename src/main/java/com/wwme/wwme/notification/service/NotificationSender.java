@@ -3,13 +3,11 @@ package com.wwme.wwme.notification.service;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.gson.JsonObject;
 import com.wwme.wwme.group.domain.Group;
-import com.wwme.wwme.group.domain.UserGroup;
 import com.wwme.wwme.notification.NotificationHistoryRepository;
 import com.wwme.wwme.notification.domain.NotificationHistory;
 import com.wwme.wwme.notification.domain.NotificationType;
 import com.wwme.wwme.task.domain.Task;
 import com.wwme.wwme.user.domain.User;
-import com.wwme.wwme.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -36,13 +34,11 @@ public class NotificationSender {
     private String projectId;
 
     private final String[] SCOPES = {"https://www.googleapis.com/auth/firebase.messaging"};
-    private final UserRepository userRepository;
     private final NotificationHistoryRepository notificationHistoryRepository;
     private final NotificationSerializer serializer;
 
-    public NotificationSender(UserRepository userRepository, NotificationHistoryRepository notificationHistoryRepository,
+    public NotificationSender(NotificationHistoryRepository notificationHistoryRepository,
                               NotificationSerializer serializer) {
-        this.userRepository = userRepository;
         this.notificationHistoryRepository = notificationHistoryRepository;
         this.serializer = serializer;
     }
@@ -232,7 +228,6 @@ public class NotificationSender {
             case "group" -> sendOnMyTaskCreationGroup(task, creatingUser);
             case "personal" -> sendOnMyTaskCreationPersonal(task, creatingUser);
         }
-        ;
     }
 
     /**
