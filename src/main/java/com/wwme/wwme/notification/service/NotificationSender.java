@@ -26,7 +26,8 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 /**
- *
+ * Service for sending notification to user using
+ * Firebase Cloud Messaging
  */
 @Slf4j
 @Service
@@ -46,10 +47,20 @@ public class NotificationSender {
         this.serializer = serializer;
     }
 
+    /**
+     * Gets InputStream from firebase service-account.json file
+     * @return InputStream of file
+     * @throws FileNotFoundException when file does not exist
+     */
     private InputStream getStream() throws FileNotFoundException {
         return new FileInputStream("service-account.json");
     }
 
+    /**
+     * Gets access token from Firebase API.
+     * @return access token string
+     * @throws IOException when access token cannot be obtained from the stream
+     */
     private String getAccessToken() throws IOException {
         GoogleCredentials googleCredentials = GoogleCredentials
                 .fromStream(getStream())
@@ -59,6 +70,12 @@ public class NotificationSender {
     }
 
 
+    /**
+     * Sends notification about due date.
+     * Also records the notification in NotificationHistory.
+     * @param task The task that is close to the due date
+     * @param user The user that is participating in the task
+     */
     public void sendDueDateNotification(Task task, User user) {
         // check notification setting if notification is enabled
         if (!user.getNotificationSetting().getOnDueDate()) {
@@ -80,7 +97,12 @@ public class NotificationSender {
         send(sendJsonObject);
     }
 
-
+    /**
+     * Sends notification about group entrance to one user.
+     * @param group The group a new user has entered.
+     * @param newUser The user that has entered.
+     * @param registrationToken The registration token of notified user.
+     */
     private void sendOneOnGroupEntranceNotification(Group group, User newUser, String registrationToken) {
         Map<String, String> dataMap = new HashMap<>();
         dataMap.put("type", NotificationType.GROUP_ENTRANCE.toString());
@@ -96,18 +118,28 @@ public class NotificationSender {
         send(sendJsonObject);
     }
 
-    public void sendOnGroupEntranceNotification(Group group, Collection<UserGroup> userGroups) {
+    /**
+     * Sends notification about group entrance to all users in group.
+     * @param group The group a new user has entered.
+     * @param newUser The user that has entered the group.
+     */
+    public void sendOnGroupEntranceNotification(Group group, User newUser) {
+        var userGroups = group.getUserGroupList();
         userGroups.forEach((userGroup) -> {
             var user = userGroup.getUser();
-
             // check notification setting if notification is enabled
             if (!user.getNotificationSetting().getOnGroupEntrance()) {
                 return;
             }
-            sendOneOnGroupEntranceNotification(group, user, user.getNotificationSetting().getRegistrationToken());
+            sendOneOnGroupEntranceNotification(group, newUser, user.getNotificationSetting().getRegistrationToken());
         });
     }
 
+    /**
+     * Send notification about task that is created as type "anyone".
+     * @param task The task created.
+     * @param creatingUser The user that has created the task.
+     */
     private void sendOnMyTaskCreationAnyone(Task task, User creatingUser) {
         task.getUserTaskList().forEach(userTask -> {
             var notifiedUser = userTask.getUser();
@@ -132,6 +164,11 @@ public class NotificationSender {
         });
     }
 
+    /**
+     * Send notification about task that is created as type "group".
+     * @param task The task created.
+     * @param creatingUser The user that has created the task.
+     */
     private void sendOnMyTaskCreationGroup(Task task, User creatingUser) {
         task.getUserTaskList().forEach(userTask -> {
             var notifiedUser = userTask.getUser();
@@ -156,6 +193,11 @@ public class NotificationSender {
 
     }
 
+    /**
+     * Send notification about task that is created as type "personal".
+     * @param task The task created.
+     * @param creatingUser The user that has created the task.
+     */
     private void sendOnMyTaskCreationPersonal(Task task, User creatingUser) {
         task.getUserTaskList().forEach(userTask -> {
             var notifiedUser = userTask.getUser();
@@ -179,6 +221,11 @@ public class NotificationSender {
         });
     }
 
+    /**
+     * Send notification about task that is created.
+     * @param task The task created.
+     * @param creatingUser The user that has created the task.
+     */
     public void sendOnMyTaskCreation(Task task, User creatingUser) {
         switch (task.getTaskType()) {
             case "anyone" -> sendOnMyTaskCreationAnyone(task, creatingUser);
@@ -188,6 +235,12 @@ public class NotificationSender {
         ;
     }
 
+    /**
+     * Send notification about task that has been changed.
+     * @param task The task that has been changed
+     * @param changedUser The users that gets the notification
+     * @param changingUser The user that has changed the notification
+     */
     public void sendOnMyTaskChange(Task task, Collection<User> changedUser, User changingUser) {
         changedUser.forEach(user -> {
             if (!user.getNotificationSetting().getOnMyTaskChange()) {
@@ -208,6 +261,15 @@ public class NotificationSender {
         });
     }
 
+    /**
+     * Records notification sending to NotificationSender.
+     * @param title The title of the notification.
+     * @param body The body of the notification.
+     * @param user User that has received the notification.
+     * @param type The notification type.
+     * @param taskId Task id of the task related to the notification if there is one.
+     * @param groupId Group id of the task related to the notification if there is one.
+     */
     private void recordNotification(String title, String body, User user,
                                     NotificationType type, Long taskId, Long groupId) {
         NotificationHistory notification = NotificationHistory.builder()
@@ -223,6 +285,10 @@ public class NotificationSender {
         notificationHistoryRepository.save(notification);
     }
 
+    /**
+     * Sends the notification given the json request body.
+     * @param jsonObject The json to be sent to Firebase Cloud Messaging server.
+     */
     private void send(JsonObject jsonObject) {
         try {
             log.info("Send notification: {}", jsonObject);
@@ -240,8 +306,10 @@ public class NotificationSender {
             HttpEntity<String> httpEntity = new HttpEntity<>(jsonObject.toString(), headers);
             var result = restTemplate.postForEntity(URI, httpEntity, String.class);
             log.info("Notification result: {}", result);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             log.error("Error in alarm send. ", e);
+        } catch (IOException e) {
+            log.error("Error in alarm send in getting the access token. ", e);
         }
     }
 }

@@ -199,7 +199,7 @@ public class GroupController {
                     user,
                     requestDTO.getGroupColor()
             );
-            notificationSender.sendOnGroupEntranceNotification(group, group.getUserGroupList());
+            notificationSender.sendOnGroupEntranceNotification(group, user);
 
             var responseDTO = new InvitationAcceptResponseSuccessDTO();
             responseDTO.setGroupId(group.getId());

@@ -63,13 +63,13 @@ public class CronTabTest {
         var someTagDTO = new CreateTagReceiveDTO();
         someTagDTO.setTag_name("ASDASD");
         someTagDTO.setGroup_id(someUserGroup.getId());
-        tagService.createTag(someTagDTO);
+        tagService.createTag(someTagDTO, userInsideGroup);
         taskCRUDService.createTask("Normal", null, "anyone", null, someUserGroup.getId(), null, userInsideGroup);
 
         var tagDTO = new CreateTagReceiveDTO();
         tagDTO.setTag_name("asd");
         tagDTO.setGroup_id(noUserGroup.getId());
-        tagService.createTag(tagDTO);
+        tagService.createTag(tagDTO, userThatLeavedGroup);
         taskCRUDService.createTask("hanging task", null, "anyone", null, noUserGroup.getId(), null, userThatLeavedGroup);
 
         // leave group
