@@ -1,4 +1,4 @@
-package com.wwme.wwme.notification;
+package com.wwme.wwme.notification.domain;
 
 public enum NotificationType {
     DUE_DATE("due_date"),

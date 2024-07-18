@@ -5,14 +5,12 @@ import com.wwme.wwme.group.repository.GroupRepository;
 import com.wwme.wwme.group.service.GroupService;
 import com.wwme.wwme.group.service.UserGroupService;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.CreateTagReceiveDTO;
-import com.wwme.wwme.task.domain.Tag;
 import com.wwme.wwme.task.repository.TagRepository;
 import com.wwme.wwme.task.repository.TaskRepository;
 import com.wwme.wwme.task.service.TagService;
 import com.wwme.wwme.task.service.TaskCRUDService;
 import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.repository.UserRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,13 +61,13 @@ public class CronTabTest {
         var someTagDTO = new CreateTagReceiveDTO();
         someTagDTO.setTag_name("ASDASD");
         someTagDTO.setGroup_id(someUserGroup.getId());
-        tagService.createTag(someTagDTO);
+        tagService.createTag(someTagDTO, userInsideGroup);
         taskCRUDService.createTask("Normal", null, "anyone", null, someUserGroup.getId(), null, userInsideGroup);
 
         var tagDTO = new CreateTagReceiveDTO();
         tagDTO.setTag_name("asd");
         tagDTO.setGroup_id(noUserGroup.getId());
-        tagService.createTag(tagDTO);
+        tagService.createTag(tagDTO, userThatLeavedGroup);
         taskCRUDService.createTask("hanging task", null, "anyone", null, noUserGroup.getId(), null, userThatLeavedGroup);
 
         // leave group
