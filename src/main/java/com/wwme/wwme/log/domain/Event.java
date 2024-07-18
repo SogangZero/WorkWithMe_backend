@@ -39,7 +39,7 @@ public class Event {
     @ManyToOne(fetch = FetchType.LAZY)
     private Group group;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.DETACH})
     private Task task;
 
     @Enumerated(EnumType.STRING)
