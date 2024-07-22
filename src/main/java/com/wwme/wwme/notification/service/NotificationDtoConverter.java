@@ -2,6 +2,7 @@ package com.wwme.wwme.notification.service;
 
 import com.wwme.wwme.notification.DTO.NotificationHistoryListResponseDTO;
 import com.wwme.wwme.notification.domain.NotificationHistory;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.List;
  * Converter for converting domain objects to DTOs.
  * Used in notification package.
  */
+@Service
 public class NotificationDtoConverter {
     public NotificationHistoryListResponseDTO convert(List<NotificationHistory> notifications) {
         List<NotificationHistoryListResponseDTO.NotificationHistoryDTO> notificationDTOList = new ArrayList<>();
