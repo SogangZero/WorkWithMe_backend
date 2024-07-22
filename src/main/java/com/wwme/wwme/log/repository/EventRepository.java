@@ -15,7 +15,8 @@ public interface EventRepository extends JpaRepository<Event,Long> {
 
     List<Event> findByGroupId(Long groupId);
 
-    @Query("SELECT e FROM Event e WHERE e.group.id = :groupId AND e.id > :lastId")
+    @Query("SELECT e FROM Event e WHERE e.group.id = :groupId AND e.id > :lastId " +
+            "ORDER BY e.operationTime desc ")
     List<Event> findByGroupIdPagingWithLastId(
             @Param("groupId") Long groupId,
             @Param("lastId") Long lastId,
