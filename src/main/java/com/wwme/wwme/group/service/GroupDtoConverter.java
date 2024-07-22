@@ -35,7 +35,7 @@ public class GroupDtoConverter {
             var curUser = new GroupUserListReadResponseSuccessDTO.User();
             curUser.setUserId(user.getId());
             curUser.setNickname(user.getNickname());
-            curUser.setProfileImageId(0);
+            curUser.setProfileImageId(user.getProfileImageId().intValue());
             return curUser;
         }).collect(Collectors.toList());
 

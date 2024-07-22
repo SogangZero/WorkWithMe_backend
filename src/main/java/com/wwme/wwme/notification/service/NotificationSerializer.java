@@ -1,6 +1,7 @@
 package com.wwme.wwme.notification.service;
 
 import com.google.gson.JsonObject;
+import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
@@ -8,6 +9,7 @@ import java.util.Map;
  * Serializes notification message to json.
  * Matches the required api Firebase Cloud Messaging Requires.
  */
+@Service
 public class NotificationSerializer {
 
     /**
