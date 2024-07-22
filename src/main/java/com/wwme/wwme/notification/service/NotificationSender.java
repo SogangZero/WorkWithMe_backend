@@ -1,51 +1,62 @@
-package com.wwme.wwme.notification;
+package com.wwme.wwme.notification.service;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.gson.JsonObject;
 import com.wwme.wwme.group.domain.Group;
-import com.wwme.wwme.group.domain.UserGroup;
+import com.wwme.wwme.notification.NotificationHistoryRepository;
+import com.wwme.wwme.notification.domain.NotificationHistory;
+import com.wwme.wwme.notification.domain.NotificationType;
 import com.wwme.wwme.task.domain.Task;
 import com.wwme.wwme.user.domain.User;
-import com.wwme.wwme.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.*;
 
+/**
+ * Service for sending notification to user using
+ * Firebase Cloud Messaging
+ */
 @Slf4j
 @Service
-@Transactional
-public class NotificationServiceImpl implements NotificationService {
-    @Value("${notification.fcm_secrets}")
-    private String rawFcmJson;
-
+public class NotificationSender {
     @Value("${notification.project_id}")
     private String projectId;
 
     private final String[] SCOPES = {"https://www.googleapis.com/auth/firebase.messaging"};
-    private final UserRepository userRepository;
     private final NotificationHistoryRepository notificationHistoryRepository;
+    private final NotificationSerializer serializer;
 
-    public NotificationServiceImpl(UserRepository userRepository, NotificationHistoryRepository notificationHistoryRepository) {
-        this.userRepository = userRepository;
+    public NotificationSender(NotificationHistoryRepository notificationHistoryRepository,
+                              NotificationSerializer serializer) {
         this.notificationHistoryRepository = notificationHistoryRepository;
+        this.serializer = serializer;
     }
 
+    /**
+     * Gets InputStream from firebase service-account.json file
+     * @return InputStream of file
+     * @throws FileNotFoundException when file does not exist
+     */
     private InputStream getStream() throws FileNotFoundException {
         return new FileInputStream("service-account.json");
     }
 
+    /**
+     * Gets access token from Firebase API.
+     * @return access token string
+     * @throws IOException when access token cannot be obtained from the stream
+     */
     private String getAccessToken() throws IOException {
         GoogleCredentials googleCredentials = GoogleCredentials
                 .fromStream(getStream())
@@ -54,30 +65,13 @@ public class NotificationServiceImpl implements NotificationService {
         return googleCredentials.getAccessToken().getTokenValue();
     }
 
-    @Override
-    public void updateRegistrationToken(String registrationToken, User user) {
-        updateRegistrationToken(registrationToken, user.getId());
-    }
 
-    @Override
-    public void updateRegistrationToken(String registrationToken, Long userId) {
-        userRepository.updateRegistrationToken(registrationToken, userId);
-    }
-
-    @Override
-    public void updateNotificationSetting(boolean onDueDate, boolean onMyTaskCreation,
-                                          boolean onMyTaskChange, boolean onGroupEntrance, User user) {
-        updateNotificationSetting(onDueDate, onMyTaskCreation, onMyTaskChange, onGroupEntrance, user.getId());
-    }
-
-    @Override
-    public void updateNotificationSetting(boolean onDueDate, boolean onMyTaskCreation,
-                                          boolean onMyTaskChange, boolean onGroupEntrance, long userId) {
-        userRepository.updateNotificationSetting(onDueDate, onMyTaskCreation, onMyTaskChange, onGroupEntrance, userId);
-    }
-
-
-    @Override
+    /**
+     * Sends notification about due date.
+     * Also records the notification in NotificationHistory.
+     * @param task The task that is close to the due date
+     * @param user The user that is participating in the task
+     */
     public void sendDueDateNotification(Task task, User user) {
         // check notification setting if notification is enabled
         if (!user.getNotificationSetting().getOnDueDate()) {
@@ -89,44 +83,59 @@ public class NotificationServiceImpl implements NotificationService {
         dataMap.put("task_id", task.getId().toString());
 
         String title = "임박한 할 일이 있어요!";
-        String body = "\"" + task.getTaskName() + "\"" + "이 " + "오늘까지인데 아직 끝나지 않았습니다!";
+        String body = "\"" + task.getTaskName() + "\"이 아직 끝나지 않았습니다!";
 
         var registrationToken = user.getNotificationSetting().getRegistrationToken();
 
-        var sendJsonObject = makeSendJsonObject(title, body, dataMap, registrationToken);
+        var sendJsonObject = serializer.makeSendJsonObject(title, body, dataMap, registrationToken);
         recordNotification(title, body, user,
                 NotificationType.DUE_DATE, task.getId(), null);
         send(sendJsonObject);
     }
 
-
+    /**
+     * Sends notification about group entrance to one user.
+     * @param group The group a new user has entered.
+     * @param newUser The user that has entered.
+     * @param registrationToken The registration token of notified user.
+     */
     private void sendOneOnGroupEntranceNotification(Group group, User newUser, String registrationToken) {
         Map<String, String> dataMap = new HashMap<>();
         dataMap.put("type", NotificationType.GROUP_ENTRANCE.toString());
         dataMap.put("group_id", group.getId().toString());
 
-        String title = group.getGroupName() + "에 " + newUser.getNickname() + "님이 들어왔습니다!";
+        String title = "\"" +  newUser.getNickname() + "\"" + "님이 "
+                + group.getGroupName() + "에 들어왔습니다.";
         String body = title;
 
-        var sendJsonObject = makeSendJsonObject(title, body, dataMap, registrationToken);
+        var sendJsonObject = serializer.makeSendJsonObject(title, body, dataMap, registrationToken);
         recordNotification(title, body, newUser,
                 NotificationType.GROUP_ENTRANCE, null, group.getId());
         send(sendJsonObject);
     }
 
-    @Override
-    public void sendOnGroupEntranceNotification(Group group, Collection<UserGroup> userGroups) {
+    /**
+     * Sends notification about group entrance to all users in group.
+     * @param group The group a new user has entered.
+     * @param newUser The user that has entered the group.
+     */
+    public void sendOnGroupEntranceNotification(Group group, User newUser) {
+        var userGroups = group.getUserGroupList();
         userGroups.forEach((userGroup) -> {
             var user = userGroup.getUser();
-
             // check notification setting if notification is enabled
             if (!user.getNotificationSetting().getOnGroupEntrance()) {
                 return;
             }
-            sendOneOnGroupEntranceNotification(group, user, user.getNotificationSetting().getRegistrationToken());
+            sendOneOnGroupEntranceNotification(group, newUser, user.getNotificationSetting().getRegistrationToken());
         });
     }
 
+    /**
+     * Send notification about task that is created as type "anyone".
+     * @param task The task created.
+     * @param creatingUser The user that has created the task.
+     */
     private void sendOnMyTaskCreationAnyone(Task task, User creatingUser) {
         task.getUserTaskList().forEach(userTask -> {
             var notifiedUser = userTask.getUser();
@@ -140,17 +149,22 @@ public class NotificationServiceImpl implements NotificationService {
             dataMap.put("type", NotificationType.TASK_CREATION.toString());
             dataMap.put("task_id", task.getId().toString());
             var title = "아무나 할 수 있는 일이 생겼습니다.";
-            var body = "\"" + task.getTaskName() + "\"을 " +
-                    creatingUser.getNickname() + "님이 만들었습니다.";
+            var body = "\"" + creatingUser.getNickname() + "\"님이 \"" +
+                    task.getTaskName() + "\"을 만들었습니다.";
             var registrationToken = notifiedUser.getNotificationSetting().getRegistrationToken();
 
-            var sendJsonObject = makeSendJsonObject(title, body, dataMap, registrationToken);
+            var sendJsonObject = serializer.makeSendJsonObject(title, body, dataMap, registrationToken);
             recordNotification(title, body, notifiedUser,
                     NotificationType.TASK_CREATION, task.getId(), null);
             send(sendJsonObject);
         });
     }
 
+    /**
+     * Send notification about task that is created as type "group".
+     * @param task The task created.
+     * @param creatingUser The user that has created the task.
+     */
     private void sendOnMyTaskCreationGroup(Task task, User creatingUser) {
         task.getUserTaskList().forEach(userTask -> {
             var notifiedUser = userTask.getUser();
@@ -164,10 +178,10 @@ public class NotificationServiceImpl implements NotificationService {
             dataMap.put("type", NotificationType.TASK_CREATION.toString());
             dataMap.put("task_id", task.getId().toString());
             var title = "모두 해야 하는 일이 생겼습니다.";
-            var body = "\"" + task.getTaskName() + "\"을 " +
-                    creatingUser.getNickname() + "이 만들었습니다.";
+            var body = "\"" + creatingUser.getNickname() + "\"님이 \"" +
+                    task.getTaskName() + "\"을 만들었습니다.";
             var registrationToken = notifiedUser.getNotificationSetting().getRegistrationToken();
-            var sendJsonObject = makeSendJsonObject(title, body, dataMap, registrationToken);
+            var sendJsonObject = serializer.makeSendJsonObject(title, body, dataMap, registrationToken);
             recordNotification(title, body, notifiedUser,
                     NotificationType.TASK_CREATION, task.getId(), null);
             send(sendJsonObject);
@@ -175,6 +189,11 @@ public class NotificationServiceImpl implements NotificationService {
 
     }
 
+    /**
+     * Send notification about task that is created as type "personal".
+     * @param task The task created.
+     * @param creatingUser The user that has created the task.
+     */
     private void sendOnMyTaskCreationPersonal(Task task, User creatingUser) {
         task.getUserTaskList().forEach(userTask -> {
             var notifiedUser = userTask.getUser();
@@ -188,27 +207,35 @@ public class NotificationServiceImpl implements NotificationService {
             dataMap.put("type", NotificationType.TASK_CREATION.toString());
             dataMap.put("task_id", task.getId().toString());
             var title = "할 일이 생겼습니다.";
-            var body = "\"" + task.getTaskName() + "\"을 " +
-                    creatingUser.getNickname() + " 님이 만들었습니다.";
+            var body = "\"" + creatingUser.getNickname() + "\"님이 \"" +
+                    task.getTaskName() + "\"을 만들었습니다.";
             var registrationToken = notifiedUser.getNotificationSetting().getRegistrationToken();
-            var sendJsonObject = makeSendJsonObject(title, body, dataMap, registrationToken);
+            var sendJsonObject = serializer.makeSendJsonObject(title, body, dataMap, registrationToken);
             recordNotification(title, body, notifiedUser,
                     NotificationType.TASK_CREATION, task.getId(), null);
             send(sendJsonObject);
         });
     }
 
-    @Override
+    /**
+     * Send notification about task that is created.
+     * @param task The task created.
+     * @param creatingUser The user that has created the task.
+     */
     public void sendOnMyTaskCreation(Task task, User creatingUser) {
         switch (task.getTaskType()) {
             case "anyone" -> sendOnMyTaskCreationAnyone(task, creatingUser);
             case "group" -> sendOnMyTaskCreationGroup(task, creatingUser);
             case "personal" -> sendOnMyTaskCreationPersonal(task, creatingUser);
         }
-        ;
     }
 
-    @Override
+    /**
+     * Send notification about task that has been changed.
+     * @param task The task that has been changed
+     * @param changedUser The users that gets the notification
+     * @param changingUser The user that has changed the notification
+     */
     public void sendOnMyTaskChange(Task task, Collection<User> changedUser, User changingUser) {
         changedUser.forEach(user -> {
             if (!user.getNotificationSetting().getOnMyTaskChange()) {
@@ -219,22 +246,25 @@ public class NotificationServiceImpl implements NotificationService {
             dataMap.put("type", NotificationType.TASK_CHANGE.toString());
             dataMap.put("task_id", task.getId().toString());
             var title = "할 일이 수정되었습니다.";
-            var body = changingUser.getNickname() + "님이 "
-                    + "\"" + task.getTaskName() + "\"을 수정하였습니다.";
+            var body = "\"" + changingUser.getNickname() + "\"님이 \"" +
+                    task.getTaskName() + "\"을 수정하였습니다..";
             var registrationToken = user.getNotificationSetting().getRegistrationToken();
-            var sendJsonObject = makeSendJsonObject(title, body, dataMap, registrationToken);
+            var sendJsonObject = serializer.makeSendJsonObject(title, body, dataMap, registrationToken);
             recordNotification(title, body, user,
                     NotificationType.TASK_CHANGE, task.getId(), null);
             send(sendJsonObject);
         });
     }
 
-    @Override
-    public List<NotificationHistory> getNotificationHistoryOfUser(User user, Long lastId) {
-        Pageable pageRequest = PageRequest.of(0, 20);
-        return notificationHistoryRepository.findAllByUserAndLastId(user, lastId, pageRequest);
-    }
-
+    /**
+     * Records notification sending to NotificationSender.
+     * @param title The title of the notification.
+     * @param body The body of the notification.
+     * @param user User that has received the notification.
+     * @param type The notification type.
+     * @param taskId Task id of the task related to the notification if there is one.
+     * @param groupId Group id of the task related to the notification if there is one.
+     */
     private void recordNotification(String title, String body, User user,
                                     NotificationType type, Long taskId, Long groupId) {
         NotificationHistory notification = NotificationHistory.builder()
@@ -250,6 +280,10 @@ public class NotificationServiceImpl implements NotificationService {
         notificationHistoryRepository.save(notification);
     }
 
+    /**
+     * Sends the notification given the json request body.
+     * @param jsonObject The json to be sent to Firebase Cloud Messaging server.
+     */
     private void send(JsonObject jsonObject) {
         try {
             log.info("Send notification: {}", jsonObject);
@@ -267,38 +301,10 @@ public class NotificationServiceImpl implements NotificationService {
             HttpEntity<String> httpEntity = new HttpEntity<>(jsonObject.toString(), headers);
             var result = restTemplate.postForEntity(URI, httpEntity, String.class);
             log.info("Notification result: {}", result);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             log.error("Error in alarm send. ", e);
+        } catch (IOException e) {
+            log.error("Error in alarm send in getting the access token. ", e);
         }
-    }
-
-    private JsonObject makeNotificationJsonObject(String title, String body) {
-        JsonObject notification = new JsonObject();
-        notification.addProperty("title", title);
-        notification.addProperty("body", body);
-
-        return notification;
-    }
-
-    private JsonObject makeDataJsonObject(Map<String, String> dataMap) {
-        JsonObject data = new JsonObject();
-        dataMap.forEach(data::addProperty);
-        return data;
-    }
-
-    private JsonObject makeSendJsonObject(String title, String body, Map<String, String> dataMap, String receiveRegistrationToken) {
-        JsonObject notification = makeNotificationJsonObject(title, body);
-        JsonObject data = makeDataJsonObject(dataMap);
-        JsonObject message = new JsonObject();
-        message.addProperty("name", "1");
-        message.add("notification", notification);
-        message.add("data", data);
-        message.addProperty("token", receiveRegistrationToken);
-
-        JsonObject sendJsonObject = new JsonObject();
-        sendJsonObject.addProperty("validateOnly", false);
-        sendJsonObject.add("message", message);
-
-        return sendJsonObject;
     }
 }

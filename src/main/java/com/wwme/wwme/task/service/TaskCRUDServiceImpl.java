@@ -3,8 +3,7 @@ package com.wwme.wwme.task.service;
 import com.wwme.wwme.group.domain.Group;
 import com.wwme.wwme.group.domain.UserGroup;
 import com.wwme.wwme.group.repository.GroupRepository;
-import com.wwme.wwme.notification.NotificationService;
-import com.wwme.wwme.task.domain.DTO.receiveDTO.CreateTaskReceiveDTO;
+import com.wwme.wwme.notification.service.NotificationSender;
 import com.wwme.wwme.log.domain.DTO.*;
 import com.wwme.wwme.log.domain.OperationType;
 import com.wwme.wwme.log.service.EventService;
@@ -42,7 +41,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
     private final GroupRepository groupRepository;
     private final UserRepository userRepository;
     private final UserTaskRepository userTaskRepository;
-    private final NotificationService notificationService;
+    private final NotificationSender notificationSender;
     private final EventService eventService;
 
 
@@ -237,7 +236,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
             if (!notifyUsers.contains(curUser)) notifyUsers.add(curUser);
         });
 
-        notificationService.sendOnMyTaskChange(task, notifyUsers, loginUser);
+        notificationSender.sendOnMyTaskChange(task, notifyUsers, loginUser);
 
 
         eventDTOList.stream()

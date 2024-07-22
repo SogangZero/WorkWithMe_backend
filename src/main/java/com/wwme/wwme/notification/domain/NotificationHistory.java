@@ -1,4 +1,4 @@
-package com.wwme.wwme.notification;
+package com.wwme.wwme.notification.domain;
 
 import com.wwme.wwme.user.domain.User;
 import jakarta.persistence.*;

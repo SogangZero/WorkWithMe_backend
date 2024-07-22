@@ -2,7 +2,6 @@ cron:
   remove-empty-group: 0 0 0/1 * * *
   on-due-date: 0 0 9 * * *
 notification:
-  fcm_secrets: ${FCM_SECRETS}
   project_id: ${PROJECT_ID}
 server:
   servlet:
