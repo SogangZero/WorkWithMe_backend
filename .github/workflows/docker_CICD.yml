@@ -48,3 +48,4 @@ jobs:
             --env-file .env \
             --add-host host.docker.internal:host-gateway \
             ${{secrets.DOCKER_USERNAME}}/workwithme:latest
+            docker cp service-account.json wwme:/server/service-account.json
