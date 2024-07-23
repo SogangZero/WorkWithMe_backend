@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,12 +22,14 @@ public interface UserRepository extends JpaRepository<User,Long> {
             "WHERE ug.group.id = :groupId")
     List<User> findAllByGroupID(Long groupId);
 
+    @Transactional
     @Modifying
     @Query("UPDATE User u " +
             "SET u.notificationSetting.registrationToken=:registrationToken " +
             "WHERE u.id=:userId")
     void updateRegistrationToken(String registrationToken, Long userId);
 
+    @Transactional
     @Modifying
     @Query("UPDATE User u " +
             "SET u.notificationSetting.onDueDate=:onDueDate, " +
