@@ -32,11 +32,11 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.DETACH})
     @JoinColumn
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.DETACH})
     private Group group;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.DETACH})
