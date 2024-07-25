@@ -915,6 +915,15 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
     }
 
     @Override
+    public Task getTaskByID(Long taskId) {
+        return taskRepository.findById(taskId).orElseThrow(
+                ()->new NoSuchElementException("Could not find Task of ID : "+taskId +"in " +
+                        "function getTaskByID")
+        );
+
+    }
+
+    @Override
     public boolean getIsDoneMe(User user, Task task) {
         // loop through user task list to see if I exist
         for (var userTask : task.getUserTaskList()) {

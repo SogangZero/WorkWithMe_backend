@@ -96,6 +96,8 @@ public interface TaskCRUDService {
      */
     void deleteTask(Long taskId, User loginUser);
 
+    Task getTaskByID(Long taskId);
+
     boolean getIsDoneMe(User user, Task task);
 
     int getDoneUserCount(Task task);

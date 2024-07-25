@@ -1,5 +1,6 @@
 package com.wwme.wwme.task.domain;
 
+import com.wwme.wwme.fileupload.domain.FileMetaData;
 import com.wwme.wwme.group.domain.Group;
 import jakarta.persistence.*;
 import lombok.*;
@@ -36,6 +37,12 @@ public class Task {
     @Builder.Default
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL) //the userTask entity controls the relationship, and there is a "task" field in usertask
     private List<UserTask> userTaskList = new ArrayList<>();
+
+
+    @Builder.Default
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FileMetaData> fileMetaDataList = new ArrayList<>();
+
 
     public void addUserTask(UserTask userTask) {
         this.userTaskList.add(userTask);
@@ -74,18 +81,6 @@ public class Task {
         }
 
     }
-
-//    public Boolean isDonePersonal() {
-////        if (!this.taskType.equals("personal")) return false;
-////        return this.userTaskList.get(0).getIsDone();
-//        UserTask ut = this.getUserTaskList().stream()
-//                .filter(s -> s.user.getId().equals())
-//    }
-
-//    public Boolean isDoneTotal() { //TODO : check for anyone task type
-//        return userTaskList.stream()
-//                .allMatch(UserTask::getIsDone);
-//    }
 
     public Integer countDoneUser() {
         return (int) userTaskList.stream()

@@ -113,4 +113,12 @@ public class GroupServiceImpl implements GroupService {
         taskRepository.deleteByGroup(group);
         groupRepository.delete(group);
     }
+
+    @Override
+    public Group getGroupByID(Long groupId) {
+        return groupRepository.findById(groupId).orElseThrow(()->
+                new NoSuchElementException("Could not find Group with given group ID : " + groupId + "In " +
+                        "Function getGroupByID"));
+    }
+
 }
