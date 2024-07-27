@@ -3,6 +3,9 @@ FROM amazoncorretto:17
 ARG VERSION
 ENV VERSION=$VERSION
 
+ARG JAVA_OPTS
+ENV JAVA_OPTS=$JAVA_OPTS
+
 COPY gradlew build.gradle settings.gradle /server/
 COPY gradle /server/gradle
 COPY src /server/src
