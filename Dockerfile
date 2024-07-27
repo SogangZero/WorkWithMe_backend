@@ -13,5 +13,6 @@ RUN chmod +x gradlew
 RUN ./gradlew build -x test --parallel
 
 EXPOSE 8080
+EXPOSE 8081
 
-CMD java -jar "build/libs/wwme-${VERSION}.jar"
+CMD java ${JAVA_OPTS} -jar "build/libs/wwme-${VERSION}.jar"
