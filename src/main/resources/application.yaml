@@ -4,8 +4,8 @@ cron:
 notification:
   project_id: ${PROJECT_ID}
 redis:
-  host: localhost
-  port: 6379
+  host: ${REDIS_HOST}
+  port: ${REDIS_PORT}
 server:
   servlet:
     encoding:
