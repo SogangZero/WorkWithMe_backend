@@ -1,8 +1,6 @@
 package com.wwme.wwme.task.service;
 
-import com.wwme.wwme.task.domain.DTO.receiveDTO.CreateTaskReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.receiveDTO.MakeTaskDoneReceiveDTO;
-import com.wwme.wwme.task.domain.DTO.receiveDTO.UpdateTaskReceiveDTO;
 import com.wwme.wwme.task.domain.DTO.sendDTO.*;
 import com.wwme.wwme.task.domain.Task;
 import com.wwme.wwme.task.domain.UserTask;
@@ -80,6 +78,18 @@ public interface TaskCRUDService {
      */
     public List<ReadTaskListByUserSendDTO> getTaskListForUser(User loginUser, Long last_task_id);
 
+
+    List<TaskListReadByGroupSendDTO.Task> getTaskDTOListByGroup(
+            Long lastId,
+            long groupId,
+            User user,
+            boolean isMyTask,
+            String completeStatus,
+            LocalDateTime startDate,
+            LocalDateTime endDate,
+            boolean withDueDate,
+            List<Long> tagList
+    );
 
     /**
      * read task list by group

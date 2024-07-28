@@ -22,6 +22,8 @@ import com.wwme.wwme.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -45,6 +47,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
     private final EventService eventService;
 
 
+    @CacheEvict(cacheNames = {"groupTaskList"}, allEntries = true)
     @Override
     public Task createTask(String taskName,
                            LocalDateTime endTime,
@@ -52,10 +55,10 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
                            Long tagId,
                            Long groupId,
                            Long todoUserId,
-                           User loginUser) throws IllegalArgumentException{
+                           User loginUser) throws IllegalArgumentException {
 
-        if(endTime == null){
-            endTime = LocalDateTime.of(2099,12,12,12,12,12);
+        if (endTime == null) {
+            endTime = LocalDateTime.of(2099, 12, 12, 12, 12, 12);
         }
 
         //parameter validation
@@ -64,9 +67,9 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         User todoUser = getTodoUserForPersonalTask(taskType, todoUserId);
 
         Tag tag = null;
-        log.info("Tag Id =  "+tagId);
-        if(tagId != null){
-            log.info("Tag ID IS NOT NULL! Tag_ID : "+tagId);
+        log.info("Tag Id =  " + tagId);
+        if (tagId != null) {
+            log.info("Tag ID IS NOT NULL! Tag_ID : " + tagId);
             tag = getTagFromDB(tagId);
             checkGroupIncludeTag(tag, group);
         }
@@ -110,7 +113,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         User todoUser = null;
         if (taskType.equals("personal")) {
             todoUser = userRepository.findById(todoUserId).orElseThrow(() -> (
-                new IllegalArgumentException("Create Task Fail - Not Found Todo User")
+                    new IllegalArgumentException("Create Task Fail - Not Found Todo User")
             ));
         }
         return todoUser;
@@ -125,12 +128,12 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
 
     private Tag getTagFromDB(Long tagId) {
         return tagRepository.findById(tagId).orElseThrow(() -> (
-                new IllegalArgumentException("Could not find Tag of ID: "+tagId
-                +" in function getTagFromDB")));
+                new IllegalArgumentException("Could not find Tag of ID: " + tagId
+                        + " in function getTagFromDB")));
     }
 
     private static void checkParameterValidity(String taskName, LocalDateTime endTime, String taskType) {
-        LocalDateTime checkEndTime = LocalDateTime.of(endTime.getYear(),endTime.getMonthValue(),endTime.getDayOfMonth(),23,59,59);
+        LocalDateTime checkEndTime = LocalDateTime.of(endTime.getYear(), endTime.getMonthValue(), endTime.getDayOfMonth(), 23, 59, 59);
 
         if (taskName == null || taskName.isEmpty()) {
             throw new IllegalArgumentException("Create Task Fail - No content of TaskName");
@@ -192,6 +195,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         }
     }
 
+    @CacheEvict(cacheNames = {"groupTaskList"}, allEntries = true)
     @Override
     //TODO: update 한 뒤에 Task 자체의 is_done 을 확인해줘야 한다.
     public Task updateTask(Long taskId,
@@ -206,12 +210,12 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         validateLoginUser(loginUser, task);
 
         User todoUser = null;
-        if(Objects.equals(taskType, "personal")){
-            if(todoUserId == null){
+        if (Objects.equals(taskType, "personal")) {
+            if (todoUserId == null) {
                 throw new IllegalArgumentException("The todoUser ID is null when updating to a personal task ID :"
-                + taskId + " in function updateTask");
+                        + taskId + " in function updateTask");
             }
-            validateTodoUser(todoUserId,task);
+            validateTodoUser(todoUserId, task);
             todoUser = getTodoUserFromDB(todoUserId);
             updateTodoUser(task, todoUser);
         }
@@ -221,8 +225,8 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         var beforeUsers = getUsersFromTask(task);
 
         //업데이트 + 로그
-        eventDTOList.add(updateTaskName(taskName,task,loginUser));
-        eventDTOList.add(updateTag(tag,task,loginUser));
+        eventDTOList.add(updateTaskName(taskName, task, loginUser));
+        eventDTOList.add(updateTag(tag, task, loginUser));
         eventDTOList.add(updateEndTime(endTime, task, loginUser));
         eventDTOList.add(updateTaskType(taskType, task, todoUser, loginUser));
 
@@ -246,10 +250,10 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         return task;
     }
 
-    private UpdateTaskNameLogDTO updateTaskName(String taskName, Task task,User loginUser) {
+    private UpdateTaskNameLogDTO updateTaskName(String taskName, Task task, User loginUser) {
 
 
-        if(!taskName.equals(task.getTaskName())){
+        if (!taskName.equals(task.getTaskName())) {
             UpdateTaskNameLogDTO updateTaskNameLogDTO = UpdateTaskNameLogDTO.buildWithSpecificParamsNoID()
                     .operationTypeEnum(OperationType.UPDATE_TASK_NAME)
                     .task(task)
@@ -261,7 +265,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
                     .build();
             task.setTaskName(taskName);
             return updateTaskNameLogDTO;
-        }else{
+        } else {
             return null;
         }
 
@@ -272,16 +276,16 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         return task.getUserTaskList().stream().map(UserTask::getUser).toList();
     }
 
-    private void updateIsDoneTotal(Task task,User todoUser) {
+    private void updateIsDoneTotal(Task task, User todoUser) {
 
-        if(task.getUserTaskList().isEmpty()){
+        if (task.getUserTaskList().isEmpty()) {
             throw new IllegalArgumentException("UserTaskList inside Task is empty in function updateIsDoneTotal");
         }
 
 
-        switch (task.getTaskType()){
+        switch (task.getTaskType()) {
             case "anyone":
-                for(UserTask ut : task.getUserTaskList()){
+                for (UserTask ut : task.getUserTaskList()) {
                     if (ut.getIsDone()) {
                         task.setTotalIsDone(true);
                         return;
@@ -290,7 +294,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
                 task.setTotalIsDone(false);
                 break;
             case "personal":
-                for(UserTask ut : task.getUserTaskList()){
+                for (UserTask ut : task.getUserTaskList()) {
                     if (ut.getUser().getId().equals(todoUser.getId())) {
                         task.setTotalIsDone(ut.getIsDone());
                         break;
@@ -298,7 +302,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
                 }
                 break;
             case "group":
-                for(UserTask ut : task.getUserTaskList()){
+                for (UserTask ut : task.getUserTaskList()) {
                     if (!ut.getIsDone()) {
                         task.setTotalIsDone(false);
                         return;
@@ -307,24 +311,24 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
                 task.setTotalIsDone(true);
                 break;
             default:
-                throw new NoSuchElementException("Illegal task type : "+task.getTaskType()
-                +"In function updateIsDoneTotal");
+                throw new NoSuchElementException("Illegal task type : " + task.getTaskType()
+                        + "In function updateIsDoneTotal");
         }
     }
 
     private static void validateLoginUser(User loginUser, Task task) {
         if (!task.getGroup().existUser(loginUser)) {
             throw new IllegalArgumentException("The task's group of NAME : " + task.getGroup().getGroupName()
-                    +"ID : " +task.getGroup().getId() +"did not match the group of loginUser of ID: "+loginUser
-            +" in function validateUsers");
+                    + "ID : " + task.getGroup().getId() + "did not match the group of loginUser of ID: " + loginUser
+                    + " in function validateUsers");
         }
     }
 
     private static void validateTodoUser(Long todoUserId, Task task) {
         if (!task.getGroup().existUserById(todoUserId)) {
             throw new IllegalArgumentException("The task's group of NAME : " + task.getGroup().getGroupName()
-                    +"ID : " +task.getGroup().getId() +"did not match the group of todoUser of ID: "+todoUserId
-                    +" in function validateTodoUser");
+                    + "ID : " + task.getGroup().getId() + "did not match the group of todoUser of ID: " + todoUserId
+                    + " in function validateTodoUser");
         }
     }
 
@@ -344,8 +348,8 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
     private UpdateTaskTypeLogDTO updateTaskType(String taskType, Task task, User todoUser, User loginUser) {
 
         String originTaskType = task.getTaskType();
-        log.info("original task type : "+task.getTaskType());
-        log.info("changing task type : "+taskType);
+        log.info("original task type : " + task.getTaskType());
+        log.info("changing task type : " + taskType);
         if (taskType != null && !task.getTaskType().equals(taskType)) { //changes taskType
             changeTaskType(taskType, task, todoUser);
 
@@ -358,7 +362,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
                     .afterTaskType(taskType)
                     .group(task.getGroup())
                     .build();
-        }else{
+        } else {
             return null;
         }
     }
@@ -383,23 +387,23 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
                     .previousDueDate(originEndTime)
                     .updatedDueDate(endTime)
                     .build();
-        }else{
+        } else {
             return null;
         }
     }
 
-    private static LocalDateTime setToEndOfDay(LocalDateTime localDateTime){
-        return LocalDateTime.of(localDateTime.getYear(),localDateTime.getMonthValue(),localDateTime.getDayOfMonth(),
-                11,59,59);
+    private static LocalDateTime setToEndOfDay(LocalDateTime localDateTime) {
+        return LocalDateTime.of(localDateTime.getYear(), localDateTime.getMonthValue(), localDateTime.getDayOfMonth(),
+                11, 59, 59);
     }
 
-    private static LocalDateTime setToStartOfDay(LocalDateTime localDateTime){
-        return LocalDateTime.of(localDateTime.getYear(),localDateTime.getMonthValue(),localDateTime.getDayOfMonth(),
-                0,0,0);
+    private static LocalDateTime setToStartOfDay(LocalDateTime localDateTime) {
+        return LocalDateTime.of(localDateTime.getYear(), localDateTime.getMonthValue(), localDateTime.getDayOfMonth(),
+                0, 0, 0);
     }
 
     private EventDTO updateTag(Tag tag, Task task, User loginUser) {
-        if(isTagUpdateScenario(task, tag)){
+        if (isTagUpdateScenario(task, tag)) {
             Tag prevTag = task.getTag();
             String prevTagName = (prevTag != null) ? prevTag.getTagName() : "해당 없음";
 
@@ -409,7 +413,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
             task.changeTag(tag);
 
             //Logging feature
-            if(tag != null){
+            if (tag != null) {
                 return UpdateTaskChangeTagDTO.buildWithSpecificParamsNoID()
                         .task(task)
                         .user(loginUser)
@@ -419,7 +423,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
                         .updateTagName(tag.getTagName())
                         .previousTagName(prevTagName)
                         .build();
-            }else{//Tag is null --> update task delete tag
+            } else {//Tag is null --> update task delete tag
                 return UpdateTaskDeleteTagDTO.buildWithSpecificParamsNoID()
                         .task(task)
                         .user(loginUser)
@@ -430,15 +434,16 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
                         .build();
             }
 
-        }else{
+        } else {
             return null;
         }
 
     }
-    private boolean isTagUpdateScenario(Task task, Tag tag){
-        if(task.getTag() == null){
+
+    private boolean isTagUpdateScenario(Task task, Tag tag) {
+        if (task.getTag() == null) {
             return tag != null;
-        }else{
+        } else {
             return task.getTag().equals(tag);
         }
     }
@@ -521,15 +526,16 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         }
     }
 
+    @CacheEvict(cacheNames = {"groupTaskList"}, allEntries = true)
     @Override
     public MakeTaskDoneSendDTO makeTaskDone(MakeTaskDoneReceiveDTO makeTaskDoneReceiveDTO, User user) {
         Task task = taskRepository.findTaskByIdWithUserTaskList(makeTaskDoneReceiveDTO.getTask_id()).orElseThrow(() -> new EntityNotFoundException(
-        "Could not find task with ID: " + makeTaskDoneReceiveDTO.getTask_id()));
+                "Could not find task with ID: " + makeTaskDoneReceiveDTO.getTask_id()));
 
         //setting the task's isdone for the user
-        for (UserTask ut : task.getUserTaskList()){
-            log.info("User In UserTask : "+ut.getUser().getNickname());
-            if(ut.getUser().getId().equals(user.getId())){
+        for (UserTask ut : task.getUserTaskList()) {
+            log.info("User In UserTask : " + ut.getUser().getNickname());
+            if (ut.getUser().getId().equals(user.getId())) {
                 ut.setIsDone(makeTaskDoneReceiveDTO.getDone());
             }
         }
@@ -540,45 +546,45 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         int is_done_count = 0;
         int total_user_count = 0;
 
-        if (task.getTaskType().equals("group")){
+        if (task.getTaskType().equals("group")) {
             boolean isDoneFlag = true;
-            for(UserTask ut : task.getUserTaskList()){
-                if(!ut.getIsDone()){
+            for (UserTask ut : task.getUserTaskList()) {
+                if (!ut.getIsDone()) {
                     isDoneFlag = false;
-                }else{
+                } else {
                     is_done_count++;
                 }
             }
             total_user_count = task.getUserTaskList().size();
             task.setTotalIsDone(isDoneFlag);
-        }else if (task.getTaskType().equals("personal")){
+        } else if (task.getTaskType().equals("personal")) {
             task.setTotalIsDone(makeTaskDoneReceiveDTO.getDone());
             total_user_count = 1;
-            if(makeTaskDoneReceiveDTO.getDone()){
+            if (makeTaskDoneReceiveDTO.getDone()) {
                 is_done_count = 1;
             }
-        }else{ // anyone task
+        } else { // anyone task
             boolean isDoneFlag = false;
-            for(UserTask ut : task.getUserTaskList()){
-                log.info("UserTask Info : User["+ut.getUser().getNickname()+"]" +
-                        " Task ["+ ut.getTask().getId() +"]" + " IsDone :  "+ut.getIsDone());
-                if(ut.getIsDone()){
-                    log.info("User  ["+ut.getUser().getNickname() + "] has finished "+
-                            " anyone task ["+task.getTaskName() + "], will break");
+            for (UserTask ut : task.getUserTaskList()) {
+                log.info("UserTask Info : User[" + ut.getUser().getNickname() + "]" +
+                        " Task [" + ut.getTask().getId() + "]" + " IsDone :  " + ut.getIsDone());
+                if (ut.getIsDone()) {
+                    log.info("User  [" + ut.getUser().getNickname() + "] has finished " +
+                            " anyone task [" + task.getTaskName() + "], will break");
                     isDoneFlag = true;
                     is_done_count++;
                     break;
                 }
             }
             total_user_count = task.getUserTaskList().size();
-            log.info("total is done flag : "+isDoneFlag);
+            log.info("total is done flag : " + isDoneFlag);
             task.setTotalIsDone(isDoneFlag);
         }
 
         taskRepository.save(task);
 
         List<MakeTaskDoneSendUserDTO> makeTaskDoneSendUserDTOList = new ArrayList<>();
-        for(UserTask ut : task.getUserTaskList()){
+        for (UserTask ut : task.getUserTaskList()) {
             MakeTaskDoneSendUserDTO makeTaskDoneSendUserDTO = MakeTaskDoneSendUserDTO.builder()
                     .user_id(ut.getUser().getId())
                     .nickname(ut.getUser().getNickname())
@@ -588,8 +594,8 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
             makeTaskDoneSendUserDTOList.add(makeTaskDoneSendUserDTO);
         }
 
-        log.info("is done count : :"+ is_done_count);
-        log.info("total user count : "+total_user_count);
+        log.info("is done count : :" + is_done_count);
+        log.info("total user count : " + total_user_count);
 
         return MakeTaskDoneSendDTO.builder()
                 .task_id(task.getId())
@@ -612,15 +618,15 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         int year = date.getYear();
         int month = date.getMonthValue();
 
-        YearMonth yearMonth = YearMonth.of(year,month);
+        YearMonth yearMonth = YearMonth.of(year, month);
         LocalDateTime startTime = yearMonth.atDay(1).atStartOfDay();
-        LocalDateTime endTime = yearMonth.atEndOfMonth().atTime(23,59,59);
-        List<Task> taskList = taskRepository.findTasksBetweenDates(startTime,endTime);
+        LocalDateTime endTime = yearMonth.atEndOfMonth().atTime(23, 59, 59);
+        List<Task> taskList = taskRepository.findTasksBetweenDates(startTime, endTime);
 
         Integer[] countList = new Integer[32];
-        Arrays.fill(countList,0);
+        Arrays.fill(countList, 0);
 
-        for(Task t : taskList){
+        for (Task t : taskList) {
             int dayOfMonth = t.getEndTime().getDayOfMonth();
             countList[dayOfMonth]++;
         }
@@ -633,15 +639,15 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
 
     @Override
     public List<TaskListForDaySendDTO> getTaskListForDay(User user, LocalDate date) {
-        List<Task> taskList = taskRepository.findAllByUserAndStartEndTimes(user.getId(),date.atStartOfDay(),date.atTime(LocalTime.MAX));
-        log.info("date : "+date);
-        log.info("user : "+user.toString());
+        List<Task> taskList = taskRepository.findAllByUserAndStartEndTimes(user.getId(), date.atStartOfDay(), date.atTime(LocalTime.MAX));
+        log.info("date : " + date);
+        log.info("user : " + user.toString());
         List<TaskListForDaySendDTO> taskListForDaySendDTOList = new ArrayList<>();
 
-        for(Task t : taskList){
+        for (Task t : taskList) {
             //fill in tag
             ROT_tagDTO rotTagDTO = null;
-            if(t.getTag() != null){
+            if (t.getTag() != null) {
                 rotTagDTO = ROT_tagDTO.builder()
                         .tag_id(t.getTag().getId())
                         .tag_name(t.getTag().getTagName())
@@ -678,22 +684,21 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
          */
         Task task = taskRepository.findTaskByIdWithUserTaskList(taskId).orElseThrow(() -> new EntityNotFoundException(
                 "Could not find task with ID: " + taskId +
-                " in method readOneTask. Details: " + taskId));
+                        " in method readOneTask. Details: " + taskId));
 
-        Group group = groupRepository.findGroupByIdLoadUserTaskList(task.getGroup().getId()).orElseThrow(()-> new EntityNotFoundException(
+        Group group = groupRepository.findGroupByIdLoadUserTaskList(task.getGroup().getId()).orElseThrow(() -> new EntityNotFoundException(
                 "Could not find group with ID: " + task.getGroup().getId() +
                         " in method readOneTask. Details: " + task.getGroup().getId()
         ));
 
         //fill in tag
         ROT_tagDTO rotTagDTO = null;
-        if(task.getTag() != null){
+        if (task.getTag() != null) {
             rotTagDTO = ROT_tagDTO.builder()
                     .tag_id(task.getTag().getId())
                     .tag_name(task.getTag().getTagName())
                     .build();
         }
-
 
 
         //convert task into readOneTaskSedDTO
@@ -707,10 +712,10 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
                         task.getGroup().getGroupName(),
                         group.getUserGroupList().size(),
                         group.getUserGroupList().stream()
-                        .filter(s -> s.getUser().getId().equals(loginUser.getId()))
-                        .findAny()
-                        .orElseThrow(() -> new NoSuchElementException("Could not find UserGroup Matching" +
-                                "user id " + loginUser.getId() + "in function fillUserListForReadOneTaskSendDTO"))
+                                .filter(s -> s.getUser().getId().equals(loginUser.getId()))
+                                .findAny()
+                                .orElseThrow(() -> new NoSuchElementException("Could not find UserGroup Matching" +
+                                        "user id " + loginUser.getId() + "in function fillUserListForReadOneTaskSendDTO"))
                                 .getColor()
 
                 ))
@@ -718,18 +723,18 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
                 .end_time(task.getEndTime())
                 .build();
 
-        fillUserListForReadOneTaskSendDTO(readOneTaskSendDTO,task);
+        fillUserListForReadOneTaskSendDTO(readOneTaskSendDTO, task);
 
         //is_done_count, is_done_personal, is_done_total;
 
         Integer is_done_count = 0;
         boolean is_done_personal = false;
 
-        for(ReadOneTaskUserDTO userDTO : readOneTaskSendDTO.getUser_list()){
-            if(userDTO.getIs_done()){
+        for (ReadOneTaskUserDTO userDTO : readOneTaskSendDTO.getUser_list()) {
+            if (userDTO.getIs_done()) {
                 is_done_count++;
             }
-            if(userDTO.getUser_id().equals(loginUser.getId()) && userDTO.getIs_done()){
+            if (userDTO.getUser_id().equals(loginUser.getId()) && userDTO.getIs_done()) {
                 is_done_personal = true;
             }
         }
@@ -739,60 +744,57 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         readOneTaskSendDTO.setIs_mine(isMyTask(task, loginUser));
 
 
-
-
         return readOneTaskSendDTO;
     }
 
 
     @Override
     public List<ReadTaskListByUserSendDTO> getTaskListForUser(User loginUser, Long last_task_id) {
-        log.info("loginUser : "+loginUser);
-        log.info("last_task_id : "+last_task_id);
+        log.info("loginUser : " + loginUser);
+        log.info("last_task_id : " + last_task_id);
 
         LocalDateTime endTime;
-        if(last_task_id != null){
-             endTime =  taskRepository.findById(last_task_id).orElseThrow(
-                    ()-> new NoSuchElementException("Could not find Task with ID: "+last_task_id
-                            +"In function getTaskListForUser")).getEndTime();
-        }else{
-            endTime = LocalDateTime.of(1999,12,7,12,12,12);
+        if (last_task_id != null) {
+            endTime = taskRepository.findById(last_task_id).orElseThrow(
+                    () -> new NoSuchElementException("Could not find Task with ID: " + last_task_id
+                            + "In function getTaskListForUser")).getEndTime();
+        } else {
+            endTime = LocalDateTime.of(1999, 12, 7, 12, 12, 12);
         }
 
 
-        Pageable pageable = PageRequest.of(0,20);
-        List<Task> taskList =  taskRepository.findTasksByUserIdFetchUserTask(loginUser.getId(), endTime, last_task_id ,pageable);
-        log.info("tasklist elements : "+ taskList.size());
+        Pageable pageable = PageRequest.of(0, 20);
+        List<Task> taskList = taskRepository.findTasksByUserIdFetchUserTask(loginUser.getId(), endTime, last_task_id, pageable);
+        log.info("tasklist elements : " + taskList.size());
         List<ReadTaskListByUserSendDTO> readTaskListByUserSendDTOList = new ArrayList<>();
 
-        for(Task t : taskList){
+        for (Task t : taskList) {
             //is done personal 구하기
             boolean is_done_personal = false;
-            for(UserTask ut : t.getUserTaskList()){
-                if(ut.getUser().getId().equals(loginUser.getId())){
+            for (UserTask ut : t.getUserTaskList()) {
+                if (ut.getUser().getId().equals(loginUser.getId())) {
                     is_done_personal = ut.getIsDone();
                     break;
                 }
             }
             //TODO: insert group color
             Group group = groupRepository.findGroupByIdLoadUserTaskList(t.getGroup().getId())
-                    .orElseThrow(()->new NoSuchElementException("Could not find group with ID: "+ t.getGroup().getId()
-                                                                + "in fuction getTaskListForUser"));
-            log.info("found group : "+ group.getId());
+                    .orElseThrow(() -> new NoSuchElementException("Could not find group with ID: " + t.getGroup().getId()
+                            + "in fuction getTaskListForUser"));
+            log.info("found group : " + group.getId());
             UserGroup ug = group.getUserGroupList().stream()
                     .filter(s -> s.getUser().getId().equals(loginUser.getId())).findAny()
-                    .orElseThrow(()-> new NoSuchElementException("Could not find userGroup with userID: "
-                            + loginUser.getId() + "In function getTaskListForUser" ));
+                    .orElseThrow(() -> new NoSuchElementException("Could not find userGroup with userID: "
+                            + loginUser.getId() + "In function getTaskListForUser"));
 
             ROT_tagDTO return_rotTagDTO = null;
             //insert tag information
-            if(t.getTag() != null){
+            if (t.getTag() != null) {
                 return_rotTagDTO = ROT_tagDTO.builder()
                         .tag_id(t.getTag().getId())
                         .tag_name(t.getTag().getTagName())
                         .build();
             }
-
 
 
             ReadTaskListByUserSendDTO readTaskListByUserSendDTO = ReadTaskListByUserSendDTO.builder()
@@ -815,6 +817,58 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         }
 
         return readTaskListByUserSendDTOList;
+    }
+
+    @Cacheable(
+            cacheNames = "groupTaskList",
+            key = "(#lastId==null?'null':#lastId.toString())  + '-' + #groupId.toString()",
+            condition = "#isMyTask==false && #completeStatus=='all' && #startDate==null && #endDate==null && #withDueDate==true && #tagList.isEmpty()"
+    )
+    @Override
+    public List<TaskListReadByGroupSendDTO.Task> getTaskDTOListByGroup(
+            Long lastId,
+            long groupId,
+            User user,
+            boolean isMyTask,
+            String completeStatus,
+            LocalDateTime startDate,
+            LocalDateTime endDate,
+            boolean withDueDate,
+            List<Long> tagList
+    ) {
+        var taskList = readTaskListByGroup(
+                lastId,
+                groupId,
+                user,
+                isMyTask,
+                completeStatus,
+                startDate,
+                endDate,
+                withDueDate,
+                tagList
+        );
+        return taskList.stream().map((task) -> {
+                    var tag = task.getTag();
+                    Long tagId = null;
+                    if (tag != null)
+                        tagId = tag.getId();
+                    var isMine = isMyTask(task, user);
+                    return new TaskListReadByGroupSendDTO.Task(
+                            task.getId(),
+                            task.getTaskName(),
+                            task.getEndTime(),
+                            task.getTaskType(),
+                            tagId,
+                            task.getTotalIsDone(),
+                            getIsDoneMe(user, task),
+                            isMine,
+                            getDoneUserCount(task),
+                            getTotalUserCount(task),
+                            getDoingNickname(task)
+                    );
+                }
+
+        ).toList();
     }
 
     @Override
@@ -844,13 +898,13 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         }
 
         if (startDate == null)
-            startDate = LocalDateTime.of(1999,12,12,12,12,12);
+            startDate = LocalDateTime.of(1999, 12, 12, 12, 12, 12);
         if (endDate == null)
-            endDate = LocalDateTime.of(2099,12,12,12,12,12);
+            endDate = LocalDateTime.of(2099, 12, 12, 12, 12, 12);
 
         // only display tasks with due date
         if (!withDueDate) {
-            endDate = LocalDateTime.of(2099,12,12,12,12,11);
+            endDate = LocalDateTime.of(2099, 12, 12, 12, 12, 11);
         }
 
         // contain all tags
@@ -890,13 +944,14 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
     }
 
 
+    @CacheEvict(cacheNames = {"groupTaskList"}, allEntries = true)
     @Override
     public void deleteTask(Long taskId, User loginUser) {
 
-        Task task = taskRepository.findById(taskId).orElseThrow(()-> new NoSuchElementException("Could" +
-                "not find task with ID : "+ taskId + "in function deleteTask"));
+        Task task = taskRepository.findById(taskId).orElseThrow(() -> new NoSuchElementException("Could" +
+                "not find task with ID : " + taskId + "in function deleteTask"));
 
-        log.info("Task With Id ["+taskId+"] exists in DB");
+        log.info("Task With Id [" + taskId + "] exists in DB");
 
         //create log DTO
         DeleteTaskLogDTO deleteTaskLogDTO = DeleteTaskLogDTO
@@ -919,7 +974,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         // loop through user task list to see if I exist
         for (var userTask : task.getUserTaskList()) {
             // If I exist, return if I am done
-            if(Objects.equals(userTask.getUser(), user)) {
+            if (Objects.equals(userTask.getUser(), user)) {
                 return userTask.getIsDone();
             }
         }
@@ -969,10 +1024,10 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
     }
 
     //friend functions.
-    private static void fillUserListForReadOneTaskSendDTO(ReadOneTaskSendDTO readOneTaskSendDTO, Task task){
+    private static void fillUserListForReadOneTaskSendDTO(ReadOneTaskSendDTO readOneTaskSendDTO, Task task) {
 
         List<ReadOneTaskUserDTO> userDTOList = new ArrayList<>();
-        for(UserTask userTask : task.getUserTaskList()){
+        for (UserTask userTask : task.getUserTaskList()) {
 
             ReadOneTaskUserDTO userDTO = ReadOneTaskUserDTO.builder()
                     .user_id(userTask.getUser().getId())
