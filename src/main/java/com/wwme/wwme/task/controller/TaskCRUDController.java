@@ -15,6 +15,7 @@ import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -170,8 +171,9 @@ public class TaskCRUDController {
         try {
             log.info("input: last_id:{} group_id{} isMyTask:{} completeStatus:{} startDate:{} endDate:{} withDueDate:{} tagList:{} ",
                     lastId, groupId, isMyTask, completeStatus, startDate, endDate, withDueDate, tagList);
-            var taskList =
-                    taskCRUDService.readTaskListByGroup(
+
+            var taskDTOList =
+                    taskCRUDService.getTaskDTOListByGroup(
                             lastId,
                             groupId,
                             user,
@@ -182,29 +184,6 @@ public class TaskCRUDController {
                             withDueDate,
                             tagList
                     );
-
-            var taskDTOList = taskList.stream().map((task) -> {
-                        var tag = task.getTag();
-                        Long tagId = null;
-                        if (tag != null)
-                            tagId = tag.getId();
-                        var isMine = taskCRUDService.isMyTask(task, user);
-                        return new TaskListReadByGroupSendDTO.Task(
-                                task.getId(),
-                                task.getTaskName(),
-                                task.getEndTime(),
-                                task.getTaskType(),
-                                tagId,
-                                task.getTotalIsDone(),
-                                taskCRUDService.getIsDoneMe(user, task),
-                                isMine,
-                                taskCRUDService.getDoneUserCount(task),
-                                taskCRUDService.getTotalUserCount(task),
-                                taskCRUDService.getDoingNickname(task)
-                        );
-                    }
-
-            ).toList();
             var responseDTO = new TaskListReadByGroupSendDTO(taskDTOList);
             return ResponseEntity
                     .ok()
