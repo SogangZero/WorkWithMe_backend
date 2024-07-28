@@ -3,6 +3,7 @@ package com.wwme.wwme.task.domain.DTO.sendDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,7 +17,7 @@ public class TaskListReadByGroupSendDTO {
 
     @Data
     @AllArgsConstructor
-    public static class Task {
+    public static class Task implements Serializable {
         @JsonProperty("task_id")
         private Long taskId;
 
