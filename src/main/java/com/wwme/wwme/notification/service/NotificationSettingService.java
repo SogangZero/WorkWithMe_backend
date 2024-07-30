@@ -1,5 +1,6 @@
 package com.wwme.wwme.notification.service;
 
+import com.wwme.wwme.notification.domain.NotificationSetting;
 import com.wwme.wwme.user.domain.User;
 import com.wwme.wwme.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -80,5 +81,9 @@ public class NotificationSettingService {
                 onDueDate, onMyTaskCreation, onMyTaskChange, onGroupEntrance, userId);
 
         userRepository.updateNotificationSetting(onDueDate, onMyTaskCreation, onMyTaskChange, onGroupEntrance, userId);
+    }
+
+    public NotificationSetting getNotificationSetting(User user) {
+        return user.getNotificationSetting();
     }
 }
