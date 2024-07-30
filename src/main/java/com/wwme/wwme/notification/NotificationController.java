@@ -4,6 +4,7 @@ package com.wwme.wwme.notification;
 import com.wwme.wwme.login.aop.Login;
 import com.wwme.wwme.notification.DTO.NotificationSettingUpdateRequestDTO;
 import com.wwme.wwme.notification.DTO.SetRegistrationTokenRequestDTO;
+import com.wwme.wwme.notification.domain.NotificationSetting;
 import com.wwme.wwme.notification.service.NotificationDtoConverter;
 import com.wwme.wwme.notification.service.NotificationHistoryService;
 import com.wwme.wwme.notification.service.NotificationSettingService;
@@ -41,6 +42,23 @@ public class NotificationController {
             log.error("Runtime Error in updating registration token.\n", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("/setting")
+    ResponseEntity<?> readNotificationSetting(
+            @Login User user
+    ) {
+       log.info("""
+               Controller entrance readNotificationSetting""");
+
+       try {
+           NotificationSetting notificationSetting = notificationSettingService.getNotificationSetting(user);
+           return new ResponseEntity<>(notificationSetting, HttpStatus.OK);
+       }
+       catch (RuntimeException e) {
+           log.error("Runtime Error in reading notification setting\n", e);
+           return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+       }
     }
 
     @PutMapping("/setting")
