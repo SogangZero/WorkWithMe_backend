@@ -33,6 +33,9 @@ public class TaskListReadByGroupSendDTO {
         @JsonProperty("tag_id")
         private Long tagId;
 
+        @JsonProperty("tag_name")
+        private String tagName;
+
         @JsonProperty("is_done_total")
         private Boolean isDoneTotal;
 

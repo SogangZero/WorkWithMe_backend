@@ -850,8 +850,11 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
         return taskList.stream().map((task) -> {
                     var tag = task.getTag();
                     Long tagId = null;
+                    String tagName = null;
                     if (tag != null)
                         tagId = tag.getId();
+                    if (tag!=null)
+                        tagName = tag.getTagName();
                     var isMine = isMyTask(task, user);
                     return new TaskListReadByGroupSendDTO.Task(
                             task.getId(),
@@ -859,6 +862,7 @@ public class TaskCRUDServiceImpl implements TaskCRUDService {
                             task.getEndTime(),
                             task.getTaskType(),
                             tagId,
+                            tagName,
                             task.getTotalIsDone(),
                             getIsDoneMe(user, task),
                             isMine,

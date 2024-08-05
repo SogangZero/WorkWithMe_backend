@@ -18,6 +18,8 @@ public class NotificationDtoConverter {
         notifications.forEach(notification -> {
             // map each notification to dto
             var notificationDTO = NotificationHistoryListResponseDTO.NotificationHistoryDTO.builder()
+                    .id(notification.getId())
+                    .time(notification.getNotificationTime())
                     .title(notification.getNotificationTitle())
                     .body(notification.getNotificationBody())
                     .type(notification.getType().toString())
