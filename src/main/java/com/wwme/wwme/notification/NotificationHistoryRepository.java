@@ -14,7 +14,7 @@ public interface NotificationHistoryRepository extends JpaRepository<Notificatio
     @Query("SELECT nh FROM NotificationHistory nh " +
             "WHERE nh.user=:user " +
             "AND (:lastId IS NULL OR nh.id > :lastId) " +
-            "ORDER BY nh.notificationTime, nh.id DESC ")
+            "ORDER BY nh.notificationTime DESC, nh.id DESC ")
     List<NotificationHistory> findAllByUserAndLastId(
            User user, Long lastId,
            Pageable pageable);
