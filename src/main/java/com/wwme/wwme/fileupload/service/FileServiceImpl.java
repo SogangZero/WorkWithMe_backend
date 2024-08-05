@@ -1,7 +1,11 @@
 package com.wwme.wwme.fileupload.service;
 
+import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,7 +14,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.net.URLDecoder;
+import java.util.Date;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -40,7 +46,20 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public File downloadFile(String foldername, String filenames) {
-        return null;
+    public URL generatePresignedUrl(String filename) {
+        try {
+            Date expiration = new Date();
+            long expTimeMillis = expiration.getTime();
+            expTimeMillis += 1000 * 60 * 15; // 15 minutes
+            expiration.setTime(expTimeMillis);
+
+            GeneratePresignedUrlRequest generatePresignedUrlRequest = new GeneratePresignedUrlRequest(bucketName, filename)
+                    .withMethod(HttpMethod.GET)
+                    .withExpiration(expiration);
+
+            return amazonS3.generatePresignedUrl(generatePresignedUrlRequest);
+        } catch (Exception e) {
+            throw new RuntimeException("Error generating presigned URL: " + e.getMessage(), e);
+        }
     }
 }

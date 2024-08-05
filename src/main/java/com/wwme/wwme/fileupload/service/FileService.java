@@ -4,6 +4,7 @@ import com.wwme.wwme.fileupload.domain.DTO.FileMetaDataReturnDTO;
 import com.wwme.wwme.group.domain.Group;
 import com.wwme.wwme.task.domain.Task;
 import org.springframework.web.multipart.MultipartFile;
+import java.net.URL;
 
 import java.io.File;
 import java.util.List;
@@ -15,6 +16,11 @@ public interface FileService {
      * @return
      */
     public String uploadFile(String filename, MultipartFile multipartFile);
-    public File downloadFile(String foldername, String filenames);
+    /**
+     * Generate a presigned URL for file download.
+     * @param filename
+     * @return
+     */
+    URL generatePresignedUrl(String filename);
 
 }

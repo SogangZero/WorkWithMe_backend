@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.net.URL;
 import java.util.List;
 
 @Slf4j
@@ -124,6 +125,18 @@ public class FileController {
             return new ResponseEntity<>(new ErrorResponseDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
 
+    }
+
+    @GetMapping("/download/single")
+    public ResponseEntity<?> downloadSingleFile(@RequestParam(name = "file_id") Long fileId) {
+        try {
+            FileMetaData fileMetaData = fileMetaDataService.getMetaDataByID(fileId);
+            URL presignedUrl = fileService.generatePresignedUrl(fileMetaData.getSavedFileName());
+            return ResponseEntity.ok(new DataWrapDTO(presignedUrl.toString()));
+        } catch (Exception e) {
+            log.error("downloadSingleFile error: " + e.getMessage());
+            return new ResponseEntity<>(new ErrorResponseDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
     }
 
 }

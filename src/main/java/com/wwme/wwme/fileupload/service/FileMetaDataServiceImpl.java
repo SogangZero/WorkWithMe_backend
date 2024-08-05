@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -67,6 +68,14 @@ public class FileMetaDataServiceImpl implements FileMetaDataService {
         return metadataToDTOs(list);
     }
 
+    @Override
+    public FileMetaData getMetaDataByID(Long fileId) {
+        return fileMetaDataRepository.findById(fileId).orElseThrow(()->new NoSuchElementException(
+                "Could not find Metadata with the following ID : " + fileId
+        ));
+
+    }
+
     private List<FileMetaDataReturnDTO> metadataToDTOs(List<FileMetaData> list) {
         List<FileMetaDataReturnDTO> fileMetaDataReturnDTOS = new ArrayList<>();
 
@@ -79,4 +88,5 @@ public class FileMetaDataServiceImpl implements FileMetaDataService {
         }
         return fileMetaDataReturnDTOS;
     }
+
 }

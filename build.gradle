@@ -41,6 +41,8 @@ dependencies {
 	implementation 'io.jsonwebtoken:jjwt-impl:0.12.3'
 	implementation 'io.jsonwebtoken:jjwt-jackson:0.12.3'
 	implementation 'com.amazonaws:aws-java-sdk-s3:1.11.238'
+	implementation 'com.github.vladimir-bukhtoyarov:bucket4j-core:7.3.0'
+	implementation 'jakarta.servlet:jakarta.servlet-api:5.0.0'
 
 }
 

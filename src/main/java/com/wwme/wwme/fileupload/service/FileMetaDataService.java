@@ -59,4 +59,6 @@ public interface FileMetaDataService {
      * @return
      */
     List<FileMetaDataReturnDTO> getFileMetaDataFromGroup(Group group);
+
+    FileMetaData getMetaDataByID(Long fileId);
 }
